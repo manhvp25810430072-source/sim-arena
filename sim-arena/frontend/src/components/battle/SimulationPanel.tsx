@@ -134,15 +134,15 @@ export default function SimulationPanel() {
           </div>
           <input 
             type="range" 
-            min="0.5" 
+            min="0.1" 
             max="5" 
-            step="0.5" 
+            step="0.1" 
             value={simulationSpeed} 
             onChange={(e) => setSimulationSpeed(parseFloat(e.target.value))}
             className="w-full accent-green-500 cursor-pointer"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.5x</span>
+            <span>0.1x</span>
             <span>1x</span>
             <span>5x</span>
           </div>
