@@ -35,7 +35,7 @@ export default function AIPanel() {
         map_description: mapDescription || "Sân đấu tiêu chuẩn",
         current_grid_state: currentGridState,
         start_ms: 0,      // Bắt đầu từ giây số 0
-        end_ms: 15000,    // Kịch bản dài 15 giây (15000 ms)
+        end_ms: 5000,    // Kịch bản dài 5 giây (5000 ms)
         is_regenerate: isRegenerate
       };
 

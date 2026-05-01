@@ -19,7 +19,7 @@ export default function ManagementPanel() {
   }
   // Bắt đầu từ mốc thời gian lớn nhất hiện tại (làm tròn lên giây chẵn)
   const nextStartMs = currentMaxTimeMs === 0 ? 0 : Math.ceil(currentMaxTimeMs / 1000) * 1000;
-  const nextEndMs = nextStartMs + 15000; // Yêu cầu AI làm 15 giây tiếp theo
+  const nextEndMs = nextStartMs + 5000; // Yêu cầu AI làm 5 giây tiếp theo
 
   // 2. Hàm Copy Dữ Liệu
   const handleCopyState = () => {

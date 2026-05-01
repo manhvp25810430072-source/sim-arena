@@ -35,7 +35,7 @@ async def generate_timeline(req: SimulationRequest):
         if req.is_regenerate:
             user_msg = "Regenerate the previous chunk. Make the actions more dynamic, brutal, and strictly follow the objective physics and personality traits. Do not repeat the exact same sequence. Output valid JSON only."
         else:
-            user_msg = f"The previous chunk is approved. Generate the timeline for the NEXT 15 seconds (from millisecond {req.start_ms} to {req.end_ms}) based on the updated CURRENT_GRID_STATE. Continue the narrative seamlessly. Output valid JSON only."
+            user_msg = f"The previous chunk is approved. Generate the timeline for the NEXT 5 seconds (from millisecond {req.start_ms} to {req.end_ms}) based on the updated CURRENT_GRID_STATE. Continue the narrative seamlessly. Output valid JSON only."
 
         # 4. Gửi yêu cầu cho Gemini 3.1 Pro
         response = model.generate_content([system_prompt, user_msg])
