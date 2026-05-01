@@ -44,6 +44,9 @@ interface MainState {
   activeDialogues: Record<string, { content: string, emotion: string } | null>;
   activeVFX: Record<string, any>;
 
+  // --- TỐC ĐỘ MÔ PHỎNG ---
+  simulationSpeed: number;
+
   // Actions
   setMap: (file: File, previewUrl: string) => void;
   setMapDescription: (desc: string) => void;
@@ -64,6 +67,9 @@ interface MainState {
   // CẬP NHẬT HÀM NÀY: Thêm tham số duration
   moveCharacterById: (id: string, x: number, y: number, duration?: number) => void;
   setVFXById: (id: string, vfx: any | null) => void;
+  
+  // --- ACTION ĐỔI TỐC ĐỘ ---
+  setSimulationSpeed: (speed: number) => void;
 }
 
 export const useMainStore = create<MainState>((set) => ({
@@ -80,6 +86,8 @@ export const useMainStore = create<MainState>((set) => ({
   liveLogs: [],
   activeDialogues: {},
   activeVFX: {},
+  
+  simulationSpeed: 1, // Mặc định là 1x
   
   setMap: (file, previewUrl) => set({ mapImage: file, mapPreviewUrl: previewUrl }),
   setMapDescription: (desc) => set({ mapDescription: desc }),
@@ -147,5 +155,7 @@ export const useMainStore = create<MainState>((set) => ({
 
   setVFXById: (id, vfx) => set((state) => ({
     activeVFX: { ...state.activeVFX, [id]: vfx }
-  }))
+  })),
+
+  setSimulationSpeed: (speed) => set({ simulationSpeed: speed })
 }))

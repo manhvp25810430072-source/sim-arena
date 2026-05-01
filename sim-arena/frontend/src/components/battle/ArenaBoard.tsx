@@ -3,7 +3,8 @@ import { useMainStore } from '../../store/useMainStore';
 import DroppableCell from './DroppableCell';
 
 export default function ArenaBoard() {
-  const { mapPreviewUrl, liveLogs, teamA, teamB, uploadedShapes, activeVFX } = useMainStore();
+  // LẤY THÊM simulationSpeed TỪ STORE
+  const { mapPreviewUrl, liveLogs, teamA, teamB, uploadedShapes, activeVFX, simulationSpeed } = useMainStore();
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
@@ -35,6 +36,8 @@ export default function ArenaBoard() {
   return (
     <div className="w-1/2 flex flex-col items-center justify-center p-4 relative bg-gray-950">
       
+      {/* CẬP NHẬT: Tốc độ hiệu ứng xuất hiện log cũng có thể điều chỉnh nhanh hơn nếu muốn, 
+          nhưng tạm thời giữ nguyên để chữ không bị giật */}
       <style>{`
         @keyframes slideFadeIn {
           0% { opacity: 0; transform: translateY(8px); }
@@ -113,8 +116,6 @@ export default function ArenaBoard() {
               const vfx = activeVFX[char.id];
               const hpPercent = Math.max(0, (char.stats.hp / (char.stats.maxHp || 1)) * 100);
               
-              // Bàn cờ 20x20 nên mỗi ô chiếm 5% chiều rộng/cao
-              // Chuyển đổi từ hệ tọa độ (X, Y) sang phần trăm CSS
               const leftPercent = `${char.position!.x * 5}%`;
               const topPercent = `${char.position!.y * 5}%`;
               const moveDuration = char.position!.duration || 0;
@@ -128,23 +129,27 @@ export default function ArenaBoard() {
                   style={{
                     left: leftPercent,
                     top: topPercent,
-                    // ĐÂY LÀ PHÉP MÀU: Báo cho trình duyệt biết hãy trượt đi trong đúng bằng thời gian tính toán
-                    transition: `all ${moveDuration}ms linear`
+                    // CHIA THỜI GIAN LƯỚT CSS CHO TỐC ĐỘ (simulationSpeed) ĐỂ HOẠT ẢNH MƯỢT MÀ
+                    transition: `all ${moveDuration / simulationSpeed}ms linear`
                   }}
                 >
                   <div 
-                    className={`w-full h-full relative border-[1.5px] rounded flex flex-col items-center justify-center transition-all duration-300 bg-gray-900 ${
+                    className={`w-full h-full relative border-[1.5px] rounded flex flex-col items-center justify-center transition-all bg-gray-900 ${
                       char.team === 'A' ? 'border-blue-500 shadow-[0_0_8px_blue]' : 'border-red-500 shadow-[0_0_8px_red]'
                     } ${char.stats.hp <= 0 ? 'grayscale opacity-30 scale-90' : ''}`}
-                    style={vfx?.css_override || {}}
+                    // CẬP NHẬT: Chia tốc độ hiệu ứng nhấp nháy/vfx đi kèm
+                    style={{
+                       ...vfx?.css_override,
+                       transitionDuration: `${300 / simulationSpeed}ms`
+                    }}
                   >
                     <img src={shape.previewUrl} alt="unit" className="w-full h-full object-cover rounded-[2px]" />
                     
                     {char.stats.hp > 0 && (
                       <div className="absolute -bottom-1.5 left-0 w-full h-1.5 bg-gray-900 border border-gray-700 rounded-full overflow-hidden z-10">
                         <div 
-                          className={`h-full transition-all duration-300 ${hpPercent > 50 ? 'bg-green-500' : hpPercent > 20 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                          style={{ width: `${hpPercent}%` }}
+                          className={`h-full transition-all ${hpPercent > 50 ? 'bg-green-500' : hpPercent > 20 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                          style={{ width: `${hpPercent}%`, transitionDuration: `${300 / simulationSpeed}ms` }}
                         ></div>
                       </div>
                     )}
