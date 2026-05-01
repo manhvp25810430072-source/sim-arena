@@ -1,0 +1,36 @@
+# =========================
+# BACKEND (Python/FastAPI)
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# Bỏ qua file database SQLite local (Tùy chọn: Nếu bác muốn push cả data mẫu thì xóa dòng này đi)
+*.db
+*.sqlite3
+
+# Thư mục chứa file tải lên (không nên push ảnh test lên GitHub)
+backend/app/uploads/maps/
+backend/app/uploads/shapes/
+
+# =========================
+# FRONTEND (Node/React/Vite)
+# =========================
+node_modules/
+dist/
+dist-ssr/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Hệ điều hành & IDE
+# =========================
+.DS_Store
+.vscode/
+.idea/
