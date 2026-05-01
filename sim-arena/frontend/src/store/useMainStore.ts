@@ -18,6 +18,14 @@ export interface Character {
   position: { x: number, y: number } | null;
 }
 
+// Cấu trúc mới cho một dòng Log
+export interface LogEvent {
+  id: string;
+  type: 'SYSTEM' | 'NARRATIVE' | 'DIALOGUE' | 'COMBAT' | 'MOVE';
+  content: string;
+  charId?: string; // Dùng để móc nối lấy hình Avatar
+}
+
 interface MainState {
   mapImage: File | null;
   mapPreviewUrl: string | null;
@@ -31,9 +39,9 @@ interface MainState {
   Master_Timeline: any[];
 
   // --- PHASE 5: REALTIME RENDER STATE ---
-  liveLogs: string[]; // Lưu lịch sử hệ thống
-  activeDialogues: Record<string, { content: string, emotion: string } | null>; // Bong bóng chat trên đầu nhân vật
-  activeVFX: Record<string, any>; // Lưu hiệu ứng CSS/Animation
+  liveLogs: LogEvent[]; // Đã thay đổi từ string[] sang LogEvent[]
+  activeDialogues: Record<string, { content: string, emotion: string } | null>;
+  activeVFX: Record<string, any>;
 
   // Actions
   setMap: (file: File, previewUrl: string) => void;
@@ -49,7 +57,7 @@ interface MainState {
   setMasterTimeline: (timeline: any[]) => void;
 
   // --- PHASE 5: ACTIONS ---
-  addLiveLog: (log: string) => void;
+  addLiveLog: (log: Omit<LogEvent, 'id'>) => void; // Cập nhật tham số
   setActiveDialogue: (charId: string, dialogue: { content: string, emotion: string } | null) => void;
   applyDamageById: (id: string, damage: number) => void;
   moveCharacterById: (id: string, x: number, y: number) => void;
@@ -78,7 +86,7 @@ export const useMainStore = create<MainState>((set) => ({
   })),
 
   addCharacter: (team, char) => set((state) => {
-    const newChar = { ...char, stats: { ...char.stats, maxHp: char.stats.hp } }; // Lưu máu gốc
+    const newChar = { ...char, stats: { ...char.stats, maxHp: char.stats.hp } }; 
     return team === 'A' ? { teamA: [...state.teamA, newChar] } : { teamB: [...state.teamB, newChar] };
   }),
   
@@ -103,7 +111,11 @@ export const useMainStore = create<MainState>((set) => ({
   setMasterTimeline: (timeline) => set({ Master_Timeline: timeline }),
 
   // --- PHASE 5 LOGIC ---
-  addLiveLog: (log) => set((state) => ({ liveLogs: [...state.liveLogs, log] })),
+  
+  // Tự động sinh ID cho mỗi log được thêm vào
+  addLiveLog: (log) => set((state) => ({ 
+    liveLogs: [...state.liveLogs, { ...log, id: crypto.randomUUID() }] 
+  })),
 
   setActiveDialogue: (charId, dialogue) => set((state) => {
     if (dialogue === null) {
@@ -118,7 +130,6 @@ export const useMainStore = create<MainState>((set) => ({
   applyDamageById: (id, damage) => set((state) => {
     const updateFn = (c: Character) => {
       if (c.id === id) {
-        // Máu không được nhỏ hơn 0. Lưu ý: damage AI gửi về thường là số âm (vd: -50)
         const newHp = Math.max(0, c.stats.hp + damage); 
         return { ...c, stats: { ...c.stats, hp: newHp } };
       }

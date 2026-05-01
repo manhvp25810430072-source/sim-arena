@@ -11,14 +11,13 @@ export default function DroppableCell({ x, y }: Props) {
   const { isOver, setNodeRef } = useDroppable({ id: cellId });
 
   // Lấy thêm các state của Phase 5 từ Store
-  const { teamA, teamB, uploadedShapes, activeDialogues, activeVFX } = useMainStore();
+  const { teamA, teamB, uploadedShapes, activeVFX } = useMainStore();
 
   const charAtCell = [...teamA, ...teamB].find(
     c => c.position?.x === x && c.position?.y === y
   );
   
   const shape = charAtCell ? uploadedShapes.find(s => s.id === charAtCell.shapeId) : null;
-  const dialogue = charAtCell ? activeDialogues[charAtCell.id] : null;
   const vfx = charAtCell ? activeVFX[charAtCell.id] : null;
 
   // Tính % máu để tô màu thanh HP
@@ -38,13 +37,7 @@ export default function DroppableCell({ x, y }: Props) {
           } ${charAtCell.stats.hp <= 0 ? 'grayscale opacity-30 scale-90' : ''}`} // Hiệu ứng chết: Trắng đen, mờ đi
           style={vfx?.css_override || {}}
         >
-          {/* Bong bóng Chat (Chỉ hiện khi có người nói) */}
-          {dialogue && (
-            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg z-50 min-w-[80px] text-center pointer-events-none animate-bounce">
-              {dialogue.content}
-              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white rotate-45"></div>
-            </div>
-          )}
+          {/* ĐÃ XÓA BONG BÓNG CHAT Ở ĐÂY ĐỂ TRÁNH CHE MÀN HÌNH */}
 
           {/* Ảnh Avatar */}
           <img src={shape.previewUrl} alt="unit" className="w-full h-full object-cover rounded-[2px]" />

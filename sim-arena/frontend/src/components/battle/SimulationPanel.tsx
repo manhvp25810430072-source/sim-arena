@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useMainStore } from '../../store/useMainStore';
 
 export default function SimulationPanel() {
-  // Đã thêm setAppStage vào đây để gọi trực tiếp từ Store
   const {
     Master_Timeline,
     liveLogs,
@@ -17,10 +16,8 @@ export default function SimulationPanel() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   
-  // Dùng useRef để lưu các bộ đếm giờ (Pha xử lý TypeScript cực bén của bạn!)
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Cleanup: Tự động xóa các bộ đếm giờ nếu người dùng thoát màn hình
   useEffect(() => {
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
@@ -32,7 +29,7 @@ export default function SimulationPanel() {
     
     setIsPlaying(true);
     setIsFinished(false);
-    addLiveLog("🎬 [HỆ THỐNG] Máy quay bắt đầu chạy! 15 giây đếm ngược...");
+    addLiveLog({ type: 'SYSTEM', content: "🎬 Máy quay bắt đầu chạy..." });
 
     let maxTime = 0;
 
@@ -42,25 +39,26 @@ export default function SimulationPanel() {
       const timer = setTimeout(() => {
         switch (event.type) {
           case 'NARRATIVE':
-            addLiveLog(`📢 DẪN TRUYỆN: ${event.content}`);
+            // Xóa tiền tố "Dẫn truyện", chỉ gửi nội dung gốc
+            addLiveLog({ type: 'NARRATIVE', content: event.content });
             break;
             
           case 'DIALOGUE':
-            addLiveLog(`💬 HỘI THOẠI: Nhân vật vừa lên tiếng.`);
+            addLiveLog({ type: 'DIALOGUE', content: event.content, charId: event.actor_id });
             setActiveDialogue(event.actor_id, { content: event.content, emotion: event.emotion });
             setTimeout(() => setActiveDialogue(event.actor_id, null), 3000);
             break;
             
           case 'ATTACK':
           case 'SKILL':
-            addLiveLog(`⚔️ CHIẾN ĐẤU: Đã trừ ${Math.abs(event.hp_change)} HP.`);
+            addLiveLog({ type: 'COMBAT', content: `Trừ ${Math.abs(event.hp_change)} HP`, charId: event.actor_id });
             if (event.target_id && event.hp_change) {
               applyDamageById(event.target_id, event.hp_change);
             }
             break;
             
           case 'MOVE':
-            addLiveLog(`🏃 DI CHUYỂN: Tới tọa độ (${event.target_x}, ${event.target_y})`);
+            addLiveLog({ type: 'MOVE', content: `Di chuyển tới (${event.target_x}, ${event.target_y})`, charId: event.actor_id });
             moveCharacterById(event.actor_id, event.target_x, event.target_y);
             break;
             
@@ -80,7 +78,7 @@ export default function SimulationPanel() {
     const endTimer = setTimeout(() => {
       setIsPlaying(false);
       setIsFinished(true);
-      addLiveLog("⏹️ [HỆ THỐNG] CẮT! Đã hoàn thành kịch bản.");
+      addLiveLog({ type: 'SYSTEM', content: "⏹️ CẮT! Hoàn thành kịch bản." });
     }, maxTime + 1000); 
 
     timeoutRefs.current.push(endTimer);
@@ -98,9 +96,9 @@ export default function SimulationPanel() {
             Bấm "BẮT ĐẦU DIỄN" để xem các nhân vật hoạt động...
           </div>
         ) : (
-          liveLogs.map((log, index) => (
-            <div key={index} className="text-sm font-mono text-gray-300 border-b border-gray-800/50 pb-1 fade-in">
-              {log}
+          liveLogs.map((log) => (
+            <div key={log.id} className="text-sm font-mono text-gray-300 border-b border-gray-800/50 pb-1 fade-in">
+              {log.content}
             </div>
           ))
         )}
