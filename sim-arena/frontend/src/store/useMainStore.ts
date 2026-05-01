@@ -15,7 +15,8 @@ export interface Character {
     range: number;          
   };
   shapeId: string | null;  
-  position: { x: number, y: number } | null;
+  // THÊM THUỘC TÍNH duration ĐỂ CSS BIẾT DI CHUYỂN TRONG BAO LÂU
+  position: { x: number, y: number, duration?: number } | null;
 }
 
 // Cấu trúc mới cho một dòng Log
@@ -39,7 +40,7 @@ interface MainState {
   Master_Timeline: any[];
 
   // --- PHASE 5: REALTIME RENDER STATE ---
-  liveLogs: LogEvent[]; // Đã thay đổi từ string[] sang LogEvent[]
+  liveLogs: LogEvent[]; 
   activeDialogues: Record<string, { content: string, emotion: string } | null>;
   activeVFX: Record<string, any>;
 
@@ -57,10 +58,11 @@ interface MainState {
   setMasterTimeline: (timeline: any[]) => void;
 
   // --- PHASE 5: ACTIONS ---
-  addLiveLog: (log: Omit<LogEvent, 'id'>) => void; // Cập nhật tham số
+  addLiveLog: (log: Omit<LogEvent, 'id'>) => void; 
   setActiveDialogue: (charId: string, dialogue: { content: string, emotion: string } | null) => void;
   applyDamageById: (id: string, damage: number) => void;
-  moveCharacterById: (id: string, x: number, y: number) => void;
+  // CẬP NHẬT HÀM NÀY: Thêm tham số duration
+  moveCharacterById: (id: string, x: number, y: number, duration?: number) => void;
   setVFXById: (id: string, vfx: any | null) => void;
 }
 
@@ -112,7 +114,6 @@ export const useMainStore = create<MainState>((set) => ({
 
   // --- PHASE 5 LOGIC ---
   
-  // Tự động sinh ID cho mỗi log được thêm vào
   addLiveLog: (log) => set((state) => ({ 
     liveLogs: [...state.liveLogs, { ...log, id: crypto.randomUUID() }] 
   })),
@@ -138,8 +139,9 @@ export const useMainStore = create<MainState>((set) => ({
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 
-  moveCharacterById: (id, x, y) => set((state) => {
-    const updateFn = (c: Character) => c.id === id ? { ...c, position: { x, y } } : c;
+  // CẬP NHẬT LƯU THÊM DURATION
+  moveCharacterById: (id, x, y, duration) => set((state) => {
+    const updateFn = (c: Character) => c.id === id ? { ...c, position: { x, y, duration: duration || 0 } } : c;
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 

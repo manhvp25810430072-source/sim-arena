@@ -33,13 +33,12 @@ export default function SimulationPanel() {
 
     let maxTime = 0;
 
-    Master_Timeline.forEach((event) => {
+    Master_Timeline.forEach((event, currentIndex) => {
       if (event.time_offset_ms > maxTime) maxTime = event.time_offset_ms;
 
       const timer = setTimeout(() => {
         switch (event.type) {
           case 'NARRATIVE':
-            // Xóa tiền tố "Dẫn truyện", chỉ gửi nội dung gốc
             addLiveLog({ type: 'NARRATIVE', content: event.content });
             break;
             
@@ -59,14 +58,32 @@ export default function SimulationPanel() {
             
           case 'MOVE':
             addLiveLog({ type: 'MOVE', content: `Di chuyển tới (${event.target_x}, ${event.target_y})`, charId: event.actor_id });
-            moveCharacterById(event.actor_id, event.target_x, event.target_y);
+            
+            // THUẬT TOÁN TÍNH THỜI GIAN DI CHUYỂN (DURATION)
+            let duration = 500; // Mặc định 500ms nếu không tìm thấy
+            // Lọc ra các hành động trước đó của CHÍNH NHÂN VẬT NÀY
+            const pastEventsForActor = Master_Timeline.filter(
+              (e) => e.actor_id === event.actor_id && e.time_offset_ms < event.time_offset_ms
+            );
+            
+            if (pastEventsForActor.length > 0) {
+              const lastEvent = pastEventsForActor[pastEventsForActor.length - 1];
+              // Thời gian di chuyển = Thời điểm hiện tại - Thời điểm xuất hiện sự kiện trước đó của nó
+              duration = event.time_offset_ms - lastEvent.time_offset_ms;
+              
+              // Để an toàn (nếu timeline sinh ra quá sát nhau), ta giới hạn tối thiểu 300ms và tối đa 3000ms
+              duration = Math.max(300, Math.min(duration, 3000));
+            }
+
+            // Truyền duration vào hàm di chuyển
+            moveCharacterById(event.actor_id, event.target_x, event.target_y, duration);
             break;
             
           case 'VFX':
             if (event.target_id) {
                 setVFXById(event.target_id, event);
-                const duration = event.duration_ms || 2000;
-                setTimeout(() => setVFXById(event.target_id, null), duration);
+                const duration_vfx = event.duration_ms || 2000;
+                setTimeout(() => setVFXById(event.target_id, null), duration_vfx);
             }
             break;
         }
