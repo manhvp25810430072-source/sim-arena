@@ -33,7 +33,7 @@ export default function SimulationPanel() {
 
     let maxTime = 0;
 
-    Master_Timeline.forEach((event, currentIndex) => {
+    Master_Timeline.forEach((event) => {
       if (event.time_offset_ms > maxTime) maxTime = event.time_offset_ms;
 
       const timer = setTimeout(() => {
