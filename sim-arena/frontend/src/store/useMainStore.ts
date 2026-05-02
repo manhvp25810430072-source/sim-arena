@@ -64,7 +64,6 @@ interface MainState {
   addLiveLog: (log: Omit<LogEvent, 'id'>) => void; 
   setActiveDialogue: (charId: string, dialogue: { content: string, emotion: string } | null) => void;
   applyDamageById: (id: string, damage: number) => void;
-  // CẬP NHẬT HÀM NÀY: Thêm tham số duration
   moveCharacterById: (id: string, x: number, y: number, duration?: number) => void;
   setVFXById: (id: string, vfx: any | null) => void;
   
@@ -147,15 +146,42 @@ export const useMainStore = create<MainState>((set) => ({
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 
-  // CẬP NHẬT LƯU THÊM DURATION
   moveCharacterById: (id, x, y, duration) => set((state) => {
     const updateFn = (c: Character) => c.id === id ? { ...c, position: { x, y, duration: duration || 0 } } : c;
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 
-  setVFXById: (id, vfx) => set((state) => ({
-    activeVFX: { ...state.activeVFX, [id]: vfx }
-  })),
+  setVFXById: (id, vfx) => set((state) => {
+    // Nếu truyền null, dọn dẹp sạch sẽ VFX của target này
+    if (vfx === null) {
+      const newVfx = { ...state.activeVFX };
+      delete newVfx[id];
+      return { activeVFX: newVfx };
+    }
+
+    const existing = state.activeVFX[id];
+    
+    // FIX LỖI GHI ĐÈ: Hợp nhất (Merge) các hiệu ứng nếu có nhiều VFX xảy ra cùng lúc
+    if (existing) {
+      return {
+        activeVFX: {
+          ...state.activeVFX,
+          [id]: {
+            ...existing, // Giữ lại animation cũ
+            ...vfx,      // Ưu tiên animation mới nhất nếu có
+            // Gộp CSS Override (Ví dụ vừa nhận filter đỏ, vừa nhận box-shadow trắng)
+            css_override: { ...(existing.css_override || {}), ...(vfx.css_override || {}) },
+            // Gộp danh sách lệnh vẽ Canvas để bắn được 2 tia laser cùng lúc
+            canvas_commands: [...(existing.canvas_commands || []), ...(vfx.canvas_commands || [])]
+          }
+        }
+      };
+    }
+
+    return {
+      activeVFX: { ...state.activeVFX, [id]: vfx }
+    };
+  }),
 
   setSimulationSpeed: (speed) => set({ simulationSpeed: speed })
 }))

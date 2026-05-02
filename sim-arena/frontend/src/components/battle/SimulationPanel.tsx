@@ -11,8 +11,8 @@ export default function SimulationPanel() {
     setActiveDialogue,
     setVFXById,
     setAppStage,
-    simulationSpeed,       // LẤY STATE TỐC ĐỘ TỪ STORE
-    setSimulationSpeed     // LẤY ACTION ĐỔI TỐC ĐỘ TỪ STORE
+    simulationSpeed,       
+    setSimulationSpeed     
   } = useMainStore();
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -38,7 +38,6 @@ export default function SimulationPanel() {
     Master_Timeline.forEach((event) => {
       if (event.time_offset_ms > maxTime) maxTime = event.time_offset_ms;
 
-      // CHIA THỜI GIAN CHẠY THEO TỐC ĐỘ (VD: tốc độ 2x thì time_offset giảm đi một nửa)
       const adjustedTimeOffset = event.time_offset_ms / simulationSpeed;
 
       const timer = setTimeout(() => {
@@ -50,8 +49,12 @@ export default function SimulationPanel() {
           case 'DIALOGUE':
             addLiveLog({ type: 'DIALOGUE', content: event.content, charId: event.actor_id });
             setActiveDialogue(event.actor_id, { content: event.content, emotion: event.emotion });
-            // THỜI GIAN HIỂN THỊ HỘI THOẠI CŨNG PHẢI NHANH LÊN HOẶC CHẬM ĐI
-            setTimeout(() => setActiveDialogue(event.actor_id, null), 3000 / simulationSpeed);
+            
+            // FIX LỖI MEMORY LEAK: Đưa timeout dọn dẹp hội thoại vào ref tracking
+            const dialogueClearTimer = setTimeout(() => {
+              setActiveDialogue(event.actor_id, null);
+            }, 3000 / simulationSpeed);
+            timeoutRefs.current.push(dialogueClearTimer);
             break;
             
           case 'ATTACK':
@@ -65,7 +68,6 @@ export default function SimulationPanel() {
           case 'MOVE':
             addLiveLog({ type: 'MOVE', content: `Di chuyển tới (${event.target_x}, ${event.target_y})`, charId: event.actor_id });
             
-            // THUẬT TOÁN TÍNH THỜI GIAN DI CHUYỂN (DURATION)
             let duration = 500; 
             const pastEventsForActor = Master_Timeline.filter(
               (e) => e.actor_id === event.actor_id && e.time_offset_ms < event.time_offset_ms
@@ -77,17 +79,21 @@ export default function SimulationPanel() {
               duration = Math.max(300, Math.min(duration, 3000));
             }
 
-            // CHIA DURATION CHO SPEED ĐỂ GỬI QUA CSS XỬ LÝ CHO MƯỢT
             moveCharacterById(event.actor_id, event.target_x, event.target_y, duration / simulationSpeed);
             break;
             
           case 'VFX':
-            if (event.target_id) {
-                setVFXById(event.target_id, event);
-                const duration_vfx = event.duration_ms || 2000;
-                // THỜI GIAN TẮT HIỆU ỨNG VFX
-                setTimeout(() => setVFXById(event.target_id, null), duration_vfx / simulationSpeed);
-            }
+            // FIX LỖI TARGET_ID NULL: Gán ID 'GLOBAL' cho các hiệu ứng toàn màn hình
+            const vfxTarget = event.target_id || 'GLOBAL';
+            setVFXById(vfxTarget, event);
+            
+            const duration_vfx = event.duration_ms || 2000;
+            
+            // FIX LỖI MEMORY LEAK: Đưa timeout dọn dẹp VFX vào ref tracking
+            const vfxClearTimer = setTimeout(() => {
+              setVFXById(vfxTarget, null);
+            }, duration_vfx / simulationSpeed);
+            timeoutRefs.current.push(vfxClearTimer);
             break;
         }
       }, adjustedTimeOffset);
@@ -95,7 +101,6 @@ export default function SimulationPanel() {
       timeoutRefs.current.push(timer);
     });
 
-    // CHIA THỜI GIAN KẾT THÚC CHO TỐC ĐỘ
     const endTimer = setTimeout(() => {
       setIsPlaying(false);
       setIsFinished(true);
@@ -125,7 +130,6 @@ export default function SimulationPanel() {
         )}
       </div>
 
-      {/* THANH ĐIỀU CHỈNH TỐC ĐỘ: CHỈ HIỆN KHI CHƯA CHẠY HOẶC CHƯA CHẠY XONG */}
       {!isPlaying && !isFinished && (
         <div className="mb-4 bg-gray-800 p-4 rounded-lg border border-gray-700">
           <div className="flex justify-between items-center mb-2">

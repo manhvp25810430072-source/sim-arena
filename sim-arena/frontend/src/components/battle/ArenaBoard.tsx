@@ -10,13 +10,11 @@ const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character,
   const charRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Nếu có animation API từ AI (rung, xoay, lướt...)
     if (vfx?.web_animation && charRef.current) {
       const { keyframes, options } = vfx.web_animation;
       try {
         const anim = charRef.current.animate(keyframes, {
           ...options,
-          // Tính toán lại tốc độ animation khớp với tua nhanh/chậm
           duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
         });
         return () => anim.cancel();
@@ -31,7 +29,6 @@ const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character,
   const topPercent = `${char.position!.y * 5}%`;
   const moveDuration = char.position!.duration || 0;
   
-  // LOGIC CÁI CHẾT: Nếu máu <= 0 thì coi như đã tèo
   const isDead = char.stats.hp <= 0;
 
   return (
@@ -49,16 +46,13 @@ const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character,
           char.team === 'A' ? 'border-blue-500 shadow-[0_0_8px_blue]' : 'border-red-500 shadow-[0_0_8px_red]'
         }`}
         style={{
-           ...vfx?.css_override, // Style AI sinh ra (như đổi màu, phát sáng)
-           
-           // Ghi đè trạng thái chết: Xám xịt, mờ đi, và không nhận hiệu ứng phát sáng nữa
+           ...vfx?.css_override,
            ...(isDead ? { filter: 'grayscale(100%)', opacity: 0.3, transform: 'scale(0.8)', boxShadow: 'none' } : {}),
            transitionDuration: `${300 / simulationSpeed}ms`
         }}
       >
         <img src={shape.previewUrl} alt="unit" className="w-full h-full object-cover rounded-[2px]" />
         
-        {/* Thanh Máu: Giấu đi khi nhân vật chết */}
         {!isDead && (
           <div className="absolute -bottom-1.5 left-0 w-full h-1.5 bg-gray-900 border border-gray-700 rounded-full overflow-hidden z-10">
             <div 
@@ -79,35 +73,75 @@ export default function ArenaBoard() {
   const { mapPreviewUrl, liveLogs, teamA, teamB, uploadedShapes, activeVFX, simulationSpeed } = useMainStore();
   const logContainerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  // Dùng WeakMap lưu thời điểm bắt đầu của TỪNG LỆNH CANVAS để phục vụ requestAnimationFrame (Tuyệt đối không bị ghi đè)
+  const commandStartTimes = useRef(new WeakMap<object, number>());
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
+  const globalVFX = activeVFX['GLOBAL'];
 
-  // Cuộn log tự động
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [displayLogs]);
 
-  // --- ENGINE VẼ CANVAS (XỬ LÝ VFX TOÀN CỤC) ---
+  useEffect(() => {
+    if (globalVFX?.web_animation && boardRef.current) {
+      const { keyframes, options } = globalVFX.web_animation;
+      try {
+        const anim = boardRef.current.animate(keyframes, {
+          ...options,
+          duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
+        });
+        return () => anim.cancel();
+      } catch (e) {
+        console.error("Global animation error:", e);
+      }
+    }
+  }, [globalVFX, simulationSpeed]);
+
+  // --- 🚀 ENGINE VẼ CANVAS SIÊU CẤP (NỘI SUY THEO THỜI GIAN THỰC) 🚀 ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Cố định độ phân giải nội bộ của canvas (20 ô x 50px = 1000x1000px)
     canvas.width = 1000;
     canvas.height = 1000;
     const CELL_SIZE = 50;
 
-    // Xóa frame cũ mỗi lần VFX thay đổi
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let animationFrameId: number;
 
-    // Duyệt qua tất cả hiệu ứng hiện tại đang có canvas_commands
-    Object.values(activeVFX).forEach((vfx: any) => {
-      if (vfx && vfx.canvas_commands) {
+    const render = (time: number) => {
+      // Xóa toàn bộ canvas để vẽ lại frame mới
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      Object.values(activeVFX).forEach((vfx: any) => {
+        if (!vfx || !vfx.canvas_commands) return;
+
+        const duration = (vfx.duration_ms || 2000) / simulationSpeed;
+
         vfx.canvas_commands.forEach((cmd: any) => {
+          // Khởi tạo mốc thời gian bắt đầu cho lệnh nếu nó mới xuất hiện
+          if (!commandStartTimes.current.has(cmd)) {
+            commandStartTimes.current.set(cmd, time);
+          }
+          const startTime = commandStartTimes.current.get(cmd)!;
+          const elapsed = time - startTime;
+          
+          // Giới hạn tiến trình (progress) chạy từ 0 -> 1 (0% đến 100%)
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Hàm toán học cốt lõi: Nội suy tuyến tính (Linear Interpolation)
+          const lerp = (start: number, end: number, t: number) => {
+            if (start === undefined) return end || 0;
+            if (end === undefined) return start;
+            return start + (end - start) * t;
+          };
+
           ctx.save();
           
           if (cmd.glow) {
@@ -119,34 +153,67 @@ export default function ArenaBoard() {
           ctx.strokeStyle = cmd.color || 'white';
           ctx.lineWidth = cmd.width || 2;
 
+          // Nội suy Opacity (Độ rõ nét giảm hoặc tăng dần)
+          const startOp = cmd.startOpacity !== undefined ? cmd.startOpacity : 1;
+          const endOp = cmd.endOpacity !== undefined ? cmd.endOpacity : 1;
+          ctx.globalAlpha = Math.max(0, lerp(startOp, endOp, progress));
+
+          // PHÂN LOẠI & VẼ FRAME HIỆN TẠI
           switch (cmd.action) {
-            case 'FILL_RECT':
-              // Vẽ ô màu (dùng cho sương mù, mưa lửa, nháy đỏ màn hình)
-              ctx.fillRect(cmd.x * CELL_SIZE, cmd.y * CELL_SIZE, cmd.width * CELL_SIZE, cmd.height * CELL_SIZE);
-              break;
+            case 'ANIMATE_CIRCLE':
+            case 'DRAW_CIRCLE': {
+              const cx = cmd.centerX !== undefined ? cmd.centerX : cmd.x;
+              const cy = cmd.centerY !== undefined ? cmd.centerY : cmd.y;
+              // Nếu là ANIMATE thì nội suy bán kính, nếu DRAW tĩnh thì lấy radius cứng
+              const r = cmd.action === 'ANIMATE_CIRCLE' 
+                        ? lerp(cmd.startRadius, cmd.endRadius, progress) 
+                        : cmd.radius;
               
-            case 'DRAW_CIRCLE':
-              ctx.beginPath();
-              // Vẽ vòng tròn tại tâm ô (cộng 0.5 để ra tâm)
-              ctx.arc((cmd.centerX + 0.5) * CELL_SIZE, (cmd.centerY + 0.5) * CELL_SIZE, cmd.radius * CELL_SIZE, 0, Math.PI * 2);
-              if (cmd.fill) ctx.fill();
-              else ctx.stroke();
+              if (r > 0) {
+                ctx.beginPath();
+                ctx.arc((cx + 0.5) * CELL_SIZE, (cy + 0.5) * CELL_SIZE, r * CELL_SIZE, 0, Math.PI * 2);
+                if (cmd.fill) ctx.fill();
+                else ctx.stroke();
+              }
               break;
+            }
               
-            case 'DRAW_LINE':
+            case 'ANIMATE_LINE':
+            case 'DRAW_LINE': {
               ctx.beginPath();
-              // Bắn tia laser / chém kiếm từ điểm A tới điểm B
+              // Điểm Bắt đầu
               ctx.moveTo((cmd.startX + 0.5) * CELL_SIZE, (cmd.startY + 0.5) * CELL_SIZE);
-              ctx.lineTo((cmd.endX + 0.5) * CELL_SIZE, (cmd.endY + 0.5) * CELL_SIZE);
+              
+              // Điểm Kết thúc lao dần từ tọa độ Start đến tọa độ End
+              const currentEndX = cmd.action === 'ANIMATE_LINE' ? lerp(cmd.startX, cmd.endX, progress) : cmd.endX;
+              const currentEndY = cmd.action === 'ANIMATE_LINE' ? lerp(cmd.startY, cmd.endY, progress) : cmd.endY;
+              
+              ctx.lineTo((currentEndX + 0.5) * CELL_SIZE, (currentEndY + 0.5) * CELL_SIZE);
               ctx.stroke();
               break;
+            }
+
+            case 'ANIMATE_RECT':
+            case 'FILL_RECT': {
+              ctx.fillRect(cmd.x * CELL_SIZE, cmd.y * CELL_SIZE, cmd.width * CELL_SIZE, cmd.height * CELL_SIZE);
+              break;
+            }
           }
           
           ctx.restore();
         });
-      }
-    });
-  }, [activeVFX]);
+      });
+
+      // Lặp lại frame tiếp theo (Vòng lặp vĩnh cửu của Game Engine)
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    // Kích hoạt vòng lặp
+    animationFrameId = requestAnimationFrame(render);
+
+    // Dọn dẹp nếu component unmount hoặc re-render
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [activeVFX, simulationSpeed]);
 
   const getAvatarUrl = (charId?: string) => {
     if (!charId) return null;
@@ -179,7 +246,6 @@ export default function ArenaBoard() {
       `}</style>
 
       <div className="w-full max-w-[500px] flex flex-col relative">
-        {/* KHUNG HỘI THOẠI MÔ PHỎNG */}
         <div 
           ref={logContainerRef}
           className="w-full bg-gray-900/80 border border-gray-700 rounded-t-lg mb-1 p-3 overflow-y-auto custom-scrollbar flex flex-col gap-3 scroll-smooth"
@@ -222,14 +288,16 @@ export default function ArenaBoard() {
           })}
         </div>
 
-        {/* KHUNG BÀN CỜ GIẢ LẬP */}
         <div 
-          className="w-full aspect-square relative bg-cover bg-center rounded-b-lg overflow-hidden shadow-2xl border border-gray-600"
-          style={{ backgroundImage: `url(${mapPreviewUrl})` }}
+          ref={boardRef}
+          className="w-full aspect-square relative bg-cover bg-center rounded-b-lg overflow-hidden shadow-2xl border border-gray-600 transition-all"
+          style={{ 
+            backgroundImage: `url(${mapPreviewUrl})`,
+            ...globalVFX?.css_override 
+          }}
         >
           <div className="absolute inset-0 bg-black/40"></div>
           
-          {/* Lưới tọa độ vô hình (hứng event kéo thả quân) */}
           <div 
             className="absolute inset-0"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(20, minmax(0, 1fr))', gridTemplateRows: 'repeat(20, minmax(0, 1fr))' }}
@@ -239,14 +307,12 @@ export default function ArenaBoard() {
             ))}
           </div>
 
-          {/* LỚP PHỦ CANVAS (VẼ HIỆU ỨNG TIA LASER, MÁU ME TOÀN CỤC) */}
           <canvas 
             ref={canvasRef} 
-            className="absolute inset-0 w-full h-full pointer-events-none z-20"
+            className="absolute inset-0 w-full h-full pointer-events-none z-40"
           />
 
-          {/* LỚP PHỦ NHÂN VẬT (CHUYỂN ĐỘNG & RUNG GIẬT) */}
-          <div className="absolute inset-0 pointer-events-none z-30">
+          <div className="absolute inset-0 pointer-events-none z-50">
             {allCharactersOnBoard.map(char => {
               const shape = uploadedShapes.find(s => s.id === char.shapeId);
               const vfx = activeVFX[char.id];
