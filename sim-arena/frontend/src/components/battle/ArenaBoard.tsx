@@ -76,6 +76,8 @@ export default function ArenaBoard() {
   const boardRef = useRef<HTMLDivElement>(null);
 
   const commandStartTimes = useRef(new WeakMap<object, number>());
+  const commandSpawned = useRef(new WeakSet<object>()); // Tránh spam hạt trong vòng lặp
+  const particlesRef = useRef<any[]>([]); // Quản lý vòng đời Particle System
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
   const globalVFX = activeVFX['GLOBAL'];
@@ -101,7 +103,7 @@ export default function ArenaBoard() {
     }
   }, [globalVFX, simulationSpeed]);
 
-  // --- 🚀 ENGINE VẼ CANVAS 2.0 (HỖ TRỢ EASING & MỌI THUỘC TÍNH NỘI SUY) 🚀 ---
+  // --- 🚀 ENGINE VẼ CANVAS 2.1 (HỖ TRỢ LERP, BEZIER, BLEND MODE & PARTICLES) 🚀 ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -114,7 +116,6 @@ export default function ArenaBoard() {
 
     let animationFrameId: number;
 
-    // Bộ hàm Easing tiêu chuẩn
     const Easing = {
       linear: (t: number) => t,
       easeIn: (t: number) => t * t,
@@ -122,7 +123,6 @@ export default function ArenaBoard() {
       easeInOut: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
     };
 
-    // Tự động phân tích easing từ AI, mặc định lấy easeOut để tạo cảm giác "chạm trán" tốt hơn
     const getEasingFunction = (easingName?: string) => {
       if (!easingName) return Easing.easeOut; 
       if (easingName.includes('ease-in-out')) return Easing.easeInOut;
@@ -134,6 +134,34 @@ export default function ArenaBoard() {
     const render = (time: number) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // 1. RENDER HỆ THỐNG HẠT (PARTICLES) Ở DƯỚI CÙNG
+      ctx.globalCompositeOperation = 'lighter'; // Mặc định hạt đè sáng lên nhau cho đẹp
+      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+        const p = particlesRef.current[i];
+        p.x += p.vx * simulationSpeed;
+        p.y += p.vy * simulationSpeed;
+        p.vy += p.gravity * simulationSpeed; 
+        p.life -= p.decay * simulationSpeed; 
+        
+        if (p.life <= 0) {
+          particlesRef.current.splice(i, 1);
+          continue;
+        }
+        
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        if (p.glow) {
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = p.color;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 2. RENDER CÁC LỆNH VFX CHÍNH (CANVAS COMMANDS)
       Object.values(activeVFX).forEach((vfx: any) => {
         if (!vfx || !vfx.canvas_commands) return;
 
@@ -147,8 +175,6 @@ export default function ArenaBoard() {
           const elapsed = time - startTime;
           
           const rawProgress = Math.min(elapsed / duration, 1);
-          
-          // Áp dụng Easing để tạo gia tốc động năng thay vì chuyển động đều
           const easeFn = getEasingFunction(cmd.easing || vfx.easing);
           const progress = easeFn(rawProgress);
 
@@ -158,8 +184,39 @@ export default function ArenaBoard() {
             return start + (end - start) * t;
           };
 
+          // NẾU LÀ LỆNH SPAWN HẠT -> XỬ LÝ RIÊNG & KHÔNG VẼ
+          if (cmd.action === 'SPAWN_PARTICLES') {
+            if (!commandSpawned.current.has(cmd)) {
+              commandSpawned.current.add(cmd);
+              const count = cmd.count || 50;
+              const originX = (cmd.x !== undefined ? cmd.x + 0.5 : 10) * CELL_SIZE;
+              const originY = (cmd.y !== undefined ? cmd.y + 0.5 : 10) * CELL_SIZE;
+              
+              for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * (cmd.speed || 5);
+                particlesRef.current.push({
+                  x: originX,
+                  y: originY,
+                  vx: Math.cos(angle) * speed,
+                  vy: Math.sin(angle) * speed,
+                  life: 1.0,
+                  decay: Math.random() * 0.03 + 0.01,
+                  color: cmd.color || 'red',
+                  size: Math.random() * (cmd.size || 3) + 1,
+                  gravity: cmd.gravity || 0,
+                  glow: cmd.glow
+                });
+              }
+            }
+            return; // Xong việc spawn thì next lệnh khác
+          }
+
           ctx.save();
           
+          // 🚀 NÂNG CẤP BLEND MODE TẠI ĐÂY
+          ctx.globalCompositeOperation = cmd.blendMode || 'source-over';
+
           if (cmd.glow) {
             ctx.shadowBlur = cmd.shadowBlur || 20;
             ctx.shadowColor = cmd.shadowColor || cmd.color;
@@ -167,9 +224,11 @@ export default function ArenaBoard() {
 
           ctx.fillStyle = cmd.color || 'white';
           ctx.strokeStyle = cmd.color || 'white';
-          ctx.lineWidth = cmd.width || 2;
           
-          // FIX: Bo tròn đầu laser và góc cắt
+          // Nội suy cả độ dày nét vẽ (lineWidth) nếu cần
+          const currentLineWidth = cmd.startWidth !== undefined ? lerp(cmd.startWidth, cmd.endWidth || cmd.width, progress) : (cmd.width || 2);
+          ctx.lineWidth = currentLineWidth;
+          
           ctx.lineCap = cmd.lineCap || 'round';
           ctx.lineJoin = cmd.lineJoin || 'round';
 
@@ -208,9 +267,30 @@ export default function ArenaBoard() {
               break;
             }
 
+            // 🚀 NÂNG CẤP VẼ ĐƯỜNG CONG BEZIER TẠI ĐÂY
+            case 'ANIMATE_BEZIER':
+            case 'DRAW_BEZIER': {
+              ctx.beginPath();
+              ctx.moveTo((cmd.startX + 0.5) * CELL_SIZE, (cmd.startY + 0.5) * CELL_SIZE);
+              
+              const currentEndX = cmd.action === 'ANIMATE_BEZIER' ? lerp(cmd.startX, cmd.endX, progress) : cmd.endX;
+              const currentEndY = cmd.action === 'ANIMATE_BEZIER' ? lerp(cmd.startY, cmd.endY, progress) : cmd.endY;
+              
+              const ctrlX = cmd.controlX !== undefined ? cmd.controlX : (cmd.startX + cmd.endX) / 2;
+              const ctrlY = cmd.controlY !== undefined ? cmd.controlY : (cmd.startY + cmd.endY) / 2 - 2;
+
+              ctx.quadraticCurveTo(
+                (ctrlX + 0.5) * CELL_SIZE, 
+                (ctrlY + 0.5) * CELL_SIZE, 
+                (currentEndX + 0.5) * CELL_SIZE, 
+                (currentEndY + 0.5) * CELL_SIZE
+              );
+              ctx.stroke();
+              break;
+            }
+
             case 'ANIMATE_RECT':
             case 'FILL_RECT': {
-              // Hỗ trợ nội suy tất cả tọa độ và kích thước nếu có cung cấp start/end
               const currentX = cmd.startX !== undefined ? lerp(cmd.startX, cmd.endX || cmd.x, progress) : cmd.x;
               const currentY = cmd.startY !== undefined ? lerp(cmd.startY, cmd.endY || cmd.y, progress) : cmd.y;
               const currentW = cmd.startWidth !== undefined ? lerp(cmd.startWidth, cmd.endWidth || cmd.width, progress) : cmd.width;
