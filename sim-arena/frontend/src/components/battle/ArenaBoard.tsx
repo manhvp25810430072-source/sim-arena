@@ -21,6 +21,7 @@ const CharacterNode = ({ char, shape, vfxList, simulationSpeed }: { char: Charac
         try {
           const anim = charRef.current!.animate(keyframes, {
             ...options,
+            composite: options.composite || 'add', // 🚀 NÂNG CẤP: Cho phép cộng dồn hoạt ảnh vật lý thay vì ghi đè
             duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
           });
           animations.push(anim);
@@ -40,8 +41,19 @@ const CharacterNode = ({ char, shape, vfxList, simulationSpeed }: { char: Charac
   
   const isDead = char.stats.hp <= 0;
 
-  // 🚀 NÂNG CẤP: Gộp tất cả các CSS Override của các VFX đang Active lại với nhau
-  const mergedCssOverride = vfxList?.reduce((acc, vfx) => ({ ...acc, ...(vfx.css_override || {}) }), {}) || {};
+  // 🚀 NÂNG CẤP: Gộp tất cả các CSS Override của các VFX đang Active lại với nhau (Cộng dồn Filter & Transform)
+  const mergedCssOverride = vfxList?.reduce((acc: any, vfx: any) => {
+    const css = vfx.css_override || {};
+    const result = { ...acc };
+    for (const key in css) {
+      if ((key === 'transform' || key === 'filter') && result[key]) {
+        result[key] = `${result[key]} ${css[key]}`; // Nối string để cộng dồn hiệu ứng tĩnh
+      } else {
+        result[key] = css[key];
+      }
+    }
+    return result;
+  }, {}) || {};
 
   return (
     <div
@@ -93,7 +105,20 @@ export default function ArenaBoard() {
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
   const globalVFXList = activeVFX['GLOBAL'] || [];
-  const mergedGlobalCss = globalVFXList.reduce((acc, vfx) => ({ ...acc, ...(vfx.css_override || {}) }), {});
+  
+  // 🚀 NÂNG CẤP: Gộp tất cả các CSS Override của các VFX Global (Cộng dồn Filter & Transform)
+  const mergedGlobalCss = globalVFXList.reduce((acc: any, vfx: any) => {
+    const css = vfx.css_override || {};
+    const result = { ...acc };
+    for (const key in css) {
+      if ((key === 'transform' || key === 'filter') && result[key]) {
+        result[key] = `${result[key]} ${css[key]}`;
+      } else {
+        result[key] = css[key];
+      }
+    }
+    return result;
+  }, {});
 
   useEffect(() => {
     if (logContainerRef.current) {
@@ -110,6 +135,7 @@ export default function ArenaBoard() {
         try {
           const anim = boardRef.current!.animate(keyframes, {
             ...options,
+            composite: options.composite || 'add', // 🚀 NÂNG CẤP: Cho phép cộng dồn hoạt ảnh vật lý toàn bản đồ
             duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
           });
           animations.push(anim);
@@ -395,6 +421,58 @@ export default function ArenaBoard() {
                 if (cmd.closePath !== false) ctx.closePath();
                 if (cmd.fill) ctx.fill();
                 else ctx.stroke();
+              }
+              break;
+            }
+
+            // 🚀 NÂNG CẤP: Vẽ và hiệu ứng Typography (Chữ)
+            case 'ANIMATE_TEXT':
+            case 'DRAW_TEXT': {
+              const currentX = cmd.startX !== undefined ? lerp(cmd.startX, cmd.endX || cmd.x, progress) : cmd.x;
+              const currentY = cmd.startY !== undefined ? lerp(cmd.startY, cmd.endY || cmd.y, progress) : cmd.y;
+              const fontSize = cmd.startSize !== undefined ? lerp(cmd.startSize, cmd.endSize || cmd.size, progress) : (cmd.size || 1);
+              
+              ctx.font = `${cmd.fontWeight || 'bold'} ${fontSize * CELL_SIZE}px ${cmd.fontFamily || 'sans-serif'}`;
+              ctx.textAlign = cmd.align || 'center';
+              ctx.textBaseline = cmd.baseline || 'middle';
+              
+              if (cmd.fill !== false) {
+                ctx.fillText(cmd.text, (currentX + 0.5) * CELL_SIZE, (currentY + 0.5) * CELL_SIZE);
+              }
+              if (cmd.stroke) {
+                ctx.strokeText(cmd.text, (currentX + 0.5) * CELL_SIZE, (currentY + 0.5) * CELL_SIZE);
+              }
+              break;
+            }
+
+            // 🚀 NÂNG CẤP: Vẽ tàn ảnh hoặc Texture tuỳ chỉnh (Image)
+            case 'DRAW_IMAGE':
+            case 'ANIMATE_IMAGE': {
+              if (!cmd.imageUrl) break;
+              
+              const currentX = cmd.startX !== undefined ? lerp(cmd.startX, cmd.endX || cmd.x, progress) : cmd.x;
+              const currentY = cmd.startY !== undefined ? lerp(cmd.startY, cmd.endY || cmd.y, progress) : cmd.y;
+              const currentW = cmd.startWidth !== undefined ? lerp(cmd.startWidth, cmd.endWidth || cmd.width, progress) : (cmd.width || 1);
+              const currentH = cmd.startHeight !== undefined ? lerp(cmd.startHeight, cmd.endHeight || cmd.height, progress) : (cmd.height || 1);
+              
+              // Sử dụng cơ chế cache ảnh để đảm bảo 60FPS không bị sụt khi vẽ liên tục
+              if (!(window as any)._vfxImgCache) (window as any)._vfxImgCache = {};
+              let img = (window as any)._vfxImgCache[cmd.imageUrl];
+              
+              if (!img) {
+                img = new Image();
+                img.src = cmd.imageUrl;
+                (window as any)._vfxImgCache[cmd.imageUrl] = img;
+              }
+              
+              if (img.complete) {
+                ctx.drawImage(
+                  img,
+                  currentX * CELL_SIZE,
+                  currentY * CELL_SIZE,
+                  currentW * CELL_SIZE,
+                  currentH * CELL_SIZE
+                );
               }
               break;
             }
