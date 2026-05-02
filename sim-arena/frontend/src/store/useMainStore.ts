@@ -9,22 +9,20 @@ export interface Character {
   skillDesc: string;        
   stats: {
     hp: number;             
-    maxHp?: number; // Thêm maxHp để tính % thanh máu
+    maxHp?: number; 
     agility: number;        
     damage: number;         
     range: number;          
   };
   shapeId: string | null;  
-  // THÊM THUỘC TÍNH duration ĐỂ CSS BIẾT DI CHUYỂN TRONG BAO LÂU
   position: { x: number, y: number, duration?: number } | null;
 }
 
-// Cấu trúc mới cho một dòng Log
 export interface LogEvent {
   id: string;
   type: 'SYSTEM' | 'NARRATIVE' | 'DIALOGUE' | 'COMBAT' | 'MOVE';
   content: string;
-  charId?: string; // Dùng để móc nối lấy hình Avatar
+  charId?: string; 
 }
 
 interface MainState {
@@ -39,15 +37,12 @@ interface MainState {
   appStage: 'PHASE_1_2_STUDIO' | 'PHASE_3_SETUP_BOARD' | 'PHASE_4_AI_GENERATING' | 'PHASE_5_SIMULATING' | 'PHASE_6_EXPORTING';
   Master_Timeline: any[];
 
-  // --- PHASE 5: REALTIME RENDER STATE ---
   liveLogs: LogEvent[]; 
   activeDialogues: Record<string, { content: string, emotion: string } | null>;
   activeVFX: Record<string, any>;
 
-  // --- TỐC ĐỘ MÔ PHỎNG ---
   simulationSpeed: number;
 
-  // Actions
   setMap: (file: File, previewUrl: string) => void;
   setMapDescription: (desc: string) => void;
   addShape: (file: File, previewUrl: string) => void;
@@ -60,16 +55,34 @@ interface MainState {
   placeCharacterOnBoard: (team: 'A' | 'B', charId: string, x: number, y: number) => void;
   setMasterTimeline: (timeline: any[]) => void;
 
-  // --- PHASE 5: ACTIONS ---
   addLiveLog: (log: Omit<LogEvent, 'id'>) => void; 
   setActiveDialogue: (charId: string, dialogue: { content: string, emotion: string } | null) => void;
   applyDamageById: (id: string, damage: number) => void;
   moveCharacterById: (id: string, x: number, y: number, duration?: number) => void;
   setVFXById: (id: string, vfx: any | null) => void;
   
-  // --- ACTION ĐỔI TỐC ĐỘ ---
   setSimulationSpeed: (speed: number) => void;
 }
+
+// ============================================================================
+// 🛠️ BỘ LỌC THÔNG DỊCH CSS (CSS NORMALIZER)
+// Tự động chuyển đổi các key kebab-case từ AI (VD: mix-blend-mode) 
+// thành camelCase chuẩn React (VD: mixBlendMode).
+// ============================================================================
+const kebabToCamel = (str: string) => {
+  if (str.startsWith('--')) return str; // Giữ nguyên các biến CSS variable nếu có
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+};
+
+const normalizeCSS = (cssObj: Record<string, any> | undefined) => {
+  if (!cssObj) return {};
+  const normalized: Record<string, any> = {};
+  for (const key in cssObj) {
+    normalized[kebabToCamel(key)] = cssObj[key];
+  }
+  return normalized;
+};
+// ============================================================================
 
 export const useMainStore = create<MainState>((set) => ({
   mapImage: null,
@@ -86,7 +99,7 @@ export const useMainStore = create<MainState>((set) => ({
   activeDialogues: {},
   activeVFX: {},
   
-  simulationSpeed: 1, // Mặc định là 1x
+  simulationSpeed: 1, 
   
   setMap: (file, previewUrl) => set({ mapImage: file, mapPreviewUrl: previewUrl }),
   setMapDescription: (desc) => set({ mapDescription: desc }),
@@ -118,8 +131,6 @@ export const useMainStore = create<MainState>((set) => ({
   }),
 
   setMasterTimeline: (timeline) => set({ Master_Timeline: timeline }),
-
-  // --- PHASE 5 LOGIC ---
   
   addLiveLog: (log) => set((state) => ({ 
     liveLogs: [...state.liveLogs, { ...log, id: crypto.randomUUID() }] 
@@ -152,34 +163,35 @@ export const useMainStore = create<MainState>((set) => ({
   }),
 
   setVFXById: (id, vfx) => set((state) => {
-    // Nếu truyền null, dọn dẹp sạch sẽ VFX của target này
     if (vfx === null) {
       const newVfx = { ...state.activeVFX };
       delete newVfx[id];
       return { activeVFX: newVfx };
     }
 
+    // Tiền xử lý CSS để React có thể đọc được
+    const normalizedCSS = normalizeCSS(vfx.css_override);
+    const processedVFX = { ...vfx, css_override: normalizedCSS };
+
     const existing = state.activeVFX[id];
     
-    // FIX LỖI GHI ĐÈ: Hợp nhất (Merge) các hiệu ứng nếu có nhiều VFX xảy ra cùng lúc
+    // Xử lý Merge thông minh: Gộp mảng canvas và merge object css
     if (existing) {
       return {
         activeVFX: {
           ...state.activeVFX,
           [id]: {
-            ...existing, // Giữ lại animation cũ
-            ...vfx,      // Ưu tiên animation mới nhất nếu có
-            // Gộp CSS Override (Ví dụ vừa nhận filter đỏ, vừa nhận box-shadow trắng)
-            css_override: { ...(existing.css_override || {}), ...(vfx.css_override || {}) },
-            // Gộp danh sách lệnh vẽ Canvas để bắn được 2 tia laser cùng lúc
-            canvas_commands: [...(existing.canvas_commands || []), ...(vfx.canvas_commands || [])]
+            ...existing,
+            ...processedVFX,
+            css_override: { ...(existing.css_override || {}), ...normalizedCSS },
+            canvas_commands: [...(existing.canvas_commands || []), ...(processedVFX.canvas_commands || [])]
           }
         }
       };
     }
 
     return {
-      activeVFX: { ...state.activeVFX, [id]: vfx }
+      activeVFX: { ...state.activeVFX, [id]: processedVFX }
     };
   }),
 

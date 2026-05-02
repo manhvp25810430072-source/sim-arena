@@ -4,7 +4,7 @@ import DroppableCell from './DroppableCell';
 import type { Character } from '../../store/useMainStore';
 
 // ---------------------------------------------------------
-// COMPONENT CON: Quản lý riêng DOM Ref và Web Animation cho từng nhân vật
+// COMPONENT CON: Quản lý riêng DOM Ref và Web Animation
 // ---------------------------------------------------------
 const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character, shape: any, vfx: any, simulationSpeed: number }) => {
   const charRef = useRef<HTMLDivElement>(null);
@@ -75,7 +75,6 @@ export default function ArenaBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
 
-  // Dùng WeakMap lưu thời điểm bắt đầu của TỪNG LỆNH CANVAS để phục vụ requestAnimationFrame (Tuyệt đối không bị ghi đè)
   const commandStartTimes = useRef(new WeakMap<object, number>());
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
@@ -102,7 +101,7 @@ export default function ArenaBoard() {
     }
   }, [globalVFX, simulationSpeed]);
 
-  // --- 🚀 ENGINE VẼ CANVAS SIÊU CẤP (NỘI SUY THEO THỜI GIAN THỰC) 🚀 ---
+  // --- 🚀 ENGINE VẼ CANVAS 2.0 (HỖ TRỢ EASING & MỌI THUỘC TÍNH NỘI SUY) 🚀 ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -115,8 +114,24 @@ export default function ArenaBoard() {
 
     let animationFrameId: number;
 
+    // Bộ hàm Easing tiêu chuẩn
+    const Easing = {
+      linear: (t: number) => t,
+      easeIn: (t: number) => t * t,
+      easeOut: (t: number) => t * (2 - t),
+      easeInOut: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    };
+
+    // Tự động phân tích easing từ AI, mặc định lấy easeOut để tạo cảm giác "chạm trán" tốt hơn
+    const getEasingFunction = (easingName?: string) => {
+      if (!easingName) return Easing.easeOut; 
+      if (easingName.includes('ease-in-out')) return Easing.easeInOut;
+      if (easingName.includes('ease-in')) return Easing.easeIn;
+      if (easingName.includes('linear')) return Easing.linear;
+      return Easing.easeOut;
+    };
+
     const render = (time: number) => {
-      // Xóa toàn bộ canvas để vẽ lại frame mới
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       Object.values(activeVFX).forEach((vfx: any) => {
@@ -125,17 +140,18 @@ export default function ArenaBoard() {
         const duration = (vfx.duration_ms || 2000) / simulationSpeed;
 
         vfx.canvas_commands.forEach((cmd: any) => {
-          // Khởi tạo mốc thời gian bắt đầu cho lệnh nếu nó mới xuất hiện
           if (!commandStartTimes.current.has(cmd)) {
             commandStartTimes.current.set(cmd, time);
           }
           const startTime = commandStartTimes.current.get(cmd)!;
           const elapsed = time - startTime;
           
-          // Giới hạn tiến trình (progress) chạy từ 0 -> 1 (0% đến 100%)
-          const progress = Math.min(elapsed / duration, 1);
+          const rawProgress = Math.min(elapsed / duration, 1);
+          
+          // Áp dụng Easing để tạo gia tốc động năng thay vì chuyển động đều
+          const easeFn = getEasingFunction(cmd.easing || vfx.easing);
+          const progress = easeFn(rawProgress);
 
-          // Hàm toán học cốt lõi: Nội suy tuyến tính (Linear Interpolation)
           const lerp = (start: number, end: number, t: number) => {
             if (start === undefined) return end || 0;
             if (end === undefined) return start;
@@ -152,19 +168,20 @@ export default function ArenaBoard() {
           ctx.fillStyle = cmd.color || 'white';
           ctx.strokeStyle = cmd.color || 'white';
           ctx.lineWidth = cmd.width || 2;
+          
+          // FIX: Bo tròn đầu laser và góc cắt
+          ctx.lineCap = cmd.lineCap || 'round';
+          ctx.lineJoin = cmd.lineJoin || 'round';
 
-          // Nội suy Opacity (Độ rõ nét giảm hoặc tăng dần)
           const startOp = cmd.startOpacity !== undefined ? cmd.startOpacity : 1;
           const endOp = cmd.endOpacity !== undefined ? cmd.endOpacity : 1;
           ctx.globalAlpha = Math.max(0, lerp(startOp, endOp, progress));
 
-          // PHÂN LOẠI & VẼ FRAME HIỆN TẠI
           switch (cmd.action) {
             case 'ANIMATE_CIRCLE':
             case 'DRAW_CIRCLE': {
               const cx = cmd.centerX !== undefined ? cmd.centerX : cmd.x;
               const cy = cmd.centerY !== undefined ? cmd.centerY : cmd.y;
-              // Nếu là ANIMATE thì nội suy bán kính, nếu DRAW tĩnh thì lấy radius cứng
               const r = cmd.action === 'ANIMATE_CIRCLE' 
                         ? lerp(cmd.startRadius, cmd.endRadius, progress) 
                         : cmd.radius;
@@ -181,10 +198,8 @@ export default function ArenaBoard() {
             case 'ANIMATE_LINE':
             case 'DRAW_LINE': {
               ctx.beginPath();
-              // Điểm Bắt đầu
               ctx.moveTo((cmd.startX + 0.5) * CELL_SIZE, (cmd.startY + 0.5) * CELL_SIZE);
               
-              // Điểm Kết thúc lao dần từ tọa độ Start đến tọa độ End
               const currentEndX = cmd.action === 'ANIMATE_LINE' ? lerp(cmd.startX, cmd.endX, progress) : cmd.endX;
               const currentEndY = cmd.action === 'ANIMATE_LINE' ? lerp(cmd.startY, cmd.endY, progress) : cmd.endY;
               
@@ -195,7 +210,17 @@ export default function ArenaBoard() {
 
             case 'ANIMATE_RECT':
             case 'FILL_RECT': {
-              ctx.fillRect(cmd.x * CELL_SIZE, cmd.y * CELL_SIZE, cmd.width * CELL_SIZE, cmd.height * CELL_SIZE);
+              // Hỗ trợ nội suy tất cả tọa độ và kích thước nếu có cung cấp start/end
+              const currentX = cmd.startX !== undefined ? lerp(cmd.startX, cmd.endX || cmd.x, progress) : cmd.x;
+              const currentY = cmd.startY !== undefined ? lerp(cmd.startY, cmd.endY || cmd.y, progress) : cmd.y;
+              const currentW = cmd.startWidth !== undefined ? lerp(cmd.startWidth, cmd.endWidth || cmd.width, progress) : cmd.width;
+              const currentH = cmd.startHeight !== undefined ? lerp(cmd.startHeight, cmd.endHeight || cmd.height, progress) : cmd.height;
+              
+              if (cmd.fill !== false) {
+                ctx.fillRect(currentX * CELL_SIZE, currentY * CELL_SIZE, currentW * CELL_SIZE, currentH * CELL_SIZE);
+              } else {
+                ctx.strokeRect(currentX * CELL_SIZE, currentY * CELL_SIZE, currentW * CELL_SIZE, currentH * CELL_SIZE);
+              }
               break;
             }
           }
@@ -204,16 +229,13 @@ export default function ArenaBoard() {
         });
       });
 
-      // Lặp lại frame tiếp theo (Vòng lặp vĩnh cửu của Game Engine)
       animationFrameId = requestAnimationFrame(render);
     };
 
-    // Kích hoạt vòng lặp
     animationFrameId = requestAnimationFrame(render);
-
-    // Dọn dẹp nếu component unmount hoặc re-render
     return () => cancelAnimationFrame(animationFrameId);
   }, [activeVFX, simulationSpeed]);
+  // --------------------------------------------------------------------------
 
   const getAvatarUrl = (charId?: string) => {
     if (!charId) return null;

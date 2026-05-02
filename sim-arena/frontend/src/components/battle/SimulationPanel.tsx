@@ -19,10 +19,16 @@ export default function SimulationPanel() {
   const [isFinished, setIsFinished] = useState(false);
   
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
+  
+  // 🛠️ Tách riêng Ref để quản lý bộ đếm lùi xóa VFX và Dialogue (Chống đè mất hiệu ứng mới)
+  const vfxClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const dialogueClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
+      Object.values(vfxClearTimers.current).forEach(clearTimeout);
+      Object.values(dialogueClearTimers.current).forEach(clearTimeout);
     };
   }, []);
 
@@ -50,11 +56,14 @@ export default function SimulationPanel() {
             addLiveLog({ type: 'DIALOGUE', content: event.content, charId: event.actor_id });
             setActiveDialogue(event.actor_id, { content: event.content, emotion: event.emotion });
             
-            // FIX LỖI MEMORY LEAK: Đưa timeout dọn dẹp hội thoại vào ref tracking
-            const dialogueClearTimer = setTimeout(() => {
+            // 🛠️ HỦY BỘ ĐẾM CŨ NẾU NHÂN VẬT NÓI CÂU MỚI (Chống mất thoại)
+            if (dialogueClearTimers.current[event.actor_id]) {
+              clearTimeout(dialogueClearTimers.current[event.actor_id]);
+            }
+            
+            dialogueClearTimers.current[event.actor_id] = setTimeout(() => {
               setActiveDialogue(event.actor_id, null);
             }, 3000 / simulationSpeed);
-            timeoutRefs.current.push(dialogueClearTimer);
             break;
             
           case 'ATTACK':
@@ -83,17 +92,21 @@ export default function SimulationPanel() {
             break;
             
           case 'VFX':
-            // FIX LỖI TARGET_ID NULL: Gán ID 'GLOBAL' cho các hiệu ứng toàn màn hình
             const vfxTarget = event.target_id || 'GLOBAL';
             setVFXById(vfxTarget, event);
             
             const duration_vfx = event.duration_ms || 2000;
             
-            // FIX LỖI MEMORY LEAK: Đưa timeout dọn dẹp VFX vào ref tracking
-            const vfxClearTimer = setTimeout(() => {
+            // 🛠️ FIX LỖI XÓA ĐÈ VFX:
+            // Nếu mục tiêu đang có 1 timeout chờ xóa VFX cũ, ta phải HỦY nó đi
+            // để hiệu ứng mới nhất được hiển thị đủ thời gian và tự nhiên gộp (merge) lại.
+            if (vfxClearTimers.current[vfxTarget]) {
+              clearTimeout(vfxClearTimers.current[vfxTarget]);
+            }
+
+            vfxClearTimers.current[vfxTarget] = setTimeout(() => {
               setVFXById(vfxTarget, null);
             }, duration_vfx / simulationSpeed);
-            timeoutRefs.current.push(vfxClearTimer);
             break;
         }
       }, adjustedTimeOffset);
