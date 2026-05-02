@@ -39,7 +39,9 @@ interface MainState {
 
   liveLogs: LogEvent[]; 
   activeDialogues: Record<string, { content: string, emotion: string } | null>;
-  activeVFX: Record<string, any>;
+  
+  // 🚀 NÂNG CẤP: Chuyển activeVFX thành Mảng (Array) để cộng dồn nhiều hiệu ứng
+  activeVFX: Record<string, any[]>;
 
   simulationSpeed: number;
 
@@ -59,18 +61,20 @@ interface MainState {
   setActiveDialogue: (charId: string, dialogue: { content: string, emotion: string } | null) => void;
   applyDamageById: (id: string, damage: number) => void;
   moveCharacterById: (id: string, x: number, y: number, duration?: number) => void;
-  setVFXById: (id: string, vfx: any | null) => void;
+  
+  // 🚀 NÂNG CẤP: Các hàm quản lý vòng đời VFX mới
+  addVFXById: (id: string, vfx: any) => string; // Trả về instanceId để hẹn giờ xóa
+  removeVFXInstance: (id: string, instanceId: string) => void;
+  clearAllVFX: () => void;
   
   setSimulationSpeed: (speed: number) => void;
 }
 
 // ============================================================================
 // 🛠️ BỘ LỌC THÔNG DỊCH CSS (CSS NORMALIZER)
-// Tự động chuyển đổi các key kebab-case từ AI (VD: mix-blend-mode) 
-// thành camelCase chuẩn React (VD: mixBlendMode).
 // ============================================================================
 const kebabToCamel = (str: string) => {
-  if (str.startsWith('--')) return str; // Giữ nguyên các biến CSS variable nếu có
+  if (str.startsWith('--')) return str; 
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 };
 
@@ -162,38 +166,48 @@ export const useMainStore = create<MainState>((set) => ({
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 
-  setVFXById: (id, vfx) => set((state) => {
-    if (vfx === null) {
+  // 🚀 NÂNG CẤP: Logic thêm VFX vào mảng
+  addVFXById: (id, vfx) => {
+    const instanceId = crypto.randomUUID();
+    const normalizedCSS = normalizeCSS(vfx.css_override);
+    const processedVFX = { ...vfx, css_override: normalizedCSS, _instanceId: instanceId };
+
+    set((state) => {
+      const existing = state.activeVFX[id] || [];
+      return {
+        activeVFX: {
+          ...state.activeVFX,
+          [id]: [...existing, processedVFX]
+        }
+      };
+    });
+
+    return instanceId; // Trả về ID để dùng cho Timeout xóa sau này
+  },
+
+  // 🚀 NÂNG CẤP: Logic gỡ bỏ một VFX cụ thể khi hết thời gian
+  removeVFXInstance: (id, instanceId) => set((state) => {
+    const existing = state.activeVFX[id];
+    if (!existing) return state;
+
+    const filtered = existing.filter((vfx: any) => vfx._instanceId !== instanceId);
+
+    // Nếu xóa xong mà mảng rỗng thì dọn dẹp key luôn cho sạch state
+    if (filtered.length === 0) {
       const newVfx = { ...state.activeVFX };
       delete newVfx[id];
       return { activeVFX: newVfx };
     }
 
-    // Tiền xử lý CSS để React có thể đọc được
-    const normalizedCSS = normalizeCSS(vfx.css_override);
-    const processedVFX = { ...vfx, css_override: normalizedCSS };
-
-    const existing = state.activeVFX[id];
-    
-    // Xử lý Merge thông minh: Gộp mảng canvas và merge object css
-    if (existing) {
-      return {
-        activeVFX: {
-          ...state.activeVFX,
-          [id]: {
-            ...existing,
-            ...processedVFX,
-            css_override: { ...(existing.css_override || {}), ...normalizedCSS },
-            canvas_commands: [...(existing.canvas_commands || []), ...(processedVFX.canvas_commands || [])]
-          }
-        }
-      };
-    }
-
     return {
-      activeVFX: { ...state.activeVFX, [id]: processedVFX }
+      activeVFX: {
+        ...state.activeVFX,
+        [id]: filtered
+      }
     };
   }),
+
+  clearAllVFX: () => set({ activeVFX: {} }),
 
   setSimulationSpeed: (speed) => set({ simulationSpeed: speed })
 }))

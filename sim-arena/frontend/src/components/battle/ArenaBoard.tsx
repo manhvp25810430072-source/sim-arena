@@ -6,23 +6,32 @@ import type { Character } from '../../store/useMainStore';
 // ---------------------------------------------------------
 // COMPONENT CON: Quản lý riêng DOM Ref và Web Animation
 // ---------------------------------------------------------
-const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character, shape: any, vfx: any, simulationSpeed: number }) => {
+const CharacterNode = ({ char, shape, vfxList, simulationSpeed }: { char: Character, shape: any, vfxList: any[], simulationSpeed: number }) => {
   const charRef = useRef<HTMLDivElement>(null);
 
+  // 🚀 NÂNG CẤP: Chạy song song nhiều Web Animation trên cùng 1 nhân vật
   useEffect(() => {
-    if (vfx?.web_animation && charRef.current) {
-      const { keyframes, options } = vfx.web_animation;
-      try {
-        const anim = charRef.current.animate(keyframes, {
-          ...options,
-          duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
-        });
-        return () => anim.cancel();
-      } catch (e) {
-        console.error("Animation error:", e);
+    if (!charRef.current || !vfxList || vfxList.length === 0) return;
+    
+    const animations: Animation[] = [];
+    
+    vfxList.forEach(vfx => {
+      if (vfx.web_animation) {
+        const { keyframes, options } = vfx.web_animation;
+        try {
+          const anim = charRef.current!.animate(keyframes, {
+            ...options,
+            duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
+          });
+          animations.push(anim);
+        } catch (e) {
+          console.error("Animation error:", e);
+        }
       }
-    }
-  }, [vfx, simulationSpeed]);
+    });
+
+    return () => animations.forEach(anim => anim.cancel());
+  }, [vfxList, simulationSpeed]);
 
   const hpPercent = Math.max(0, (char.stats.hp / (char.stats.maxHp || 1)) * 100);
   const leftPercent = `${char.position!.x * 5}%`;
@@ -30,6 +39,9 @@ const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character,
   const moveDuration = char.position!.duration || 0;
   
   const isDead = char.stats.hp <= 0;
+
+  // 🚀 NÂNG CẤP: Gộp tất cả các CSS Override của các VFX đang Active lại với nhau
+  const mergedCssOverride = vfxList?.reduce((acc, vfx) => ({ ...acc, ...(vfx.css_override || {}) }), {}) || {};
 
   return (
     <div
@@ -46,7 +58,7 @@ const CharacterNode = ({ char, shape, vfx, simulationSpeed }: { char: Character,
           char.team === 'A' ? 'border-blue-500 shadow-[0_0_8px_blue]' : 'border-red-500 shadow-[0_0_8px_red]'
         }`}
         style={{
-           ...vfx?.css_override,
+           ...mergedCssOverride, // Áp dụng CSS đã gộp
            ...(isDead ? { filter: 'grayscale(100%)', opacity: 0.3, transform: 'scale(0.8)', boxShadow: 'none' } : {}),
            transitionDuration: `${300 / simulationSpeed}ms`
         }}
@@ -76,11 +88,12 @@ export default function ArenaBoard() {
   const boardRef = useRef<HTMLDivElement>(null);
 
   const commandStartTimes = useRef(new WeakMap<object, number>());
-  const commandSpawned = useRef(new WeakSet<object>()); // Tránh spam hạt trong vòng lặp
-  const particlesRef = useRef<any[]>([]); // Quản lý vòng đời Particle System
+  const commandSpawned = useRef(new WeakSet<object>());
+  const particlesRef = useRef<any[]>([]);
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
-  const globalVFX = activeVFX['GLOBAL'];
+  const globalVFXList = activeVFX['GLOBAL'] || [];
+  const mergedGlobalCss = globalVFXList.reduce((acc, vfx) => ({ ...acc, ...(vfx.css_override || {}) }), {});
 
   useEffect(() => {
     if (logContainerRef.current) {
@@ -89,21 +102,26 @@ export default function ArenaBoard() {
   }, [displayLogs]);
 
   useEffect(() => {
-    if (globalVFX?.web_animation && boardRef.current) {
-      const { keyframes, options } = globalVFX.web_animation;
-      try {
-        const anim = boardRef.current.animate(keyframes, {
-          ...options,
-          duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
-        });
-        return () => anim.cancel();
-      } catch (e) {
-        console.error("Global animation error:", e);
+    if (!boardRef.current || globalVFXList.length === 0) return;
+    const animations: Animation[] = [];
+    globalVFXList.forEach(vfx => {
+      if (vfx.web_animation) {
+        const { keyframes, options } = vfx.web_animation;
+        try {
+          const anim = boardRef.current!.animate(keyframes, {
+            ...options,
+            duration: options.duration ? options.duration / simulationSpeed : 500 / simulationSpeed
+          });
+          animations.push(anim);
+        } catch (e) {
+          console.error("Global animation error:", e);
+        }
       }
-    }
-  }, [globalVFX, simulationSpeed]);
+    });
+    return () => animations.forEach(a => a.cancel());
+  }, [globalVFXList, simulationSpeed]);
 
-  // --- 🚀 ENGINE VẼ CANVAS 2.1 (HỖ TRỢ LERP, BEZIER, BLEND MODE & PARTICLES) 🚀 ---
+  // --- 🚀 ENGINE VẼ CANVAS 3.0 (HỖ TRỢ LERP, BEZIER, BLEND MODE, PARTICLES NÂNG CAO, POLYGON, ROTATION) 🚀 ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -135,15 +153,27 @@ export default function ArenaBoard() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // 1. RENDER HỆ THỐNG HẠT (PARTICLES) Ở DƯỚI CÙNG
-      ctx.globalCompositeOperation = 'lighter'; // Mặc định hạt đè sáng lên nhau cho đẹp
+      ctx.globalCompositeOperation = 'lighter'; 
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i];
+        
+        // Cập nhật Vận tốc xoáy (Lỗ đen / Lốc xoáy)
+        if (p.angularVelocity) {
+          const cos = Math.cos(p.angularVelocity * simulationSpeed);
+          const sin = Math.sin(p.angularVelocity * simulationSpeed);
+          const nx = p.vx * cos - p.vy * sin;
+          const ny = p.vx * sin + p.vy * cos;
+          p.vx = nx;
+          p.vy = ny;
+        }
+
         p.x += p.vx * simulationSpeed;
         p.y += p.vy * simulationSpeed;
         p.vy += p.gravity * simulationSpeed; 
-        p.life -= p.decay * simulationSpeed; 
+        p.life -= p.decay * simulationSpeed;
+        p.size = Math.max(0, p.size - (p.sizeDecay || 0) * simulationSpeed);
         
-        if (p.life <= 0) {
+        if (p.life <= 0 || p.size <= 0) {
           particlesRef.current.splice(i, 1);
           continue;
         }
@@ -155,14 +185,29 @@ export default function ArenaBoard() {
           ctx.shadowBlur = 10;
           ctx.shadowColor = p.color;
         }
+        
+        ctx.translate(p.x, p.y);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
+        if (p.shape === 'rect') {
+          ctx.rect(-p.size/2, -p.size/2, p.size, p.size);
+        } else if (p.shape === 'line') {
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-p.vx * 2, -p.vy * 2); // Vẽ đuôi vệt sao chổi
+          ctx.lineWidth = p.size;
+          ctx.strokeStyle = p.color;
+          ctx.stroke();
+        } else {
+          ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        }
+        if (p.shape !== 'line') ctx.fill();
         ctx.restore();
       }
 
       // 2. RENDER CÁC LỆNH VFX CHÍNH (CANVAS COMMANDS)
-      Object.values(activeVFX).forEach((vfx: any) => {
+      // Gom tất cả các lệnh canvas của mọi nhân vật đang có hiệu ứng
+      const allVfxInstances = Object.values(activeVFX).flat();
+
+      allVfxInstances.forEach((vfx: any) => {
         if (!vfx || !vfx.canvas_commands) return;
 
         const duration = (vfx.duration_ms || 2000) / simulationSpeed;
@@ -184,7 +229,7 @@ export default function ArenaBoard() {
             return start + (end - start) * t;
           };
 
-          // NẾU LÀ LỆNH SPAWN HẠT -> XỬ LÝ RIÊNG & KHÔNG VẼ
+          // LỆNH SPAWN HẠT -> XỬ LÝ RIÊNG & KHÔNG VẼ
           if (cmd.action === 'SPAWN_PARTICLES') {
             if (!commandSpawned.current.has(cmd)) {
               commandSpawned.current.add(cmd);
@@ -201,20 +246,22 @@ export default function ArenaBoard() {
                   vx: Math.cos(angle) * speed,
                   vy: Math.sin(angle) * speed,
                   life: 1.0,
-                  decay: Math.random() * 0.03 + 0.01,
+                  decay: Math.random() * (cmd.decayMax || 0.03) + (cmd.decayMin || 0.01),
                   color: cmd.color || 'red',
                   size: Math.random() * (cmd.size || 3) + 1,
+                  sizeDecay: cmd.sizeDecay || 0, 
                   gravity: cmd.gravity || 0,
+                  angularVelocity: cmd.angularVelocity || 0,
+                  shape: cmd.shape || 'circle',
                   glow: cmd.glow
                 });
               }
             }
-            return; // Xong việc spawn thì next lệnh khác
+            return; 
           }
 
           ctx.save();
           
-          // 🚀 NÂNG CẤP BLEND MODE TẠI ĐÂY
           ctx.globalCompositeOperation = cmd.blendMode || 'source-over';
 
           if (cmd.glow) {
@@ -222,19 +269,49 @@ export default function ArenaBoard() {
             ctx.shadowColor = cmd.shadowColor || cmd.color;
           }
 
-          ctx.fillStyle = cmd.color || 'white';
-          ctx.strokeStyle = cmd.color || 'white';
+          // Xử lý Gradient hoặc Solid Color
+          if (cmd.gradient) {
+            let grad;
+            if (cmd.gradient.type === 'linear') {
+              grad = ctx.createLinearGradient(
+                (cmd.gradient.x0 || 0) * CELL_SIZE, (cmd.gradient.y0 || 0) * CELL_SIZE,
+                (cmd.gradient.x1 || 1) * CELL_SIZE, (cmd.gradient.y1 || 1) * CELL_SIZE
+              );
+            } else if (cmd.gradient.type === 'radial') {
+              grad = ctx.createRadialGradient(
+                (cmd.gradient.x0 || 0) * CELL_SIZE, (cmd.gradient.y0 || 0) * CELL_SIZE, (cmd.gradient.r0 || 0) * CELL_SIZE,
+                (cmd.gradient.x1 || 0) * CELL_SIZE, (cmd.gradient.y1 || 0) * CELL_SIZE, (cmd.gradient.r1 || 1) * CELL_SIZE
+              );
+            }
+            if (grad && cmd.gradient.stops) {
+              cmd.gradient.stops.forEach((stop: any) => grad.addColorStop(stop.offset, stop.color));
+            }
+            ctx.fillStyle = grad || cmd.color || 'white';
+            ctx.strokeStyle = grad || cmd.color || 'white';
+          } else {
+            ctx.fillStyle = cmd.color || 'white';
+            ctx.strokeStyle = cmd.color || 'white';
+          }
           
-          // Nội suy cả độ dày nét vẽ (lineWidth) nếu cần
           const currentLineWidth = cmd.startWidth !== undefined ? lerp(cmd.startWidth, cmd.endWidth || cmd.width, progress) : (cmd.width || 2);
           ctx.lineWidth = currentLineWidth;
-          
           ctx.lineCap = cmd.lineCap || 'round';
           ctx.lineJoin = cmd.lineJoin || 'round';
 
           const startOp = cmd.startOpacity !== undefined ? cmd.startOpacity : 1;
           const endOp = cmd.endOpacity !== undefined ? cmd.endOpacity : 1;
           ctx.globalAlpha = Math.max(0, lerp(startOp, endOp, progress));
+
+          // Hỗ trợ Xoay vật thể (Rotation)
+          if (cmd.rotation !== undefined || cmd.startAngle !== undefined) {
+             const cx = (cmd.centerX !== undefined ? cmd.centerX : (cmd.x || 0)) + 0.5;
+             const cy = (cmd.centerY !== undefined ? cmd.centerY : (cmd.y || 0)) + 0.5;
+             const angle = cmd.rotation !== undefined ? cmd.rotation : lerp(cmd.startAngle || 0, cmd.endAngle || 0, progress);
+             
+             ctx.translate(cx * CELL_SIZE, cy * CELL_SIZE);
+             ctx.rotate(angle * Math.PI / 180); 
+             ctx.translate(-cx * CELL_SIZE, -cy * CELL_SIZE);
+          }
 
           switch (cmd.action) {
             case 'ANIMATE_CIRCLE':
@@ -267,7 +344,6 @@ export default function ArenaBoard() {
               break;
             }
 
-            // 🚀 NÂNG CẤP VẼ ĐƯỜNG CONG BEZIER TẠI ĐÂY
             case 'ANIMATE_BEZIER':
             case 'DRAW_BEZIER': {
               ctx.beginPath();
@@ -300,6 +376,25 @@ export default function ArenaBoard() {
                 ctx.fillRect(currentX * CELL_SIZE, currentY * CELL_SIZE, currentW * CELL_SIZE, currentH * CELL_SIZE);
               } else {
                 ctx.strokeRect(currentX * CELL_SIZE, currentY * CELL_SIZE, currentW * CELL_SIZE, currentH * CELL_SIZE);
+              }
+              break;
+            }
+            
+            // 🚀 NÂNG CẤP: Cho phép vẽ Đa Giác (Ngôi sao, mảng vỡ, tia chớp zic-zắc)
+            case 'ANIMATE_POLYGON':
+            case 'DRAW_POLYGON': {
+              if (cmd.points && cmd.points.length > 0) {
+                ctx.beginPath();
+                cmd.points.forEach((pt: any, index: number) => {
+                  const px = cmd.action === 'ANIMATE_POLYGON' ? lerp(pt.startX, pt.endX, progress) : pt.x;
+                  const py = cmd.action === 'ANIMATE_POLYGON' ? lerp(pt.startY, pt.endY, progress) : pt.y;
+                  
+                  if (index === 0) ctx.moveTo((px + 0.5) * CELL_SIZE, (py + 0.5) * CELL_SIZE);
+                  else ctx.lineTo((px + 0.5) * CELL_SIZE, (py + 0.5) * CELL_SIZE);
+                });
+                if (cmd.closePath !== false) ctx.closePath();
+                if (cmd.fill) ctx.fill();
+                else ctx.stroke();
               }
               break;
             }
@@ -395,7 +490,7 @@ export default function ArenaBoard() {
           className="w-full aspect-square relative bg-cover bg-center rounded-b-lg overflow-hidden shadow-2xl border border-gray-600 transition-all"
           style={{ 
             backgroundImage: `url(${mapPreviewUrl})`,
-            ...globalVFX?.css_override 
+            ...mergedGlobalCss 
           }}
         >
           <div className="absolute inset-0 bg-black/40"></div>
@@ -417,7 +512,8 @@ export default function ArenaBoard() {
           <div className="absolute inset-0 pointer-events-none z-50">
             {allCharactersOnBoard.map(char => {
               const shape = uploadedShapes.find(s => s.id === char.shapeId);
-              const vfx = activeVFX[char.id];
+              // Lấy mảng VFX, nếu chưa có thì truyền mảng rỗng
+              const vfxList = activeVFX[char.id] || [];
               if (!shape) return null;
               
               return (
@@ -425,7 +521,7 @@ export default function ArenaBoard() {
                   key={char.id} 
                   char={char} 
                   shape={shape} 
-                  vfx={vfx} 
+                  vfxList={vfxList} 
                   simulationSpeed={simulationSpeed} 
                 />
               );

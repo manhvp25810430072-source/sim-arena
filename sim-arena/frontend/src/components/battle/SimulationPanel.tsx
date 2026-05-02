@@ -9,7 +9,12 @@ export default function SimulationPanel() {
     applyDamageById,
     moveCharacterById,
     setActiveDialogue,
-    setVFXById,
+    
+    // 🚀 NÂNG CẤP: Lấy các hàm mới từ store
+    addVFXById,
+    removeVFXInstance,
+    clearAllVFX,
+    
     setAppStage,
     simulationSpeed,       
     setSimulationSpeed     
@@ -20,15 +25,14 @@ export default function SimulationPanel() {
   
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
   
-  // 🛠️ Tách riêng Ref để quản lý bộ đếm lùi xóa VFX và Dialogue (Chống đè mất hiệu ứng mới)
-  const vfxClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  // 🛠️ Giữ lại quản lý dialogue để tránh đè mất thoại (nhưng loại bỏ vfxClearTimers vì giờ VFX chạy song song)
   const dialogueClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
-      Object.values(vfxClearTimers.current).forEach(clearTimeout);
       Object.values(dialogueClearTimers.current).forEach(clearTimeout);
+      clearAllVFX(); // Dọn dẹp hiệu ứng nếu người dùng thoát Component
     };
   }, []);
 
@@ -56,7 +60,7 @@ export default function SimulationPanel() {
             addLiveLog({ type: 'DIALOGUE', content: event.content, charId: event.actor_id });
             setActiveDialogue(event.actor_id, { content: event.content, emotion: event.emotion });
             
-            // 🛠️ HỦY BỘ ĐẾM CŨ NẾU NHÂN VẬT NÓI CÂU MỚI (Chống mất thoại)
+            // HỦY BỘ ĐẾM CŨ NẾU NHÂN VẬT NÓI CÂU MỚI (Chống mất thoại)
             if (dialogueClearTimers.current[event.actor_id]) {
               clearTimeout(dialogueClearTimers.current[event.actor_id]);
             }
@@ -79,7 +83,7 @@ export default function SimulationPanel() {
             
             let duration = 500; 
             const pastEventsForActor = Master_Timeline.filter(
-              (e) => e.actor_id === event.actor_id && e.time_offset_ms < event.time_offset_ms
+              (e: any) => e.actor_id === event.actor_id && e.time_offset_ms < event.time_offset_ms
             );
             
             if (pastEventsForActor.length > 0) {
@@ -93,20 +97,17 @@ export default function SimulationPanel() {
             
           case 'VFX':
             const vfxTarget = event.target_id || 'GLOBAL';
-            setVFXById(vfxTarget, event);
-            
             const duration_vfx = event.duration_ms || 2000;
             
-            // 🛠️ FIX LỖI XÓA ĐÈ VFX:
-            // Nếu mục tiêu đang có 1 timeout chờ xóa VFX cũ, ta phải HỦY nó đi
-            // để hiệu ứng mới nhất được hiển thị đủ thời gian và tự nhiên gộp (merge) lại.
-            if (vfxClearTimers.current[vfxTarget]) {
-              clearTimeout(vfxClearTimers.current[vfxTarget]);
-            }
-
-            vfxClearTimers.current[vfxTarget] = setTimeout(() => {
-              setVFXById(vfxTarget, null);
+            // 🚀 NÂNG CẤP: Thêm VFX vào Store, nhận lại instanceId
+            const instanceId = addVFXById(vfxTarget, event);
+            
+            // 🚀 NÂNG CẤP: Đặt giờ để xóa đúng cái instance đó thay vì xóa trắng toàn bộ VFX của nhân vật
+            const removeTimer = setTimeout(() => {
+              removeVFXInstance(vfxTarget, instanceId);
             }, duration_vfx / simulationSpeed);
+
+            timeoutRefs.current.push(removeTimer);
             break;
         }
       }, adjustedTimeOffset);
