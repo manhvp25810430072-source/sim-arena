@@ -70,24 +70,6 @@ interface MainState {
   setSimulationSpeed: (speed: number) => void;
 }
 
-// ============================================================================
-// 🛠️ BỘ LỌC THÔNG DỊCH CSS (CSS NORMALIZER)
-// ============================================================================
-const kebabToCamel = (str: string) => {
-  if (str.startsWith('--')) return str; 
-  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-};
-
-const normalizeCSS = (cssObj: Record<string, any> | undefined) => {
-  if (!cssObj) return {};
-  const normalized: Record<string, any> = {};
-  for (const key in cssObj) {
-    normalized[kebabToCamel(key)] = cssObj[key];
-  }
-  return normalized;
-};
-// ============================================================================
-
 export const useMainStore = create<MainState>((set) => ({
   mapImage: null,
   mapPreviewUrl: null,
@@ -166,11 +148,10 @@ export const useMainStore = create<MainState>((set) => ({
     return { teamA: state.teamA.map(updateFn), teamB: state.teamB.map(updateFn) };
   }),
 
-  // 🚀 NÂNG CẤP: Logic thêm VFX vào mảng
+  // 🚀 NÂNG CẤP: Logic thêm VFX vào mảng (Nhận trực tiếp 10 công cụ từ JSON)
   addVFXById: (id, vfx) => {
     const instanceId = crypto.randomUUID();
-    const normalizedCSS = normalizeCSS(vfx.css_override);
-    const processedVFX = { ...vfx, css_override: normalizedCSS, _instanceId: instanceId };
+    const processedVFX = { ...vfx, _instanceId: instanceId };
 
     set((state) => {
       const existing = state.activeVFX[id] || [];
@@ -181,7 +162,6 @@ export const useMainStore = create<MainState>((set) => ({
         }
       };
     });
-
     return instanceId; // Trả về ID để dùng cho Timeout xóa sau này
   },
 

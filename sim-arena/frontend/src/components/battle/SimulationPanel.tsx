@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMainStore } from '../../store/useMainStore';
+// 🚀 NÂNG CẤP: Import Động cơ Kỹ xảo
+import { initVFXEngine, executeVFX, clearAllVFX as clearPixiVFX } from '../../utils/vfxEngine';
 
 export default function SimulationPanel() {
   const {
@@ -10,7 +12,6 @@ export default function SimulationPanel() {
     moveCharacterById,
     setActiveDialogue,
     
-    // 🚀 NÂNG CẤP: Lấy các hàm mới từ store
     addVFXById,
     removeVFXInstance,
     clearAllVFX,
@@ -24,15 +25,17 @@ export default function SimulationPanel() {
   const [isFinished, setIsFinished] = useState(false);
   
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
-  
-  // 🛠️ Giữ lại quản lý dialogue để tránh đè mất thoại (nhưng loại bỏ vfxClearTimers vì giờ VFX chạy song song)
   const dialogueClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
+    // 🚀 Khởi tạo Engine Kỹ xảo ngay khi Panel giả lập xuất hiện
+    initVFXEngine('vfx-bg-layer', 'vfx-fg-layer');
+
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
       Object.values(dialogueClearTimers.current).forEach(clearTimeout);
-      clearAllVFX(); // Dọn dẹp hiệu ứng nếu người dùng thoát Component
+      clearAllVFX(); // Dọn dẹp state trong Store
+      clearPixiVFX(); // Dọn dẹp rác Canvas của PixiJS & GSAP
     };
   }, []);
 
@@ -60,7 +63,6 @@ export default function SimulationPanel() {
             addLiveLog({ type: 'DIALOGUE', content: event.content, charId: event.actor_id });
             setActiveDialogue(event.actor_id, { content: event.content, emotion: event.emotion });
             
-            // HỦY BỘ ĐẾM CŨ NẾU NHÂN VẬT NÓI CÂU MỚI (Chống mất thoại)
             if (dialogueClearTimers.current[event.actor_id]) {
               clearTimeout(dialogueClearTimers.current[event.actor_id]);
             }
@@ -80,33 +82,54 @@ export default function SimulationPanel() {
             
           case 'MOVE':
             addLiveLog({ type: 'MOVE', content: `Di chuyển tới (${event.target_x}, ${event.target_y})`, charId: event.actor_id });
-            
             let duration = 500; 
             const pastEventsForActor = Master_Timeline.filter(
               (e: any) => e.actor_id === event.actor_id && e.time_offset_ms < event.time_offset_ms
             );
-            
             if (pastEventsForActor.length > 0) {
               const lastEvent = pastEventsForActor[pastEventsForActor.length - 1];
               duration = event.time_offset_ms - lastEvent.time_offset_ms;
               duration = Math.max(300, Math.min(duration, 3000));
             }
 
-            moveCharacterById(event.actor_id, event.target_x, event.target_y, duration / simulationSpeed);
+            // 1. Lấy vị trí hiện tại của nhân vật từ Store (trước khi di chuyển)
+            const state = useMainStore.getState();
+            const char = [...state.teamA, ...state.teamB].find(c => c.id === event.actor_id);
+            const oldX = char?.position?.x ?? event.target_x;
+            const oldY = char?.position?.y ?? event.target_y;
+
+            // 2. Ép React cập nhật DOM đến điểm đích NGAY LẬP TỨC để chốt sổ Data
+            moveCharacterById(event.actor_id, event.target_x, event.target_y, 0);
+            
+            // 3. Đợi 1 tick nhỏ xíu để React ghim xong DOM ở vị trí mới, rồi bảo GSAP kéo ngược về oldX, oldY và trượt lên
+            const animTimer = setTimeout(() => {
+              executeVFX({
+                gsap_tween: {
+                  target_id: event.actor_id,
+                  from_x: oldX,
+                  from_y: oldY,
+                  x: event.target_x,
+                  y: event.target_y,
+                  duration_ms: duration,
+                  ease: "power1.inOut"
+                }
+              }, simulationSpeed);
+            }, 0);
+            timeoutRefs.current.push(animTimer);
             break;
             
           case 'VFX':
             const vfxTarget = event.target_id || 'GLOBAL';
             const duration_vfx = event.duration_ms || 2000;
             
-            // 🚀 NÂNG CẤP: Thêm VFX vào Store, nhận lại instanceId
-            const instanceId = addVFXById(vfxTarget, event);
+            // 🚀 GỌI ENGINE ĐỘC LẬP ĐỂ VẼ HIỆU ỨNG (PIXIJS + GSAP)
+            executeVFX(event, simulationSpeed);
             
-            // 🚀 NÂNG CẤP: Đặt giờ để xóa đúng cái instance đó thay vì xóa trắng toàn bộ VFX của nhân vật
+            // 🚀 NÂNG CẤP: Vẫn thêm vào Store để React quản lý vòng đời DOM nếu cần
+            const instanceId = addVFXById(vfxTarget, event);
             const removeTimer = setTimeout(() => {
               removeVFXInstance(vfxTarget, instanceId);
             }, duration_vfx / simulationSpeed);
-
             timeoutRefs.current.push(removeTimer);
             break;
         }
