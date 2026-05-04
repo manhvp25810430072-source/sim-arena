@@ -383,6 +383,50 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const endScale = payload.end_scale ?? 0.1;
       const count = payload.particle_count ?? 50;
 
+      const actualLifeTimeMs = lifetimeSec * 1000;
+      const startR = (startColor.color >> 16) & 255;
+      const startG = (startColor.color >> 8) & 255;
+      const startB = startColor.color & 255;
+      const endR = (endColor.color >> 16) & 255;
+      const endG = (endColor.color >> 8) & 255;
+      const endB = endColor.color & 255;
+
+      const activeParticles: any[] = [];
+      const particleTicker = trackTicker(new PIXI.Ticker());
+
+      particleTicker.add((tickerObj) => {
+        const deltaMs = (tickerObj as any).deltaMS ?? (tickerObj as any).deltaTime * 16.6667;
+        for (let i = activeParticles.length - 1; i >= 0; i--) {
+          const p = activeParticles[i];
+          p.elapsed += deltaMs;
+          let ratio = p.elapsed / actualLifeTimeMs;
+          if (ratio >= 1) {
+            if (!p.sprite.destroyed) {
+              container.removeChild(p.sprite);
+              p.sprite.destroy();
+            }
+            activeParticles.splice(i, 1);
+            continue;
+          }
+
+          const easeRatio = 1 - Math.pow(1 - ratio, 2);
+
+          p.sprite.x = p.dx * easeRatio;
+          p.sprite.y = p.dy * easeRatio;
+          
+          p.sprite.scale.set(startScale + (endScale - startScale) * easeRatio);
+          p.sprite.alpha = startColor.alpha + (endAlpha - startColor.alpha) * ratio;
+
+          if (startColor.color !== endColor.color) {
+            const r = Math.round(startR + (endR - startR) * ratio);
+            const g = Math.round(startG + (endG - startG) * ratio);
+            const b = Math.round(startB + (endB - startB) * ratio);
+            p.sprite.tint = (r << 16) | (g << 8) | b;
+          }
+        }
+      });
+      particleTicker.start();
+
       const spawnParticle = (angleDeg: number) => {
         const sprite = new PIXI.Sprite(particleTexture);
         sprite.anchor.set(0.5);
@@ -398,47 +442,11 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         const dx = Math.cos(angleRad) * speedPx;
         const dy = Math.sin(angleRad) * speedPx;
 
-        const colorTween = { t: 0 };
-        const startR = (startColor.color >> 16) & 255;
-        const startG = (startColor.color >> 8) & 255;
-        const startB = startColor.color & 255;
-        const endR = (endColor.color >> 16) & 255;
-        const endG = (endColor.color >> 8) & 255;
-        const endB = endColor.color & 255;
-
-        const timeline = gsap.timeline({
-          onComplete: () => {
-            gsap.killTweensOf(colorTween);
-            gsap.killTweensOf(sprite);
-            gsap.killTweensOf(sprite.scale);
-            if (!sprite.destroyed) {
-              container.removeChild(sprite);
-              sprite.destroy();
-            }
-          }
+        activeParticles.push({
+          sprite,
+          dx, dy,
+          elapsed: 0
         });
-
-        timeline.to(sprite, { x: dx, y: dy, duration: lifetimeSec, ease: 'power1.out' }, 0);
-        timeline.to(sprite.scale, { x: endScale, y: endScale, duration: lifetimeSec, ease: 'power1.out' }, 0);
-        timeline.to(sprite, { alpha: endAlpha, duration: lifetimeSec, ease: 'linear' }, 0);
-
-        if (startColor.color !== endColor.color) {
-          timeline.to(
-            colorTween,
-            {
-              t: 1,
-              duration: lifetimeSec,
-              ease: 'linear',
-              onUpdate: () => {
-                const r = Math.round(startR + (endR - startR) * colorTween.t);
-                const g = Math.round(startG + (endG - startG) * colorTween.t);
-                const b = Math.round(startB + (endB - startB) * colorTween.t);
-                sprite.tint = (r << 16) | (g << 8) | b;
-              }
-            },
-            0
-          );
-        }
       };
 
       const spawnBurst = (amount: number) => {
@@ -466,6 +474,16 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       }
 
       trackTimeout(setTimeout(() => {
+        particleTicker.stop();
+        particleTicker.destroy();
+        activeTickers.delete(particleTicker);
+        
+        activeParticles.forEach(p => {
+          if (!p.sprite.destroyed) p.sprite.destroy();
+        });
+        
+        if (particleTexture) particleTexture.destroy(true);
+
         if (!container.destroyed) {
           stage.removeChild(container);
           container.destroy();
