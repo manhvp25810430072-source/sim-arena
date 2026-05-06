@@ -79,6 +79,8 @@ const resolveBlendMode = (mode?: string) => {
       return 'multiply';
     case 'SCREEN':
       return 'screen';
+    case 'OVERLAY':
+      return 'overlay';
     case 'NORMAL':
       return 'normal';
     default:
@@ -125,6 +127,45 @@ const scheduleEffect = (
   }
 };
 
+// Hàm tiện ích xử lý vòng đời: Mờ dần khi bắt đầu (Fade In) và tan biến (Fade Out)
+const handleLifecycle = (
+  obj: PIXI.Container | PIXI.Sprite | PIXI.Graphics | PIXI.Text | PIXI.Container, 
+  payload: any, 
+  simulationSpeed: number, 
+  stage: PIXI.Container
+) => {
+  const fadeIn = (payload.fade_in_ms || 0) / simulationSpeed;
+  const lifetime = (payload.lifetime_ms || 1000) / simulationSpeed;
+  const fadeOut = (payload.fade_out_ms || 0) / simulationSpeed;
+  const targetAlpha = obj.alpha;
+
+  if (fadeIn > 0) {
+    obj.alpha = 0;
+    gsap.to(obj, { alpha: targetAlpha, duration: fadeIn / 1000, ease: 'power1.inOut' });
+  }
+
+  trackTimeout(setTimeout(() => {
+    if (fadeOut > 0) {
+      gsap.to(obj, { 
+        alpha: 0, 
+        duration: fadeOut / 1000, 
+        ease: 'power1.inOut',
+        onComplete: () => {
+          if (!obj.destroyed) {
+            stage.removeChild(obj);
+            obj.destroy();
+          }
+        }
+      });
+    } else {
+      if (!obj.destroyed) {
+        stage.removeChild(obj);
+        obj.destroy();
+      }
+    }
+  }, (fadeIn + lifetime) / simulationSpeed));
+};
+
 export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
   const bgCanvas = document.getElementById(bgCanvasId) as HTMLCanvasElement;
   const fgCanvas = document.getElementById(fgCanvasId) as HTMLCanvasElement;
@@ -146,7 +187,7 @@ export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
   appFg = new PIXI.Application({ backgroundAlpha: 0, width: 1000, height: 1000, clearBeforeRender: true });
   await appFg.init({ canvas: fgCanvas, width: 1000, height: 1000, backgroundAlpha: 0, clearBeforeRender: true });
 
-  console.log('VFX Engine (PixiJS + GSAP) Initialized');
+  console.log('VFX Engine (PixiJS + GSAP) Initialized with Grid Cell standard');
 };
 
 export const clearAllVFX = () => {
@@ -178,16 +219,42 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   const blendMode = resolveBlendMode(vfxEvent.blend_mode?.mode);
 
   if (vfxEvent.gsap_tween) {
-    const { target_id, x, y, from_x, from_y, scale, opacity, rotation_deg, duration_ms, ease } = vfxEvent.gsap_tween;
-    const domTarget = target_id === 'GLOBAL' ? '#arena-board' : `#char-${target_id}`;
+    const { 
+      target_id, x, y, from_x, from_y, 
+      scale_x, scale_y, scale, opacity, rotation_deg, 
+      duration_ms, ease, local_shake_x, local_shake_y, 
+      repeat, yoyo 
+    } = vfxEvent.gsap_tween;
+    
+    const domTarget = target_id === 'GLOBAL' ? '#arena-board' : `#char-${target_id || vfxEvent.target_id}`;
     const duration = ((duration_ms ?? 500) / 1000) / simulationSpeed;
+
+    // Xử lý rung lắc cục bộ (Shake)
+    if (local_shake_x || local_shake_y) {
+      const sx = (local_shake_x || 0) * CELL_SIZE;
+      const sy = (local_shake_y || 0) * CELL_SIZE;
+      const shakeCount = repeat !== undefined ? repeat : Math.max(1, Math.floor((duration * 1000) / 50));
+      
+      gsap.fromTo(domTarget,
+        { x: -sx, y: -sy },
+        {
+          x: sx,
+          y: sy,
+          duration: 0.05 / simulationSpeed,
+          repeat: shakeCount,
+          yoyo: true,
+          ease: 'none',
+          clearProps: 'x,y'
+        }
+      );
+    }
 
     const toConfig: gsap.TweenVars = {
       duration,
       ease: ease || 'power1.out',
       delay: (sequence.delayMs / 1000) / simulationSpeed,
-      repeat: sequence.repeat ?? 0,
-      yoyo: sequence.yoyo,
+      repeat: sequence.repeat ?? repeat ?? 0,
+      yoyo: sequence.yoyo || yoyo || false,
       overwrite: 'auto'
     };
 
@@ -195,7 +262,13 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       toConfig.repeatDelay = (sequence.staggerMs / 1000) / simulationSpeed;
     }
 
-    if (scale !== undefined) toConfig.scale = scale;
+    if (scale !== undefined) {
+      toConfig.scale = scale;
+    } else {
+      if (scale_x !== undefined) toConfig.scaleX = scale_x;
+      if (scale_y !== undefined) toConfig.scaleY = scale_y;
+    }
+    
     if (opacity !== undefined) toConfig.opacity = opacity;
     if (rotation_deg !== undefined) toConfig.rotation = rotation_deg;
     if (x !== undefined) toConfig.left = `${x * 5}%`;
@@ -208,29 +281,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     }
   }
 
-  if (vfxEvent.camera_shake) {
-    const { intensity, duration_ms } = vfxEvent.camera_shake;
-    const totalMs = (duration_ms || 300) / simulationSpeed;
-    const repeatCount = Math.max(1, Math.floor(totalMs / 50));
-
-    gsap.fromTo(
-      '#arena-board',
-      { x: -intensity, y: -intensity },
-      {
-        x: intensity,
-        y: intensity,
-        duration: 0.05 / simulationSpeed,
-        repeat: repeatCount,
-        yoyo: true,
-        ease: 'none',
-        clearProps: 'x,y'
-      }
-    );
-  }
-
   if (vfxEvent.pixi_graphics) {
     const payload = vfxEvent.pixi_graphics;
-    const durationMs = vfxEvent.duration_ms || 1000;
+    const durationMs = payload.lifetime_ms || vfxEvent.duration_ms || 1000;
 
     scheduleEffect(() => {
       const graphics = new PIXI.Graphics();
@@ -244,7 +297,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const stroke = payload.line_color ? parseColor(payload.line_color) : null;
       const fillAlpha = fill ? (payload.fill_alpha ?? 1) * fill.alpha : 0;
       const strokeAlpha = stroke ? (payload.line_alpha ?? 1) * stroke.alpha : 0;
-      const strokeWidth = payload.line_width ?? (stroke ? 1 : 0);
+      const strokeWidth = (payload.line_width ?? (stroke ? 0.05 : 0)) * CELL_SIZE;
 
       const applyFillStroke = (allowFill: boolean) => {
         if (allowFill && fill) {
@@ -272,9 +325,6 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             graphicsAny.drawPolygon(flatPoints);
           }
           applyFillStroke(true);
-        } else {
-          graphics.rect(p0.x * CELL_SIZE, p0.y * CELL_SIZE, (payload.width || 1) * CELL_SIZE, (payload.height || 1) * CELL_SIZE);
-          applyFillStroke(true);
         }
       } else if (payload.shape_type === 'rect') {
         let rectX = p0.x;
@@ -289,7 +339,6 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           rectW = Math.max(Math.abs(p1[0] - p0.x), rectW);
           rectH = Math.max(Math.abs(p1[1] - p0.y), rectH);
         }
-
         graphics.rect(rectX * CELL_SIZE, rectY * CELL_SIZE, rectW * CELL_SIZE, rectH * CELL_SIZE);
         applyFillStroke(true);
       } else {
@@ -298,68 +347,66 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         applyFillStroke(true);
       }
 
+      graphics.alpha = (fillAlpha > 0 ? fillAlpha : strokeAlpha > 0 ? strokeAlpha : 1);
       stage.addChild(graphics);
+      
+      handleLifecycle(graphics, payload, simulationSpeed, stage);
 
-      trackTimeout(setTimeout(() => {
-        if (!graphics.destroyed) {
-          stage.removeChild(graphics);
-          graphics.destroy();
-        }
-      }, durationMs / simulationSpeed));
     }, sequence, durationMs, simulationSpeed);
   }
 
   if (vfxEvent.pixi_text) {
     const payload = vfxEvent.pixi_text;
-    const durationMs = payload.fade_duration_ms || 1500;
+    const durationMs = payload.lifetime_ms || payload.fade_duration_ms || 1500;
 
     scheduleEffect(() => {
+      const dropShadowDistanceX = (payload.drop_shadow_distance_x || 0) * CELL_SIZE;
+      const dropShadowDistanceY = (payload.drop_shadow_distance_y || 0) * CELL_SIZE;
+
       const textStyle = new PIXI.TextStyle({
-        fontFamily: '"Arial Black", Arial, sans-serif',
-        fontSize: payload.font_size || 24,
+        fontFamily: payload.font_family || '"Arial Black", Arial, sans-serif',
+        fontSize: (payload.font_size || 0.5) * CELL_SIZE,
         fill: payload.color || '#FFFFFF',
         fontWeight: (payload.font_weight as any) || 'bold',
-        dropShadow: !!payload.drop_shadow
-      });
+        dropShadow: payload.drop_shadow || dropShadowDistanceX > 0 || dropShadowDistanceY > 0,
+        dropShadowDistance: Math.max(dropShadowDistanceX, dropShadowDistanceY)
+      } as any);
 
       const textObj = new PIXI.Text({ text: String(payload.content), style: textStyle });
       const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
 
-      textObj.x = (payload.x !== undefined ? payload.x : fallbackPos.x) * CELL_SIZE;
-      textObj.y = (payload.y !== undefined ? payload.y : fallbackPos.y) * CELL_SIZE;
+      textObj.x = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
+      textObj.y = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
       textObj.anchor.set(0.5);
 
       if (blendMode !== null) textObj.blendMode = blendMode;
       stage.addChild(textObj);
 
-      const floatY = payload.float_distance_y !== undefined ? payload.float_distance_y : -2;
-      const fadeMs = payload.fade_duration_ms || 1500;
+      const floatY = (payload.float_distance_y !== undefined ? payload.float_distance_y : -1) * CELL_SIZE;
+      const floatDuration = (payload.float_duration_ms || durationMs) / simulationSpeed;
 
       gsap.to(textObj, {
-        y: textObj.y + (floatY * CELL_SIZE),
-        alpha: 0,
-        duration: (fadeMs / 1000) / simulationSpeed,
-        ease: 'power2.out',
-        onComplete: () => {
-          if (!textObj.destroyed) {
-            stage.removeChild(textObj);
-            textObj.destroy();
-          }
-        }
+        y: textObj.y + floatY,
+        duration: floatDuration / 1000,
+        ease: 'power2.out'
       });
+
+      handleLifecycle(textObj, payload, simulationSpeed, stage);
+
     }, sequence, durationMs, simulationSpeed);
   }
 
   if (vfxEvent.pixi_particles) {
     const payload = vfxEvent.pixi_particles;
-    const durationMs = payload.lifetime_ms || 1000;
+    const durationMs = payload.emit_duration_ms || payload.lifetime_ms || 1000;
 
     scheduleEffect(() => {
       const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
-      const originX = (payload.x !== undefined ? payload.x : fallbackPos.x) * CELL_SIZE;
-      const originY = (payload.y !== undefined ? payload.y : fallbackPos.y) * CELL_SIZE;
-      const lifetimeMs = payload.lifetime_ms || 1000;
-      const lifetimeSec = (lifetimeMs / 1000) / simulationSpeed;
+      const originX = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
+      const originY = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
+      
+      const particleLifetimeMs = payload.particle_lifetime_ms || payload.lifetime_ms || 1000;
+      const particleLifetimeSec = (particleLifetimeMs / 1000) / simulationSpeed;
 
       const startColor = parseColor(payload.start_color, '#ffffff');
       const endColor = parseColor(payload.end_color ?? payload.start_color, payload.start_color || '#ffffff');
@@ -378,12 +425,14 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
       const spread = payload.spread_angle ?? (payload.emitter_type === 'fountain' ? 45 : 360);
       const baseAngle = payload.emitter_type === 'fountain' ? -90 : 0;
-      const speedPx = (payload.speed ?? 10) * CELL_SIZE;
+      const speedPx = (payload.speed ?? 2) * CELL_SIZE;
       const startScale = payload.start_scale ?? 1;
       const endScale = payload.end_scale ?? 0.1;
-      const count = payload.particle_count ?? 50;
+      
+      const spawnWidth = (payload.spawn_width || 0) * CELL_SIZE;
+      const spawnHeight = (payload.spawn_height || 0) * CELL_SIZE;
 
-      const actualLifeTimeMs = lifetimeSec * 1000;
+      const actualLifeTimeMs = particleLifetimeSec * 1000;
       const startR = (startColor.color >> 16) & 255;
       const startG = (startColor.color >> 8) & 255;
       const startB = startColor.color & 255;
@@ -411,8 +460,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
           const easeRatio = 1 - Math.pow(1 - ratio, 2);
 
-          p.sprite.x = p.dx * easeRatio;
-          p.sprite.y = p.dy * easeRatio;
+          p.sprite.x = p.startX + p.dx * easeRatio;
+          p.sprite.y = p.startY + p.dy * easeRatio;
           
           p.sprite.scale.set(startScale + (endScale - startScale) * easeRatio);
           p.sprite.alpha = startColor.alpha + (endAlpha - startColor.alpha) * ratio;
@@ -427,11 +476,11 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       });
       particleTicker.start();
 
-      const spawnParticle = (angleDeg: number) => {
+      const spawnParticle = (angleDeg: number, offsetX: number, offsetY: number) => {
         const sprite = new PIXI.Sprite(particleTexture);
         sprite.anchor.set(0.5);
-        sprite.x = 0;
-        sprite.y = 0;
+        sprite.x = offsetX;
+        sprite.y = offsetY;
         sprite.scale.set(startScale);
         sprite.alpha = startColor.alpha;
         sprite.tint = startColor.color;
@@ -444,6 +493,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
         activeParticles.push({
           sprite,
+          startX: offsetX,
+          startY: offsetY,
           dx, dy,
           elapsed: 0
         });
@@ -452,27 +503,30 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const spawnBurst = (amount: number) => {
         for (let i = 0; i < amount; i += 1) {
           const angle = baseAngle + (Math.random() - 0.5) * spread;
-          spawnParticle(angle);
+          const offsetX = (Math.random() - 0.5) * spawnWidth;
+          const offsetY = (Math.random() - 0.5) * spawnHeight;
+          spawnParticle(angle, offsetX, offsetY);
         }
       };
 
-      if (payload.emitter_type === 'stream' || payload.emitter_type === 'fountain') {
+      // Xử lý logic Emit
+      const burstCount = payload.burst_count ?? payload.particle_count ?? 0;
+      if (burstCount > 0) {
+        spawnBurst(burstCount);
+      }
+
+      if (payload.emitter_type === 'stream' || payload.emitter_type === 'fountain' || payload.emit_rate > 0) {
         const intervalMs = 100;
-        const perTick = Math.max(1, Math.round(count / (1000 / intervalMs)));
+        const rate = payload.emit_rate ?? 10;
+        const perTick = Math.max(1, Math.round(rate / (1000 / intervalMs)));
+        
         const intervalHandle = trackInterval(setInterval(() => spawnBurst(perTick), intervalMs / simulationSpeed));
         trackTimeout(setTimeout(() => {
           clearInterval(intervalHandle);
-        }, lifetimeMs / simulationSpeed));
-      } else if (payload.emitter_type === 'pulse') {
-        const pulseIntervalMs = 200;
-        const intervalHandle = trackInterval(setInterval(() => spawnBurst(count), pulseIntervalMs / simulationSpeed));
-        trackTimeout(setTimeout(() => {
-          clearInterval(intervalHandle);
-        }, lifetimeMs / simulationSpeed));
-      } else {
-        spawnBurst(count);
+        }, durationMs / simulationSpeed));
       }
 
+      // Cleanup hạt sau khi hết vòng đời
       trackTimeout(setTimeout(() => {
         particleTicker.stop();
         particleTicker.destroy();
@@ -488,13 +542,13 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           stage.removeChild(container);
           container.destroy();
         }
-      }, (lifetimeMs + 300) / simulationSpeed));
+      }, (durationMs + particleLifetimeMs + 300) / simulationSpeed));
     }, sequence, durationMs, simulationSpeed);
   }
 
   if (vfxEvent.pixi_mesh) {
     const payload = vfxEvent.pixi_mesh;
-    const durationMs = vfxEvent.duration_ms || 500;
+    const durationMs = payload.lifetime_ms || vfxEvent.duration_ms || 500;
 
     scheduleEffect(() => {
       const points = payload.path_points || [];
@@ -505,12 +559,16 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       stage.addChild(graphics);
 
       const stroke = parseColor(payload.color, '#ffffff');
-      const strokeWidth = payload.thickness ?? 5;
+      const strokeWidth = (payload.thickness ?? 0.2) * CELL_SIZE;
       const style = payload.style || 'line';
       const distortion = (payload.distortion_amplitude ?? 0) * CELL_SIZE;
       const animationSpeed = payload.animation_speed ?? 0;
 
       const basePoints = points.map((p: number[]) => ({ x: p[0] * CELL_SIZE, y: p[1] * CELL_SIZE }));
+
+      if (payload.is_closed_path && basePoints.length > 2) {
+        basePoints.push({ ...basePoints[0] });
+      }
 
       const drawLine = (pts: Array<{ x: number; y: number }>) => {
         graphics.moveTo(pts[0].x, pts[0].y);
@@ -543,22 +601,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         }
       };
 
-      const drawCurve = (pts: Array<{ x: number; y: number }>) => {
-        graphics.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i += 1) {
-          const prev = pts[i - 1];
-          const curr = pts[i];
-          const midX = (prev.x + curr.x) / 2;
-          const midY = (prev.y + curr.y) / 2;
-          graphics.quadraticCurveTo(prev.x, prev.y, midX, midY);
-        }
-        const last = pts[pts.length - 1];
-        graphics.lineTo(last.x, last.y);
-      };
-
       const jitterPoints = () => {
         return basePoints.map((p: { x: number; y: number }, idx: number) => {
-          if (idx === 0 || idx === basePoints.length - 1) return p;
+          if (idx === 0 || (idx === basePoints.length - 1 && !payload.is_closed_path)) return p;
           const jitterX = (Math.random() * 2 - 1) * distortion;
           const jitterY = (Math.random() * 2 - 1) * distortion;
           return { x: p.x + jitterX, y: p.y + jitterY };
@@ -569,22 +614,16 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         graphics.clear();
         if (style === 'dash_trail') {
           drawDashed(pts);
-        } else if (style === 'whip_curve') {
-          drawCurve(pts);
         } else {
           drawLine(pts);
         }
         graphics.stroke({ width: strokeWidth, color: stroke.color, alpha: stroke.alpha });
       };
 
-      if (style === 'lightning_arc') {
-        render(distortion > 0 ? jitterPoints() : basePoints);
-      } else {
-        render(basePoints);
-      }
+      render(distortion > 0 ? jitterPoints() : basePoints);
 
       let ticker: PIXI.Ticker | null = null;
-      if (style === 'lightning_arc' && distortion > 0 && animationSpeed > 0) {
+      if (distortion > 0 && animationSpeed > 0) {
         const intervalMs = Math.max(16, 1000 / (animationSpeed * 10));
         let elapsed = 0;
         ticker = trackTicker(new PIXI.Ticker());
@@ -599,17 +638,16 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         ticker.start();
       }
 
+      handleLifecycle(graphics, payload, simulationSpeed, stage);
+
       trackTimeout(setTimeout(() => {
         if (ticker) {
           ticker.stop();
           ticker.destroy();
           activeTickers.delete(ticker);
         }
-        if (!graphics.destroyed) {
-          stage.removeChild(graphics);
-          graphics.destroy();
-        }
       }, durationMs / simulationSpeed));
+
     }, sequence, durationMs, simulationSpeed);
   }
 
@@ -619,48 +657,17 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
     scheduleEffect(() => {
       const targetId = payload.target_id || vfxEvent.target_id;
-      if (!targetId || targetId === 'GLOBAL') return;
+      if (!targetId || targetId === 'GLOBAL') return; // Strict Rule: No GLOBAL filters
 
       const pos = resolveTargetPosition(targetId);
-      const domTarget = document.querySelector(`#char-${targetId}`) as HTMLElement | null;
       const filterColor = payload.color || '#ffffff';
       const colorParsed = parseColor(filterColor, '#ffffff');
-      const radius = payload.radius ?? 1;
       const intensity = payload.intensity ?? 1;
-
-      const applyDomFilter = (filterValue: string) => {
-        if (!domTarget) return;
-        const prev = domTarget.style.filter;
-        const next = prev ? `${prev} ${filterValue}` : filterValue;
-        domTarget.style.filter = next;
-        trackTimeout(setTimeout(() => {
-          domTarget.style.filter = prev;
-        }, durationMs / simulationSpeed));
-      };
-
-      const applyDomGlitch = () => {
-        if (!domTarget) return;
-        const jitter = Math.max(1, intensity * 2);
-        const repeatCount = Math.max(1, Math.floor((durationMs / simulationSpeed) / 50));
-        gsap.fromTo(
-          domTarget,
-          { x: -jitter, y: jitter },
-          {
-            x: jitter,
-            y: -jitter,
-            duration: 0.05 / simulationSpeed,
-            repeat: repeatCount,
-            yoyo: true,
-            ease: 'none',
-            clearProps: 'x,y'
-          }
-        );
-        applyDomFilter('contrast(140%)');
-      };
+      const amplitude = (payload.amplitude ?? 1) * CELL_SIZE;
 
       const makeRing = (lineWidth = 2, alpha = 0.8) => {
         const ring = new PIXI.Graphics();
-        ring.circle(0, 0, radius * CELL_SIZE);
+        ring.circle(0, 0, amplitude);
         ring.stroke({ width: lineWidth, color: colorParsed.color, alpha });
         ring.x = pos.x * CELL_SIZE;
         ring.y = pos.y * CELL_SIZE;
@@ -676,39 +683,12 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         }
       };
 
-      if (payload.filter_type === 'blur') {
-        applyDomFilter(`blur(${Math.max(1, intensity * 2)}px)`);
-        const ring = makeRing(Math.max(2, intensity));
-        const blurFilter = new PIXI.BlurFilter(Math.max(1, intensity * 2));
-        ring.filters = [blurFilter];
-        trackTimeout(setTimeout(() => removeDisplay(ring), durationMs / simulationSpeed));
-      } else if (payload.filter_type === 'sepia') {
-        applyDomFilter(`sepia(${Math.max(0, Math.min(1, intensity))})`);
-        const ring = makeRing(Math.max(2, intensity));
-        const matrix = new PIXI.ColorMatrixFilter();
-        matrix.sepia(true);
-        ring.filters = [matrix];
-        trackTimeout(setTimeout(() => removeDisplay(ring), durationMs / simulationSpeed));
-      } else if (payload.filter_type === 'glow') {
-        applyDomFilter(`drop-shadow(0 0 ${Math.max(4, radius * 6)}px ${filterColor})`);
-        const ring = makeRing(Math.max(2, intensity), 0.9);
-        const blurFilter = new PIXI.BlurFilter(Math.max(2, intensity * 2));
-        ring.filters = [blurFilter];
-        trackTimeout(setTimeout(() => removeDisplay(ring), durationMs / simulationSpeed));
-      } else if (payload.filter_type === 'glitch') {
-        applyDomGlitch();
-        const ring = makeRing(Math.max(2, intensity), 0.7);
-        const NoiseFilter = (PIXI as any).NoiseFilter;
-        if (NoiseFilter) {
-          ring.filters = [new NoiseFilter(Math.max(0.2, intensity / 5))];
-        }
-        trackTimeout(setTimeout(() => removeDisplay(ring), durationMs / simulationSpeed));
-      } else if (payload.filter_type === 'shockwave') {
+      if (payload.filter_type === 'shockwave') {
         const ring = makeRing(Math.max(2, intensity), 0.9);
         gsap.fromTo(
           ring.scale,
-          { x: 0.2, y: 0.2 },
-          { x: 1.4, y: 1.4, duration: (durationMs / 1000) / simulationSpeed, ease: 'power2.out' }
+          { x: 0.1, y: 0.1 },
+          { x: 1.5, y: 1.5, duration: (durationMs / 1000) / simulationSpeed, ease: 'power2.out' }
         );
         gsap.to(ring, {
           alpha: 0,
