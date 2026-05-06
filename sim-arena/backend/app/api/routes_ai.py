@@ -15,6 +15,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 class SimulationRequest(BaseModel):
     map_description: str
     current_grid_state: dict
+    vfx_prefabs: dict  # BỔ SUNG: Nhận thư viện prefabs từ Frontend
     start_ms: int
     end_ms: int
     is_regenerate: bool = False
@@ -23,10 +24,12 @@ class SimulationRequest(BaseModel):
 async def generate_timeline(req: SimulationRequest):
     try:
         # 1. Thay thế các biến động vào System Prompt
-        system_prompt = BATTLE_DIRECTOR_PROMPT.replace("**MAP_DESCRIPTION_AND_EFFECTS**", req.map_description)
-        system_prompt = system_prompt.replace("[CURRENT_GRID_STATE]", json.dumps(req.current_grid_state, indent=2))
+        system_prompt = BATTLE_DIRECTOR_PROMPT.replace("[CURRENT_GRID_STATE]", json.dumps(req.current_grid_state, indent=2))
+        system_prompt = system_prompt.replace("[vfx_prefabs]", json.dumps(req.vfx_prefabs, indent=2)) # BỔ SUNG: Gắn thư viện prefabs vào prompt
         system_prompt = system_prompt.replace("[START_MS]", str(req.start_ms))
         system_prompt = system_prompt.replace("[END_MS]", str(req.end_ms))
+        
+        # (Lưu ý: Biến MAP_DESCRIPTION_AND_EFFECTS đã được gỡ bỏ trong prompt mới để tập trung vào lưới và Grid Unit, nên ta không cần replace nữa)
 
         # 2. Cấu hình Model sử dụng mã Gemini 3.1 Pro mới nhất
         model = genai.GenerativeModel('gemini-3.1-pro-preview')
