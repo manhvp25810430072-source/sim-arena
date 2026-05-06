@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useMainStore } from '../../store/useMainStore';
 import DroppableCell from './DroppableCell';
 import type { Character } from '../../store/useMainStore';
+import gsap from 'gsap';
 
 // ---------------------------------------------------------
 // COMPONENT CON: NHÂN VẬT TRÊN BÀN CỜ
@@ -12,15 +13,24 @@ const CharacterNode = ({ char, shape, simulationSpeed }: { char: Character, shap
   const topPercent = `${char.position!.y * 5}%`;
   
   const isDead = char.stats.hp <= 0;
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  // 🚀 FIX LỖI CONFLICT RENDER: React buông tay, dùng DOM thuần để set vị trí
+  useEffect(() => {
+    // Chỉ set vị trí gốc nếu GSAP đang KHÔNG nắm quyền điều khiển
+    if (nodeRef.current && !gsap.isTweening(nodeRef.current)) {
+      nodeRef.current.style.left = leftPercent;
+      nodeRef.current.style.top = topPercent;
+    }
+  }, [leftPercent, topPercent]);
 
   return (
     <div
       id={`char-${char.id}`} // 🚀 QUAN TRỌNG 1: Gắn ID để GSAP tóm được thẻ này và đẩy/kéo/xoay
+      ref={nodeRef}
       className="absolute w-[5%] h-[5%] p-[1px] flex flex-col items-center justify-center z-20"
       style={{
-        left: leftPercent,
-        top: topPercent
-        // 🚀 ĐÃ XÓA CSS TRANSITION: Tước quyền của CSS, giao toàn bộ việc làm mượt cho GSAP
+        // 🚀 BỎ TRỐNG left và top Ở ĐÂY ĐỂ TRÁNH BỊ REACT GHI ĐÈ STYLE KHI MẤT MÁU
       }}
     >
       <div 
