@@ -2,2098 +2,1998 @@ import { useMainStore } from '../store/useMainStore';
 
 // =========================================================================
 // 🎯 KHOANG CHỨA DỮ LIỆU: DÁN Y NGUYÊN NỘI DUNG FILE GIẢ LẬP.PY CỦA BẠN VÀO ĐÂY
+// (Hãy copy toàn bộ các object JSON từ file giả lập.py và dán vào giữa cặp dấu backtick)
 // =========================================================================
 const RAW_DATA_STRING = `
 {
-  "chunk_summary": "Bão cát cuồn cuộn nổi lên che khuất tầm nhìn trên sa mạc chết. Jax ngay lập tức xông lên tuyến đầu chặn đường Krieg, hứng chịu những nhát cưa máy tàn bạo nhưng nhanh chóng phản công bằng một cú nện búa phá đất chấn động, hất văng và làm choáng gã thủ lĩnh. Dù vậy, cục diện bỗng chốc đảo chiều khi Buzz lén lút tiếp cận từ sườn để cào xé Jax, và từ xa, tia laser chết chóc của Viper khai hỏa xuyên thủng lớp giáp của anh, đẩy lùi anh về phía sau. Trong khi đó, Riko tận dụng sự hỗn loạn để bắn tỉa Buzz từ góc khuất.",
+  "chunk_summary": "Chiến dịch bắt đầu không một lời do dự. Blade-9 kích hoạt tàng hình, hóa thành bóng ma lướt nhanh về phía trận tuyến của đối phương. Phản ứng tức thời, Bolder giậm mạnh xuống đất tạo lớp khiên đá bảo vệ mình và Ignis. Dù bị che khuất tầm nhìn bởi sương mù và tàng hình, Ignis vẫn phán đoán chuẩn xác quỹ đạo di chuyển của Blade-9 khi kẻ địch tiến vào vùng khí độc, lập tức ném một Quả Cầu Lửa bùng nổ, thiêu đốt lớp giáp cơ khí và làm lộ diện hoàn toàn sát thủ drone.",
   "is_game_over": false,
   "winning_team": null,
   "updated_state": {
-    "char_jax_01": { "hp": 680, "x": 9, "y": 10 },
-    "char_riko_02": { "hp": 700, "x": 12, "y": 13 },
-    "raider_krieg_boss": { "hp": 1460, "x": 10, "y": 8 },
-    "raider_buzz_01": { "hp": 688, "x": 9, "y": 11 },
-    "raider_viper_02": { "hp": 600, "x": 15, "y": 9 }
+    "char_A1": { "hp": 150, "x": 7, "y": 15 },
+    "char_A2": { "hp": 300, "x": 7, "y": 14 },
+    "char_B1": { "hp": 120, "x": 14, "y": 6 },
+    "char_B2": { "hp": 112, "x": 8, "y": 11 }
   },
   "timeline": [
     {
       "time_offset_ms": 0,
-      "type": "VFX",
-      "target_id": "GLOBAL",
-      "canvas_layer": { "layer": "fg" },
-      "blend_mode": { "mode": "NORMAL" },
-      "pixi_particles": {
-        "x": 10,
-        "y": 10,
-        "emitter_type": "directional",
-        "particle_count": 200,
-        "lifetime_ms": 5000,
-        "start_color": "#DAA520",
-        "end_color": "#BDB76B",
-        "start_scale": 0.4,
-        "end_scale": 0.2,
-        "speed": 15,
-        "spread_angle": 5
-      }
-    },
-    {
-      "time_offset_ms": 200,
       "type": "NARRATIVE",
-      "content": "Bão cát nổi lên dữ dội. Hai phe lập tức lao vào nhau giữa đống phế liệu!"
+      "content": "Khu di tích Nguyên Tử chìm trong im lặng trước cơn bão. Tập đoàn Cơ Khí bắt đầu đợt thanh trừng."
     },
     {
-      "time_offset_ms": 500,
-      "type": "MOVE",
-      "actor_id": "char_jax_01",
-      "target_x": 10,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 500,
-      "type": "MOVE",
-      "actor_id": "raider_krieg_boss",
-      "target_x": 10,
-      "target_y": 9
-    },
-    {
-      "time_offset_ms": 1000,
-      "type": "MOVE",
-      "actor_id": "raider_buzz_01",
-      "target_x": 9,
-      "target_y": 11
-    },
-    {
-      "time_offset_ms": 1200,
-      "type": "MOVE",
-      "actor_id": "char_riko_02",
-      "target_x": 12,
-      "target_y": 13
-    },
-    {
-      "time_offset_ms": 1200,
-      "type": "MOVE",
-      "actor_id": "raider_viper_02",
-      "target_x": 15,
-      "target_y": 9
-    },
-    {
-      "time_offset_ms": 1300,
-      "type": "DIALOGUE",
-      "actor_id": "raider_krieg_boss",
-      "content": "Thịt tươi! Tới đây cho tao cưa!",
-      "emotion": "CRAZED"
-    },
-    {
-      "time_offset_ms": 1500,
-      "type": "ATTACK",
-      "actor_id": "raider_krieg_boss",
-      "target_id": "char_jax_01",
-      "hp_change": -295,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 1500,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "pixi_mesh": {
-        "path_points": [[10, 9], [10, 10]],
-        "thickness": 0.6,
-        "color": "#8B0000",
-        "distortion_amplitude": 0.3,
-        "animation_speed": 10,
-        "style": "rough_arc"
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 10.05,
-        "y": 9.05,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 5,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 3,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 1500,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_text": {
-        "content": "-295",
-        "x": 10,
-        "y": 9.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10,
-        "y": 8.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 1600,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_particles": {
-        "x": 10,
-        "y": 10,
-        "emitter_type": "directional",
-        "particle_count": 12,
-        "lifetime_ms": 400,
-        "start_color": "#8B0000",
-        "end_color": "#8B0000",
-        "start_scale": 0.15,
-        "end_scale": 0,
-        "speed": 3,
-        "spread_angle": 45
-      }
-    },
-    {
-      "time_offset_ms": 1600,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 1600,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_particles": {
-        "x": 10,
-        "y": 10,
-        "emitter_type": "burst",
-        "particle_count": 5,
-        "lifetime_ms": 1000,
-        "start_color": "#8B0000",
-        "end_color": "#8B0000",
-        "start_scale": 0.1,
-        "end_scale": 0.02,
-        "speed": 1.5,
-        "spread_angle": 180
-      },
-      "timeline_sequence": {
-        "delay_ms": 1000,
-        "stagger_ms": 0,
-        "repeat": 2,
-        "yoyo": false
-      }
-    },
-    {
-      "time_offset_ms": 1800,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "glow",
-        "intensity": 2.5,
-        "color": "#DAA520",
-        "radius": 0.2,
-        "duration_ms": 1000
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10.05,
-        "y": 10.05,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 2,
-        "duration_ms": 50,
-        "ease": "none"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 19,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 2800,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_mesh": {
-        "path_points": [[10, 10], [10, 8.5]],
-        "thickness": 1.5,
-        "color": "#708090",
-        "distortion_amplitude": 0,
-        "animation_speed": 4,
-        "style": "smash_down"
-      }
-    },
-    {
-      "time_offset_ms": 2900,
+      "time_offset_ms": 100,
       "type": "SKILL",
-      "actor_id": "char_jax_01",
-      "target_id": "raider_krieg_boss",
-      "hp_change": -340,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 2900,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "polygon",
-        "points": [[10, 10], [8.5, 7], [11.5, 7]],
-        "radius": 0,
-        "width": 3,
-        "height": 3,
-        "fill_color": "#DAA520",
-        "fill_alpha": 0.6,
-        "line_width": 0,
-        "line_color": "#FFFFFF",
-        "line_alpha": 0
-      },
-      "pixi_particles": {
-        "x": 10,
-        "y": 10,
-        "emitter_type": "cone",
-        "particle_count": 40,
-        "lifetime_ms": 800,
-        "start_color": "#FFBF00",
-        "end_color": "#654321",
-        "start_scale": 0.4,
-        "end_scale": 0.1,
-        "speed": 6,
-        "spread_angle": 60
-      }
-    },
-    {
-      "time_offset_ms": 2900,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "pixi_text": {
-        "content": "-340",
-        "x": 10,
-        "y": 8.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 10,
-        "y": 7.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 2950,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 10,
-        "y": 8,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 200,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 2950,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 10,
-        "y": 6.5,
-        "emitter_type": "burst",
-        "particle_count": 3,
-        "lifetime_ms": 1500,
-        "start_color": "#FFD700",
-        "end_color": "#FFD700",
-        "start_scale": 0.25,
-        "end_scale": 0.25,
-        "speed": 1,
-        "spread_angle": 360
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 10.1,
-        "y": 8,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 200,
-        "ease": "sine.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 7,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 3000,
-      "type": "ATTACK",
-      "actor_id": "raider_buzz_01",
-      "target_id": "char_jax_01",
-      "hp_change": -125,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 3000,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_mesh": {
-        "path_points": [[9.5, 9.5], [10.5, 10.5], [10.5, 9.5], [9.5, 10.5]],
-        "thickness": 0.2,
-        "color": "#C0C0C0",
-        "distortion_amplitude": 0,
-        "animation_speed": 0,
-        "style": "cross_slash"
-      },
-      "pixi_particles": {
-        "x": 10,
-        "y": 10,
-        "emitter_type": "burst",
-        "particle_count": 10,
-        "lifetime_ms": 200,
-        "start_color": "#FFFFFF",
-        "end_color": "#FFD700",
-        "start_scale": 0.1,
-        "end_scale": 0,
-        "speed": 4,
-        "spread_angle": 360
-      }
-    },
-    {
-      "time_offset_ms": 3000,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_text": {
-        "content": "-125",
-        "x": 10,
-        "y": 9.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10,
-        "y": 8.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 3100,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 3300,
-      "type": "DIALOGUE",
-      "actor_id": "raider_viper_02",
-      "content": "Khóa mục tiêu. Tạm biệt con gấu ngu ngốc.",
-      "emotion": "COLD"
-    },
-    {
-      "time_offset_ms": 3400,
-      "type": "VFX",
-      "target_id": "raider_viper_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "rect",
-        "points": [],
-        "radius": 0,
-        "width": 10,
-        "height": 0.1,
-        "fill_color": "#FF0000",
-        "fill_alpha": 0.8,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      },
-      "gsap_tween": {
-        "target_id": "raider_viper_02",
-        "x": 15,
-        "y": 9.05,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 29,
-        "yoyo": true
-      },
-      "pixi_particles": {
-        "x": 15,
-        "y": 9,
-        "emitter_type": "directional",
-        "particle_count": 20,
-        "lifetime_ms": 500,
-        "start_color": "#FFCCCB",
-        "end_color": "#FFCCCB",
-        "start_scale": 0.2,
-        "end_scale": 0.5,
-        "speed": 1,
-        "spread_angle": 10
-      }
-    },
-    {
-      "time_offset_ms": 4000,
-      "type": "ATTACK",
-      "actor_id": "char_riko_02",
-      "target_id": "raider_buzz_01",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
       "hp_change": 0,
       "is_critical": false
     },
     {
-      "time_offset_ms": 4000,
+      "time_offset_ms": 100,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "opacity": 0.3,
+        "duration_ms": 200,
+        "ease": "steps(5)"
+      },
+      "blend_mode": { "mode": "SCREEN" },
       "pixi_mesh": {
-        "path_points": [[12, 13], [9.88, 11.58]],
-        "thickness": 0.1,
-        "color": "#C0C0C0",
-        "distortion_amplitude": 0,
-        "animation_speed": 15,
-        "style": "straight_line"
+        "path_points": [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]],
+        "is_closed_path": true,
+        "thickness": 0.2,
+        "color": "#00FF00",
+        "alpha": 0.8,
+        "distortion_amplitude": 0.1,
+        "animation_speed": 2.0,
+        "fade_in_ms": 100,
+        "lifetime_ms": 3000,
+        "fade_out_ms": 200
       }
     },
     {
-      "time_offset_ms": 4150,
+      "time_offset_ms": 200,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_graphics": {
+        "shape_type": "rectangle",
+        "width": 1.2,
+        "height": 0.1,
+        "fill_color": "#00FF00",
+        "fill_alpha": 0.6,
+        "fade_in_ms": 0,
+        "lifetime_ms": 600,
+        "fade_out_ms": 0
+      },
+      "gsap_tween": {
+        "offset_y": 1.0,
+        "duration_ms": 600,
+        "ease": "linear",
+        "repeat": 4
+      }
+    },
+    {
+      "time_offset_ms": 500,
       "type": "SKILL",
-      "actor_id": "char_riko_02",
-      "target_id": "raider_buzz_01",
-      "hp_change": -162,
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": 0,
       "is_critical": false
     },
     {
-      "time_offset_ms": 4150,
+      "time_offset_ms": 500,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_particles": {
-        "x": 9,
-        "y": 11,
-        "emitter_type": "burst",
-        "particle_count": 8,
-        "lifetime_ms": 200,
-        "start_color": "#FFFFFF",
-        "end_color": "#C0C0C0",
-        "start_scale": 0.1,
-        "end_scale": 0,
-        "speed": 3,
-        "spread_angle": 360
-      }
-    },
-    {
-      "time_offset_ms": 4150,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_text": {
-        "content": "-162",
-        "x": 9,
-        "y": 10.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 9,
-        "y": 9.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 4150,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_filters": {
-        "target_id": "raider_buzz_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#800000",
-        "radius": 0,
-        "duration_ms": 200
-      },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 9.1,
-        "y": 11,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 3,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 4900,
-      "type": "SKILL",
-      "actor_id": "raider_viper_02",
-      "target_id": "char_jax_01",
-      "hp_change": -400,
-      "is_critical": true
-    },
-    {
-      "time_offset_ms": 4900,
-      "type": "VFX",
-      "target_id": "raider_viper_02",
+      "target_id": "char_A2",
+      "canvas_layer": { "layer": "fg" },
       "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[15, 9], [5, 11]],
-        "thickness": 0.8,
-        "color": "#00BFFF",
-        "distortion_amplitude": 0.2,
-        "animation_speed": 10,
-        "style": "lightning_beam"
+        "path_points": [[0, -2], [1.7, -1], [1.7, 1], [0, 2], [-1.7, 1], [-1.7, -1]],
+        "is_closed_path": true,
+        "thickness": 0.15,
+        "color": "#D2B48C",
+        "alpha": 0.7,
+        "fade_in_ms": 200,
+        "lifetime_ms": 5000,
+        "fade_out_ms": 400
       },
+      "gsap_tween": {
+        "scale_x": 1.05,
+        "scale_y": 1.05,
+        "duration_ms": 1500,
+        "ease": "sine.inOut",
+        "yoyo": true,
+        "repeat": -1
+      }
+    },
+    {
+      "time_offset_ms": 600,
+      "type": "VFX",
+      "target_id": "char_A2",
       "pixi_particles": {
-        "x": 15,
-        "y": 9,
-        "emitter_type": "trail",
-        "particle_count": 40,
-        "lifetime_ms": 600,
-        "start_color": "#808080",
-        "end_color": "#A9A9A9",
+        "emitter_type": "continuous",
+        "emit_rate": 8,
+        "emit_duration_ms": 4500,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.5,
+        "spawn_height": 3.5,
+        "start_color": "#FFD700",
+        "end_color": "#DAA520",
         "start_scale": 0.4,
-        "end_scale": 0.8,
-        "speed": 0,
+        "end_scale": 0.1,
+        "gravity_y": 1.5,
+        "speed": 0.8
+      }
+    },
+    {
+      "time_offset_ms": 1000,
+      "type": "MOVE",
+      "actor_id": "char_B2",
+      "target_x": 10,
+      "target_y": 8
+    },
+    {
+      "time_offset_ms": 1200,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 7,
+      "target_y": 15
+    },
+    {
+      "time_offset_ms": 1300,
+      "type": "MOVE",
+      "actor_id": "char_A2",
+      "target_x": 7,
+      "target_y": 14
+    },
+    {
+      "time_offset_ms": 2000,
+      "type": "MOVE",
+      "actor_id": "char_B2",
+      "target_x": 8,
+      "target_y": 11
+    },
+    {
+      "time_offset_ms": 2500,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 14,
+      "target_y": 6
+    },
+    {
+      "time_offset_ms": 3000,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "canvas_layer": { "layer": "fg" },
+      "pixi_graphics": {
+        "shape_type": "circle",
+        "radius": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 1.0,
+        "line_width": 0.1,
+        "line_color": "#FFD700",
+        "line_alpha": 0.8,
+        "fade_in_ms": 100,
+        "lifetime_ms": 500,
+        "fade_out_ms": 50
+      },
+      "blend_mode": { "mode": "ADD" },
+      "gsap_tween": {
+        "motion_path_points": [[0, 0], [2.5, -2.5], [5, 0]],
+        "duration_ms": 500,
+        "ease": "power2.inOut",
+        "scale_x": 1.2,
+        "scale_y": 1.2,
+        "yoyo": true,
+        "repeat": 4
+      }
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_B2",
+      "hp_change": -63,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 2.0,
+        "wavelength": 1.5,
+        "thickness": 0.5,
+        "duration_ms": 600
+      },
+      "gsap_tween": {
+        "local_shake_x": 0.5,
+        "local_shake_y": 0.5,
+        "duration_ms": 400,
+        "ease": "rough.ease",
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.6
+      }
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-63",
+        "color": "#FF0000",
+        "font_size": 1.5,
+        "font_weight": "bold",
+        "float_distance_y": -2.0,
+        "float_duration_ms": 1000,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 150
+      }
+    },
+    {
+      "time_offset_ms": 3510,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "emitter_type": "burst",
+        "burst_count": 100,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#8B0000",
+        "end_color": "#FF4500",
+        "start_scale": 1.5,
+        "end_scale": 0.2,
+        "speed": 4.5,
         "spread_angle": 360
       }
     },
     {
-      "time_offset_ms": 4900,
+      "time_offset_ms": 3520,
       "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_text": {
-        "content": "-400 TRUE",
-        "x": 10,
-        "y": 9.2,
-        "color": "#FFD700",
-        "font_size": 1.2,
-        "font_weight": "bold",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 10,
-        "y": 8.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 4950,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 10,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 150,
-        "ease": "power2.out"
-      },
+      "target_id": "char_B2",
       "canvas_layer": { "layer": "bg" },
       "pixi_graphics": {
-        "shape_type": "circle",
-        "points": [],
-        "radius": 0.6,
-        "width": 1.2,
-        "height": 0.4,
+        "shape_type": "rectangle",
+        "width": 3.0,
+        "height": 3.0,
         "fill_color": "#1A1A1A",
         "fill_alpha": 0.8,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
+        "corner_radius": 0.5,
+        "fade_in_ms": 100,
+        "lifetime_ms": 3000,
+        "fade_out_ms": 1000
+      },
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 2500,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#555555",
+        "end_color": "#000000",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "gravity_y": -1.5,
+        "speed": 1.0
       }
     },
     {
-      "time_offset_ms": 4950,
+      "time_offset_ms": 3800,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "Cảnh báo... Nhiệt độ lõi vượt ngưỡng. Lỗi quang học.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 4500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B2",
+      "hp_change": -5,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 4500,
       "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-5",
+        "color": "#FF8C00",
+        "font_size": 1.2,
+        "font_weight": "bold",
+        "float_distance_y": -1.0,
+        "float_duration_ms": 600,
+        "fade_in_ms": 50,
+        "lifetime_ms": 500,
+        "fade_out_ms": 100
       }
     }
   ]
 }
 {
-  "chunk_summary": "Giữa cơn bão cát dày đặc, Buzz lách qua điểm mù và vồ thẳng vào Riko, cắm gọng kìm trói chặt cô ranh mãnh này lại. Ngay lập tức, Krieg điên cuồng lao tới cưa nát lớp phòng thủ của Jax, khiến người cựu binh gục xuống với đầy thương tích. Trong cơn hoảng loạn vì bị áp sát, Riko bắn thẳng mũi tên nổ vào Buzz ngay sát cạnh mình, tạo ra một vụ nổ kinh hoàng thiêu đốt cả hai. Từ xa, Viper tận dụng cơ hội, lạnh lùng ngắm bắn một phát đạn chí mạng găm thẳng vào ngực Jax, dồn anh đến bờ vực cái chết, nhưng gấu già vẫn lỳ lợm vung búa tạ giáng trả thủ lĩnh toán cướp.",
+  "chunk_summary": "Tập Đoàn Cơ Khí bắt đầu phản công! X-Sniper di chuyển vào vị trí ngắm bắn hoàn hảo, khóa mục tiêu vào trục dọc nơi Ignis và Bolder đang đứng. Trong lúc Blade-9 vẫn đang chật vật vì khí độc và vết bỏng, Bolder lao tới giậm nát mặt đất bằng kỹ năng Earth Smash, khiến sát thủ drone bị choáng nặng. Ngay khi tia laser xuyên thấu của X-Sniper xé toạc không khí bắn tới, Ignis phản xạ chớp nhoáng, hóa thành luồng khói lửa lướt khỏi quỹ đạo đạn, để lại Bolder gánh chịu toàn bộ sát thương xuyên giáp.",
   "is_game_over": false,
   "winning_team": null,
   "updated_state": {
-    "char_jax_01": { "hp": 40, "x": 9, "y": 10 },
-    "char_riko_02": { "hp": 265, "x": 12, "y": 13 },
-    "raider_krieg_boss": { "hp": 1240, "x": 9, "y": 9 },
-    "raider_buzz_01": { "hp": 448, "x": 11, "y": 13 },
-    "raider_viper_02": { "hp": 600, "x": 15, "y": 9 }
+    "char_A1": { "hp": 150, "x": 4, "y": 15 },
+    "char_A2": { "hp": 236, "x": 8, "y": 12 },
+    "char_B1": { "hp": 120, "x": 7, "y": 6 },
+    "char_B2": { "hp": 62, "x": 8, "y": 11 }
   },
   "timeline": [
     {
-      "time_offset_ms": 5200,
-      "type": "DIALOGUE",
-      "actor_id": "raider_buzz_01",
-      "content": "Bắt được con nhép này rồi! Khẹc khẹc!",
-      "emotion": "MANIC"
+      "time_offset_ms": 5000,
+      "type": "NARRATIVE",
+      "content": "X-Sniper vào vị trí. Đường đạn tử thần đã được khóa chặt!"
+    },
+    {
+      "time_offset_ms": 5100,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-10 (Poison & Burn)",
+        "color": "#32CD32",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 5100,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -10,
+      "is_critical": false
     },
     {
       "time_offset_ms": 5200,
       "type": "MOVE",
-      "actor_id": "raider_buzz_01",
-      "target_x": 11,
-      "target_y": 13
-    },
-    {
-      "time_offset_ms": 5200,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 9,
-        "y": 11,
-        "scale": 0.7,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.in"
-      }
-    },
-    {
-      "time_offset_ms": 5300,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 10,
-        "y": 11.5,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 180,
-        "duration_ms": 200,
-        "ease": "power2.out"
-      }
+      "actor_id": "char_B1",
+      "target_x": 7,
+      "target_y": 6
     },
     {
       "time_offset_ms": 5500,
+      "type": "MOVE",
+      "actor_id": "char_A2",
+      "target_x": 8,
+      "target_y": 12
+    },
+    {
+      "time_offset_ms": 6000,
+      "type": "SKILL",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 6000,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
+      "target_id": "char_A2",
       "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 11,
-        "y": 13,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 360,
-        "duration_ms": 200,
+        "scale_y": 0.6,
+        "scale_x": 1.3,
+        "duration_ms": 300,
         "ease": "power2.in"
       }
     },
     {
-      "time_offset_ms": 5700,
-      "type": "SKILL",
-      "actor_id": "raider_buzz_01",
-      "target_id": "char_riko_02",
-      "hp_change": -195,
+      "time_offset_ms": 6300,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -40,
       "is_critical": false
     },
     {
-      "time_offset_ms": 5700,
+      "time_offset_ms": 6300,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_particles": {
-        "x": 12,
-        "y": 13,
-        "emitter_type": "burst",
-        "particle_count": 15,
-        "lifetime_ms": 300,
-        "start_color": "#808080",
-        "end_color": "#A9A9A9",
-        "start_scale": 0.2,
-        "end_scale": 0.05,
-        "speed": 3,
-        "spread_angle": 360
-      },
-      "pixi_graphics": {
-        "shape_type": "polygon",
-        "points": [[11.5, 13], [12.5, 13], [12.8, 13.5], [11.2, 13.5]],
-        "radius": 0,
-        "width": 1.6,
-        "height": 0.5,
-        "fill_color": "#2F4F4F",
-        "fill_alpha": 1,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-40",
+        "color": "#8B4513",
+        "font_size": 1.8,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 600,
+        "fade_in_ms": 50,
+        "lifetime_ms": 700,
+        "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 5700,
+      "time_offset_ms": 6300,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_filters": {
-        "target_id": "char_riko_02",
-        "filter_type": "color_overlay",
-        "intensity": 1,
-        "color": "#FF0000",
-        "radius": 0,
-        "duration_ms": 100
-      },
+      "target_id": "char_A2",
       "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 12,
-        "y": 12.8,
-        "scale": 0.9,
-        "opacity": 1,
-        "rotation_deg": 0,
+        "scale_y": 1.0,
+        "scale_x": 1.0,
         "duration_ms": 150,
         "ease": "bounce.out"
+      },
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 1.2,
+        "wavelength": 2.0,
+        "duration_ms": 400
       }
     },
     {
-      "time_offset_ms": 5700,
+      "time_offset_ms": 6310,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "canvas_layer": { "layer": "fg" },
+      "target_id": "char_A2",
+      "canvas_layer": { "layer": "bg" },
       "pixi_mesh": {
-        "path_points": [[11.5, 13], [12, 13.5], [12.5, 13]],
-        "thickness": 0.15,
-        "color": "#8B4513",
+        "path_points": [[0,0], [0.5, 1.5], [-0.3, 2.5], [0.8, 3]],
+        "is_closed_path": false,
+        "thickness": 0.3,
+        "color": "#4A3B22",
+        "alpha": 0.9,
         "distortion_amplitude": 0.1,
-        "animation_speed": 0,
-        "style": "thorn_roots"
+        "fade_in_ms": 50,
+        "lifetime_ms": 1500,
+        "fade_out_ms": 500
       }
     },
     {
-      "time_offset_ms": 6000,
-      "type": "MOVE",
-      "actor_id": "raider_krieg_boss",
-      "target_x": 9,
-      "target_y": 9
-    },
-    {
-      "time_offset_ms": 6000,
+      "time_offset_ms": 6320,
       "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 9,
-        "y": 9,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 200,
-        "ease": "power4.in"
+      "target_id": "char_B2",
+      "canvas_layer": { "layer": "bg" },
+      "pixi_mesh": {
+        "path_points": [[0,0], [1.5, 3], [-1.5, 3]],
+        "is_closed_path": true,
+        "color": "#8B4513",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.5,
+        "animation_speed": 0.0,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 300
       },
       "pixi_particles": {
-        "x": 9,
-        "y": 9,
-        "emitter_type": "trail",
-        "particle_count": 30,
-        "lifetime_ms": 300,
-        "start_color": "#8B0000",
-        "end_color": "#8B0000",
-        "start_scale": 0.8,
-        "end_scale": 0,
-        "speed": 0,
-        "spread_angle": 0
-      }
-    },
-    {
-      "time_offset_ms": 6250,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "points": [],
-        "radius": 1.5,
-        "width": 3,
-        "height": 3,
-        "fill_color": "#000000",
-        "fill_alpha": 0,
-        "line_width": 0.3,
-        "line_color": "#8B0000",
-        "line_alpha": 1
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 9,
-        "y": 9,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 1080,
-        "duration_ms": 600,
-        "ease": "none"
-      },
-      "pixi_particles": {
-        "x": 9,
-        "y": 9,
         "emitter_type": "burst",
-        "particle_count": 50,
-        "lifetime_ms": 500,
-        "start_color": "#FFD700",
-        "end_color": "#8B0000",
-        "start_scale": 0.2,
-        "end_scale": 0.05,
-        "speed": 8,
-        "spread_angle": 360
-      }
-    },
-    {
-      "time_offset_ms": 6300,
-      "type": "SKILL",
-      "actor_id": "raider_krieg_boss",
-      "target_id": "char_jax_01",
-      "hp_change": -145,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 6300,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 6450,
-      "type": "SKILL",
-      "actor_id": "raider_krieg_boss",
-      "target_id": "char_jax_01",
-      "hp_change": -150,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 6450,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
+        "burst_count": 60,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 2.0,
+        "start_color": "#A0522D",
+        "end_color": "#808080",
+        "start_scale": 1.0,
+        "end_scale": 0.2,
+        "speed": 3.5,
+        "gravity_y": 2.0,
+        "spread_angle": 180
       }
     },
     {
       "time_offset_ms": 6500,
-      "type": "DIALOGUE",
-      "actor_id": "char_riko_02",
-      "content": "Tránh xa tao ra, đồ điên!",
-      "emotion": "PANICKED"
+      "type": "SKILL",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 6500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "local_shake_x": 0.2,
+        "local_shake_y": 0.0,
+        "duration_ms": 300,
+        "ease": "rough.ease",
+        "color_tint": "#00FFFF",
+        "tint_alpha": 0.5
+      }
     },
     {
       "time_offset_ms": 6600,
       "type": "SKILL",
-      "actor_id": "raider_krieg_boss",
-      "target_id": "char_jax_01",
-      "hp_change": -155,
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": 0,
       "is_critical": false
     },
     {
       "time_offset_ms": 6600,
       "type": "VFX",
-      "target_id": "char_jax_01",
-      "blend_mode": { "mode": "SCREEN" },
-      "pixi_particles": {
-        "x": 9,
-        "y": 10,
-        "emitter_type": "burst",
-        "particle_count": 20,
-        "lifetime_ms": 1500,
-        "start_color": "#ADD8E6",
-        "end_color": "#87CEFA",
-        "start_scale": 0.6,
-        "end_scale": 0.8,
-        "speed": 0.5,
-        "spread_angle": 360
-      },
+      "target_id": "char_A1",
       "canvas_layer": { "layer": "bg" },
       "pixi_graphics": {
-        "shape_type": "circle",
-        "points": [],
-        "radius": 0.8,
-        "width": 1.6,
-        "height": 0.5,
-        "fill_color": "#E0FFFF",
-        "fill_alpha": 0.7,
-        "line_width": 0.05,
-        "line_color": "#FFFFFF",
-        "line_alpha": 1
+        "shape_type": "ellipse",
+        "width": 1.5,
+        "height": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.9,
+        "fade_in_ms": 50,
+        "lifetime_ms": 2000,
+        "fade_out_ms": 800
+      },
+      "pixi_filters": {
+        "filter_type": "wave",
+        "amplitude": 0.2,
+        "wavelength": 0.8,
+        "duration_ms": 2000
+      },
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1500,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.5,
+        "spawn_height": 0.8,
+        "start_color": "#FF0000",
+        "end_color": "#808080",
+        "start_scale": 0.8,
+        "end_scale": 0.1,
+        "gravity_y": -2.0,
+        "speed": 1.5
       }
     },
     {
-      "time_offset_ms": 6600,
+      "time_offset_ms": 6650,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 4,
+      "target_y": 15
+    },
+    {
+      "time_offset_ms": 6650,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_mesh": {
-        "path_points": [[12, 13], [11, 13]],
-        "thickness": 0.2,
-        "color": "#FF4500",
-        "distortion_amplitude": 0,
-        "animation_speed": 10,
-        "style": "straight_line"
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_y": 1.5,
+        "scale_x": 0.5,
+        "duration_ms": 150,
+        "ease": "power4.in",
+        "color_tint": "#FFFFFF",
+        "tint_alpha": 0.9
       }
     },
     {
       "time_offset_ms": 6800,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
+      "target_id": "char_A1",
+      "canvas_layer": { "layer": "bg" },
+      "pixi_graphics": {
+        "shape_type": "ellipse",
+        "width": 1.5,
+        "height": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.9,
+        "fade_in_ms": 50,
+        "lifetime_ms": 2000,
+        "fade_out_ms": 800
+      },
       "pixi_filters": {
-        "target_id": "raider_buzz_01",
-        "filter_type": "glow",
-        "intensity": 3,
-        "color": "#FF0000",
-        "radius": 0.3,
-        "duration_ms": 1000
+        "filter_type": "wave",
+        "amplitude": 0.2,
+        "wavelength": 0.8,
+        "duration_ms": 2000
       },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 11,
-        "y": 13,
-        "scale": 1.1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "stepped"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 9,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 7500,
-      "type": "NARRATIVE",
-      "content": "Sự hỗn loạn khiến Jax hở sườn. Viper từ đằng xa đã khóa mục tiêu với tia laser đỏ rực."
-    },
-    {
-      "time_offset_ms": 7500,
-      "type": "VFX",
-      "target_id": "raider_viper_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "rect",
-        "points": [],
-        "radius": 0,
-        "width": 9,
-        "height": 0.05,
-        "fill_color": "#E0115F",
-        "fill_alpha": 0.6,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      }
-    },
-    {
-      "time_offset_ms": 7800,
-      "type": "SKILL",
-      "actor_id": "char_riko_02",
-      "target_id": "raider_buzz_01",
-      "hp_change": -240,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 7800,
-      "type": "SKILL",
-      "actor_id": "char_riko_02",
-      "target_id": "char_riko_02",
-      "hp_change": -240,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 7800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "rect",
-        "points": [],
-        "radius": 0,
-        "width": 2.5,
-        "height": 0.5,
-        "fill_color": "#FF4500",
-        "fill_alpha": 0.9,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      }
-    },
-    {
-      "time_offset_ms": 7800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "rect",
-        "points": [],
-        "radius": 0,
-        "width": 0.5,
-        "height": 2.5,
-        "fill_color": "#FF4500",
-        "fill_alpha": 0.9,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      }
-    },
-    {
-      "time_offset_ms": 7800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
       "pixi_particles": {
-        "x": 11,
-        "y": 13,
-        "emitter_type": "fountain",
-        "particle_count": 35,
-        "lifetime_ms": 1200,
-        "start_color": "#FF4500",
-        "end_color": "#000000",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1500,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.5,
+        "spawn_height": 0.8,
+        "start_color": "#FF0000",
+        "end_color": "#808080",
+        "start_scale": 0.8,
+        "end_scale": 0.1,
+        "gravity_y": -2.0,
+        "speed": 1.5
+      }
+    },
+    {
+      "time_offset_ms": 6800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "path_points": [[0,0], [8,0]],
+        "is_closed_path": false,
+        "thickness": 0.8,
+        "color": "#00FFFF",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.2,
+        "animation_speed": 15.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 150,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 6800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "path_points": [[0,0], [8,0]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#FFFFFF",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.0,
+        "animation_speed": 0.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 150,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 6810,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_mesh": {
+        "path_points": [[1, -0.6], [1, 0.6], [3, -0.6], [3, 0.6], [5, -0.6], [5, 0.6], [7, -0.6], [7, 0.6]],
+        "is_closed_path": false,
+        "thickness": 0.1,
+        "color": "#00FFFF",
+        "alpha": 0.9,
+        "distortion_amplitude": 0.3,
+        "animation_speed": 25.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 6810,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_particles": {
+        "emitter_type": "burst",
+        "burst_count": 40,
+        "particle_lifetime_ms": 300,
+        "spawn_width": 8.0,
+        "spawn_height": 0.5,
+        "start_color": "#FFFFFF",
+        "end_color": "#00FFFF",
         "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4,
-        "spread_angle": 180
+        "end_scale": 0.1,
+        "speed": 2.5,
+        "spread_angle": 180,
+        "shape_type": "star"
       }
     },
     {
-      "time_offset_ms": 7800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_filters": {
-        "target_id": "raider_buzz_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#800000",
-        "radius": 0,
-        "duration_ms": 200
-      },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 11.1,
-        "y": 13,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 3,
-        "yoyo": true
-      }
+      "time_offset_ms": 6820,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": -64,
+      "is_critical": false
     },
     {
-      "time_offset_ms": 7800,
+      "time_offset_ms": 6820,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_filters": {
-        "target_id": "char_riko_02",
-        "filter_type": "color_overlay",
-        "intensity": 1,
-        "color": "#FF0000",
-        "radius": 0,
-        "duration_ms": 100
-      },
+      "target_id": "char_A2",
       "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 12,
-        "y": 12.8,
-        "scale": 0.9,
-        "opacity": 1,
-        "rotation_deg": 0,
+        "local_shake_x": 0.8,
         "duration_ms": 150,
-        "ease": "bounce.out"
+        "ease": "power4.out"
       }
     },
     {
-      "time_offset_ms": 7800,
+      "time_offset_ms": 6820,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 11,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 15,
-        "lifetime_ms": 800,
-        "start_color": "#FFA500",
-        "end_color": "#FF4500",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 2,
-        "spread_angle": 45
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "-64",
+        "color": "#00FFFF",
+        "font_size": 2.0,
+        "font_weight": "bold",
+        "float_distance_y": -2.0,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 1000,
+        "fade_out_ms": 200
       }
     },
     {
-      "time_offset_ms": 7800,
+      "time_offset_ms": 6850,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 12,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 15,
-        "lifetime_ms": 800,
-        "start_color": "#FFA500",
-        "end_color": "#FF4500",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 2,
-        "spread_angle": 45
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_y": 1.0,
+        "scale_x": 1.0,
+        "duration_ms": 150,
+        "ease": "back.out(1.7)",
+        "color_tint": "#FFFFFF",
+        "tint_alpha": 0.0
       }
     },
     {
       "time_offset_ms": 8500,
-      "type": "VFX",
-      "target_id": "raider_viper_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 15,
-        "y": 9,
-        "emitter_type": "burst",
-        "particle_count": 1,
-        "lifetime_ms": 100,
-        "start_color": "#FFFFFF",
-        "end_color": "#FFFF00",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "speed": 0,
-        "spread_angle": 0
-      },
-      "pixi_mesh": {
-        "path_points": [[15, 9], [9, 10]],
-        "thickness": 0.1,
-        "color": "#FFFFFF",
-        "distortion_amplitude": 0,
-        "animation_speed": 20,
-        "style": "bullet_trail"
-      }
-    },
-    {
-      "time_offset_ms": 8550,
-      "type": "ATTACK",
-      "actor_id": "raider_viper_02",
-      "target_id": "char_jax_01",
-      "hp_change": -190,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 8550,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "points": [],
-        "radius": 0.2,
-        "width": 0.4,
-        "height": 0.4,
-        "fill_color": "#FFFFFF",
-        "fill_alpha": 1,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      }
-    },
-    {
-      "time_offset_ms": 8550,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_filters": {
-        "target_id": "char_jax_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#8B0000",
-        "radius": 0,
-        "duration_ms": 150
-      },
-      "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 10,
-        "scale": 0.8,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power1.inOut"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 1,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 8800,
       "type": "DIALOGUE",
-      "actor_id": "char_jax_01",
-      "content": "Tao... chưa gục đâu!",
-      "emotion": "DETERMINED"
-    },
-    {
-      "time_offset_ms": 9000,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "blend_mode": { "mode": "NORMAL" },
-      "pixi_mesh": {
-        "path_points": [[9, 10], [9, 9]],
-        "thickness": 0.8,
-        "color": "#708090",
-        "distortion_amplitude": 0,
-        "animation_speed": 1.5,
-        "style": "arc_swing"
-      }
-    },
-    {
-      "time_offset_ms": 9300,
-      "type": "ATTACK",
-      "actor_id": "char_jax_01",
-      "target_id": "raider_krieg_boss",
-      "hp_change": -220,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 9300,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "pixi_particles": {
-        "x": 9,
-        "y": 9,
-        "emitter_type": "burst",
-        "particle_count": 15,
-        "lifetime_ms": 500,
-        "start_color": "#8B4513",
-        "end_color": "#D2B48C",
-        "start_scale": 0.2,
-        "end_scale": 0.05,
-        "speed": 2,
-        "spread_angle": 180
-      }
-    },
-    {
-      "time_offset_ms": 9300,
-      "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "pixi_filters": {
-        "target_id": "raider_krieg_boss",
-        "filter_type": "color_overlay",
-        "intensity": 1,
-        "color": "#FF0000",
-        "radius": 0,
-        "duration_ms": 100
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 9.3,
-        "y": 9,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 100,
-        "ease": "power2.out"
-      },
-      "pixi_particles": {
-        "x": 9,
-        "y": 9,
-        "emitter_type": "burst",
-        "particle_count": 15,
-        "lifetime_ms": 300,
-        "start_color": "#8B0000",
-        "end_color": "#8B0000",
-        "start_scale": 0.3,
-        "end_scale": 0,
-        "speed": 1,
-        "spread_angle": 360
-      }
+      "actor_id": "char_B1",
+      "content": "Mục tiêu ưu tiên S đã tẩu thoát. Cập nhật quỹ đạo: Gây sát thương tối đa lên đơn vị phòng ngự.",
+      "emotion": "COLD"
     }
   ]
 }
 {
-  "chunk_summary": "Sự tàn khốc của chiến trường được đẩy lên đỉnh điểm. Dù kiên cường đến đâu, Jax cuối cùng cũng gục ngã trước những nhát cưa máy đẫm máu của Krieg. Riko, hoảng loạn và bị bỏng nặng, cố gắng rút lui về phía thùng phi xăng nhưng không thể thoát khỏi gọng kìm oan nghiệt của Buzz. Dù đã né được phát đạn bắn tỉa của Viper bằng tốc độ phản xạ phi thường, Riko cuối cùng vẫn bị Buzz xé nát, đánh dấu thất bại hoàn toàn của Đội A giữa cơn bão cát khắc nghiệt.",
-  "is_game_over": true,
-  "winning_team": "B",
+  "chunk_summary": "Vừa thoát khỏi trạng thái choáng, Blade-9 lập tức tung đòn chém kép tử thần vào Bolder, xé rách lớp phòng ngự và gây chảy máu nghiêm trọng, đồng thời X-Sniper ném mìn lưới khóa chặt chân đấu sĩ đất. Bất chấp sự hỗn loạn, Ignis giữ khoảng cách an toàn, ngưng tụ hỏa lực tung Quả Cầu Lửa tàn phá thẳng vào tàn tích nơi Blade-9 đang đứng. Bị ăn trọn sát thương kết hợp với khí độc, cỗ máy sát thủ hoàn toàn bốc cháy và tan nát. Giờ đây, X-Sniper phải đối mặt với cơn thịnh nộ của hai Vệ Binh Ma Thuật.",
+  "is_game_over": false,
+  "winning_team": null,
   "updated_state": {
-    "char_jax_01": { "hp": 0, "x": 9, "y": 10 },
-    "char_riko_02": { "hp": 0, "x": 13, "y": 15 },
-    "raider_krieg_boss": { "hp": 1240, "x": 11, "y": 13 },
-    "raider_buzz_01": { "hp": 268, "x": 12, "y": 14 },
-    "raider_viper_02": { "hp": 600, "x": 15, "y": 10 }
+    "char_A1": { "hp": 150, "x": 4, "y": 11 },
+    "char_A2": { "hp": 168, "x": 8, "y": 12 },
+    "char_B1": { "hp": 120, "x": 7, "y": 6 },
+    "char_B2": { "hp": 0, "x": 8, "y": 11 }
   },
   "timeline": [
     {
+      "time_offset_ms": 10000,
+      "type": "NARRATIVE",
+      "content": "Chất độc len lỏi vào vi mạch của Blade-9. Trận chiến không có chỗ cho sự nhân từ."
+    },
+    {
       "time_offset_ms": 10100,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -5,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 10100,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-5 (Poison)",
+        "color": "#32CD32",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 150
+      }
+    },
+    {
+      "time_offset_ms": 10500,
       "type": "DIALOGUE",
-      "actor_id": "raider_krieg_boss",
-      "content": "Mày đứt hơi rồi, gấu tàn tạ!",
+      "actor_id": "char_B2",
+      "content": "Kích hoạt giao thức thanh trừng...",
       "emotion": "AGGRESSIVE"
     },
     {
-      "time_offset_ms": 10300,
-      "type": "ATTACK",
-      "actor_id": "raider_krieg_boss",
-      "target_id": "char_jax_01",
-      "hp_change": -290,
+      "time_offset_ms": 10800,
+      "type": "SKILL",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": 0,
       "is_critical": false
     },
     {
-      "time_offset_ms": 10300,
+      "time_offset_ms": 10800,
       "type": "VFX",
-      "target_id": "raider_krieg_boss",
-      "pixi_mesh": {
-        "path_points": [[9, 9], [9, 10]],
-        "thickness": 0.6,
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "local_shake_x": 0.5,
+        "duration_ms": 200,
+        "ease": "power2.inOut"
+      }
+    },
+    {
+      "time_offset_ms": 11000,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -30,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "-30",
         "color": "#8B0000",
-        "distortion_amplitude": 0.3,
-        "animation_speed": 10,
-        "style": "rough_arc"
-      },
-      "gsap_tween": {
-        "target_id": "raider_krieg_boss",
-        "x": 9.05,
-        "y": 9.05,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 5,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 3,
-        "yoyo": true
-      }
-    },
-    {
-      "time_offset_ms": 10300,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_text": {
-        "content": "-290",
-        "x": 9,
-        "y": 9.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
+        "font_size": 1.5,
         "font_weight": "bold",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
+        "float_distance_y": -1.0,
+        "float_duration_ms": 500,
+        "fade_in_ms": 50,
+        "lifetime_ms": 500,
+        "fade_out_ms": 100
       },
       "gsap_tween": {
-        "target_id": "char_jax_01",
-        "x": 9,
-        "y": 8.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
+        "local_shake_x": 0.3,
+        "duration_ms": 150,
+        "ease": "rough.ease"
       }
     },
     {
-      "time_offset_ms": 10400,
-      "type": "VFX",
-      "target_id": "char_jax_01",
-      "pixi_particles": {
-        "x": 9,
-        "y": 10,
-        "emitter_type": "directional",
-        "particle_count": 12,
-        "lifetime_ms": 400,
-        "start_color": "#8B0000",
-        "end_color": "#8B0000",
-        "start_scale": 0.15,
-        "end_scale": 0,
-        "speed": 3,
-        "spread_angle": 45
-      }
-    },
-    {
-      "time_offset_ms": 10600,
-      "type": "NARRATIVE",
-      "content": "Jax gục ngã hoàn toàn. Bức tường cuối cùng của Đội A đã sụp đổ."
-    },
-    {
-      "time_offset_ms": 10800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 11,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 15,
-        "lifetime_ms": 800,
-        "start_color": "#FFA500",
-        "end_color": "#FF4500",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 2,
-        "spread_angle": 45
-      }
-    },
-    {
-      "time_offset_ms": 10800,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_text": {
-        "content": "-30",
-        "x": 11,
-        "y": 12.2,
-        "color": "#FFA500",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 11,
-        "y": 11.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 10800,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 12,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 15,
-        "lifetime_ms": 800,
-        "start_color": "#FFA500",
-        "end_color": "#FF4500",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 2,
-        "spread_angle": 45
-      }
-    },
-    {
-      "time_offset_ms": 10800,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_text": {
-        "content": "-30",
-        "x": 12,
-        "y": 12.2,
-        "color": "#FFA500",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
-      },
-      "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 12,
-        "y": 11.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 10900,
-      "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_particles": {
-        "x": 11,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 5,
-        "lifetime_ms": 1000,
-        "start_color": "#2F4F4F",
-        "end_color": "#000000",
-        "start_scale": 0.2,
-        "end_scale": 0.4,
-        "speed": 1.5,
-        "spread_angle": 30
-      }
-    },
-    {
-      "time_offset_ms": 10900,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_particles": {
-        "x": 12,
-        "y": 13,
-        "emitter_type": "cone",
-        "particle_count": 5,
-        "lifetime_ms": 1000,
-        "start_color": "#2F4F4F",
-        "end_color": "#000000",
-        "start_scale": 0.2,
-        "end_scale": 0.4,
-        "speed": 1.5,
-        "spread_angle": 30
-      }
-    },
-    {
-      "time_offset_ms": 11000,
+      "time_offset_ms": 11200,
       "type": "ATTACK",
-      "actor_id": "raider_buzz_01",
-      "target_id": "char_riko_02",
-      "hp_change": -142,
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -28,
       "is_critical": false
     },
     {
-      "time_offset_ms": 11000,
+      "time_offset_ms": 11200,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_mesh": {
-        "path_points": [[11.5, 12.5], [12.5, 13.5], [12.5, 12.5], [11.5, 13.5]],
-        "thickness": 0.2,
-        "color": "#C0C0C0",
-        "distortion_amplitude": 0,
-        "animation_speed": 0,
-        "style": "cross_slash"
-      },
-      "pixi_particles": {
-        "x": 12,
-        "y": 13,
-        "emitter_type": "burst",
-        "particle_count": 10,
-        "lifetime_ms": 200,
-        "start_color": "#FFFFFF",
-        "end_color": "#FFD700",
-        "start_scale": 0.1,
-        "end_scale": 0,
-        "speed": 4,
-        "spread_angle": 360
-      }
-    },
-    {
-      "time_offset_ms": 11000,
-      "type": "VFX",
-      "target_id": "char_riko_02",
+      "target_id": "char_A2",
       "pixi_text": {
-        "content": "-142",
-        "x": 12,
-        "y": 12.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
+        "content": "-28",
+        "color": "#8B0000",
+        "font_size": 1.5,
+        "font_weight": "bold",
+        "float_distance_y": -1.0,
+        "float_duration_ms": 500,
+        "fade_in_ms": 50,
+        "lifetime_ms": 500,
+        "fade_out_ms": 100
       },
       "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 12,
-        "y": 11.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 11000,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_filters": {
-        "target_id": "char_riko_02",
-        "filter_type": "color_overlay",
-        "intensity": 1,
-        "color": "#FF0000",
-        "radius": 0,
-        "duration_ms": 100
-      },
-      "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 12,
-        "y": 12.8,
-        "scale": 0.9,
-        "opacity": 1,
-        "rotation_deg": 0,
+        "local_shake_x": 0.4,
         "duration_ms": 150,
-        "ease": "bounce.out"
+        "ease": "rough.ease"
       }
-    },
-    {
-      "time_offset_ms": 11300,
-      "type": "DIALOGUE",
-      "actor_id": "char_riko_02",
-      "content": "Mẹ kiếp, tao không bỏ mạng ở xó này đâu!",
-      "emotion": "PANICKED"
     },
     {
       "time_offset_ms": 11500,
-      "type": "MOVE",
-      "actor_id": "char_riko_02",
-      "target_x": 13,
-      "target_y": 15
+      "type": "SKILL",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": 0,
+      "is_critical": false
     },
     {
-      "time_offset_ms": 11600,
-      "type": "MOVE",
-      "actor_id": "raider_viper_02",
-      "target_x": 15,
-      "target_y": 10
+      "time_offset_ms": 11500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "scale_y": 0.8,
+        "duration_ms": 150,
+        "ease": "power1.in",
+        "yoyo": true,
+        "repeat": 1
+      }
     },
     {
       "time_offset_ms": 11800,
-      "type": "MOVE",
-      "actor_id": "raider_buzz_01",
-      "target_x": 12,
-      "target_y": 14
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "ROOTED",
+        "color": "#DAA520",
+        "font_size": 1.2,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 1000,
+        "fade_in_ms": 100,
+        "lifetime_ms": 2000,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 12000,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_B2",
+      "hp_change": 0,
+      "is_critical": false
     },
     {
       "time_offset_ms": 12000,
       "type": "VFX",
-      "target_id": "raider_viper_02",
-      "blend_mode": { "mode": "ADD" },
+      "target_id": "char_A1",
+      "canvas_layer": {
+        "layer": "fg"
+      },
       "pixi_graphics": {
-        "shape_type": "rect",
-        "points": [],
-        "radius": 0,
-        "width": 9,
-        "height": 0.05,
-        "fill_color": "#E0115F",
-        "fill_alpha": 0.6,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
+        "shape_type": "circle",
+        "radius": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 1.0,
+        "line_width": 0.1,
+        "line_color": "#FFD700",
+        "line_alpha": 0.8,
+        "fade_in_ms": 100,
+        "lifetime_ms": 500,
+        "fade_out_ms": 50
+      },
+      "blend_mode": {
+        "mode": "ADD"
+      },
+      "gsap_tween": {
+        "motion_path_points": [
+          [0, 0],
+          [2.5, -2.5],
+          [5, 0]
+        ],
+        "duration_ms": 500,
+        "ease": "power2.inOut",
+        "scale_x": 1.2,
+        "scale_y": 1.2,
+        "yoyo": true,
+        "repeat": 4
       }
     },
     {
       "time_offset_ms": 12500,
       "type": "ATTACK",
-      "actor_id": "raider_viper_02",
-      "target_id": "char_riko_02",
-      "hp_change": 0,
+      "actor_id": "char_A1",
+      "target_id": "char_B2",
+      "hp_change": -65,
       "is_critical": false
     },
     {
-      "time_offset_ms": 13000,
+      "time_offset_ms": 12500,
       "type": "VFX",
-      "target_id": "raider_viper_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_particles": {
-        "x": 15,
-        "y": 10,
-        "emitter_type": "burst",
-        "particle_count": 1,
-        "lifetime_ms": 100,
-        "start_color": "#FFFFFF",
-        "end_color": "#FFFF00",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "speed": 0,
-        "spread_angle": 0
-      },
-      "pixi_mesh": {
-        "path_points": [[15, 10], [13, 15]],
-        "thickness": 0.1,
-        "color": "#FFFFFF",
-        "distortion_amplitude": 0,
-        "animation_speed": 20,
-        "style": "bullet_trail"
-      }
-    },
-    {
-      "time_offset_ms": 13050,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "points": [],
-        "radius": 0.2,
-        "width": 0.4,
-        "height": 0.4,
-        "fill_color": "#FFFFFF",
-        "fill_alpha": 1,
-        "line_width": 0,
-        "line_color": "#000000",
-        "line_alpha": 0
-      }
-    },
-    {
-      "time_offset_ms": 13050,
-      "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_text": {
-        "content": "TRƯỢT",
-        "x": 13,
-        "y": 14.2,
-        "color": "#A9A9A9",
-        "font_size": 1.2,
-        "font_weight": "bold",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
+      "target_id": "char_B2",
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 2.0,
+        "wavelength": 1.5,
+        "thickness": 0.5,
+        "duration_ms": 600
       },
       "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 13,
-        "y": 13.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
+        "local_shake_x": 0.5,
+        "local_shake_y": 0.5,
+        "duration_ms": 400,
+        "ease": "rough.ease",
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.6
       }
     },
     {
-      "time_offset_ms": 13100,
-      "type": "NARRATIVE",
-      "content": "Phát đạn tỉa sượt qua tóc Riko. Đôi chân ranh mãnh đã tạm cứu mạng cô."
-    },
-    {
-      "time_offset_ms": 13500,
-      "type": "ATTACK",
-      "actor_id": "char_riko_02",
-      "target_id": "raider_buzz_01",
-      "hp_change": -150,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 13500,
+      "time_offset_ms": 12500,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "blend_mode": { "mode": "ADD" },
-      "pixi_mesh": {
-        "path_points": [[13, 15], [12, 14]],
-        "thickness": 0.1,
-        "color": "#C0C0C0",
-        "distortion_amplitude": 0,
-        "animation_speed": 15,
-        "style": "straight_line"
+      "target_id": "char_B2",
+      "pixi_text": {
+        "content": "-65",
+        "color": "#FF4500",
+        "font_size": 2.2,
+        "font_weight": "900",
+        "float_distance_y": -2.0,
+        "float_duration_ms": 1000,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 200
       }
     },
     {
-      "time_offset_ms": 13650,
+      "time_offset_ms": 12510,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
+      "target_id": "char_B2",
+      "blend_mode": {
+        "mode": "ADD"
+      },
       "pixi_particles": {
-        "x": 12,
-        "y": 14,
         "emitter_type": "burst",
-        "particle_count": 8,
-        "lifetime_ms": 200,
-        "start_color": "#FFFFFF",
-        "end_color": "#C0C0C0",
-        "start_scale": 0.1,
-        "end_scale": 0,
-        "speed": 3,
+        "burst_count": 100,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#8B0000",
+        "end_color": "#FF4500",
+        "start_scale": 1.5,
+        "end_scale": 0.2,
+        "speed": 4.5,
         "spread_angle": 360
       }
     },
     {
-      "time_offset_ms": 13650,
+      "time_offset_ms": 12520,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_text": {
-        "content": "-150",
-        "x": 12,
-        "y": 13.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "normal",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
+      "target_id": "char_B2",
+      "canvas_layer": {
+        "layer": "bg"
       },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 12,
-        "y": 12.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
+      "pixi_graphics": {
+        "shape_type": "rectangle",
+        "width": 3.0,
+        "height": 3.0,
+        "fill_color": "#1A1A1A",
+        "fill_alpha": 0.8,
+        "corner_radius": 0.5,
+        "fade_in_ms": 100,
+        "lifetime_ms": 3000,
+        "fade_out_ms": 1000
+      },
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 2500,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#555555",
+        "end_color": "#000000",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "gravity_y": -1.5,
+        "speed": 1.0
       }
     },
     {
-      "time_offset_ms": 13650,
+      "time_offset_ms": 12800,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "Lỗi hệ thống... Năng lượng lõi cạn kiệt...",
+      "emotion": "AGONY"
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -10,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13500,
       "type": "VFX",
-      "target_id": "raider_buzz_01",
-      "pixi_filters": {
-        "target_id": "raider_buzz_01",
-        "filter_type": "color_overlay",
-        "intensity": 0.8,
-        "color": "#800000",
-        "radius": 0,
-        "duration_ms": 200
-      },
-      "gsap_tween": {
-        "target_id": "raider_buzz_01",
-        "x": 12.1,
-        "y": 14,
-        "scale": 1,
-        "opacity": 1,
-        "rotation_deg": 0,
-        "duration_ms": 50,
-        "ease": "rough"
-      },
-      "timeline_sequence": {
-        "delay_ms": 0,
-        "stagger_ms": 0,
-        "repeat": 3,
-        "yoyo": true
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "-10 (Bleed)",
+        "color": "#FF0000",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.0,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 150
       }
     },
     {
       "time_offset_ms": 14000,
       "type": "MOVE",
-      "actor_id": "raider_krieg_boss",
-      "target_x": 11,
-      "target_y": 13
+      "actor_id": "char_A1",
+      "target_x": 4,
+      "target_y": 11
     },
     {
-      "time_offset_ms": 14500,
+      "time_offset_ms": 14800,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Tín hiệu đồng minh đã tắt. Chuẩn bị đánh giá lại tình hình.",
+      "emotion": "COLD"
+    }
+  ]
+}
+{
+  "chunk_summary": "Đơn độc trước hai Vệ Binh sau khi Blade-9 gục ngã, X-Sniper không hề hoảng loạn mà ngay lập tức tính toán lại góc bắn. Cỗ máy dịch chuyển và khai hỏa Đạn Xuyên Giáp thẳng vào Bolder, tàn phá nặng nề đấu sĩ đất bất chấp lớp phòng ngự dày đặc. Chịu sức ép từ khí độc, Ignis hóa thành tàn lửa lướt thoát ra ngoài, ngay lập tức ném một Quả Cầu Lửa rực cháy phản công trúng đích, thiêu đốt X-Sniper. Nhận sát thương lớn, xạ thủ cơ khí lùi sâu về phía sau và bắn tỉa trả đũa bằng laser, kéo dài trận chiến sinh tử.",
+  "is_game_over": false,
+  "winning_team": null,
+  "updated_state": {
+    "char_A1": { "hp": 87, "x": 4, "y": 8 },
+    "char_A2": { "hp": 93, "x": 8, "y": 9 },
+    "char_B1": { "hp": 53, "x": 8, "y": 3 },
+    "char_B2": { "hp": 0, "x": 8, "y": 11 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 15000,
+      "type": "NARRATIVE",
+      "content": "Blade-9 đã bị phá hủy. Trọng tâm chiến thuật của X-Sniper lập tức chuyển sang giao thức độc lập."
+    },
+    {
+      "time_offset_ms": 15100,
       "type": "ATTACK",
-      "actor_id": "raider_buzz_01",
-      "target_id": "char_riko_02",
-      "hp_change": -110,
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -5,
       "is_critical": false
     },
     {
-      "time_offset_ms": 14500,
+      "time_offset_ms": 15100,
       "type": "VFX",
-      "target_id": "char_riko_02",
+      "target_id": "char_A1",
+      "pixi_text": {
+        "content": "-5 (Poison)",
+        "color": "#32CD32",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 150
+      }
+    },
+    {
+      "time_offset_ms": 15200,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 8,
+      "target_y": 6
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Góc bắn thẳng tuyệt đối. Xóa sổ mục tiêu phòng ngự.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 15800,
+      "type": "SKILL",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "local_shake_x": 0.2,
+        "local_shake_y": 0.0,
+        "duration_ms": 300,
+        "ease": "rough.ease",
+        "color_tint": "#00FFFF",
+        "tint_alpha": 0.5
+      }
+    },
+    {
+      "time_offset_ms": 16100,
+      "type": "VFX",
+      "target_id": "char_B1",
       "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[12.5, 14.5], [13.5, 15.5], [13.5, 14.5], [12.5, 15.5]],
+        "path_points": [[0,0], [0,6]],
+        "is_closed_path": false,
+        "thickness": 0.8,
+        "color": "#00FFFF",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.2,
+        "animation_speed": 15.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 150,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 16100,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "path_points": [[0,0], [0,6]],
+        "is_closed_path": false,
         "thickness": 0.2,
-        "color": "#C0C0C0",
-        "distortion_amplitude": 0,
-        "animation_speed": 0,
-        "style": "cross_slash"
+        "color": "#FFFFFF",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.0,
+        "animation_speed": 0.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 150,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 16100,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -5,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16100,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "pixi_text": {
+        "content": "-5 (Poison)",
+        "color": "#32CD32",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 150
+      }
+    },
+    {
+      "time_offset_ms": 16110,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_mesh": {
+        "path_points": [[-0.6, 1], [0.6, 1], [-0.6, 3], [0.6, 3], [-0.6, 5], [0.6, 5]],
+        "is_closed_path": false,
+        "thickness": 0.1,
+        "color": "#00FFFF",
+        "alpha": 0.9,
+        "distortion_amplitude": 0.3,
+        "animation_speed": 25.0,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 16110,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_particles": {
+        "emitter_type": "burst",
+        "burst_count": 40,
+        "particle_lifetime_ms": 300,
+        "spawn_width": 0.5,
+        "spawn_height": 6.0,
+        "start_color": "#FFFFFF",
+        "end_color": "#00FFFF",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 2.5,
+        "spread_angle": 180,
+        "shape_type": "star"
+      }
+    },
+    {
+      "time_offset_ms": 16120,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": -75,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16120,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "local_shake_x": 0.8,
+        "duration_ms": 150,
+        "ease": "power4.out"
+      }
+    },
+    {
+      "time_offset_ms": 16120,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "-75",
+        "color": "#00FFFF",
+        "font_size": 2.0,
+        "font_weight": "bold",
+        "float_distance_y": -2.0,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 1000,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 16300,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16300,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "canvas_layer": { "layer": "bg" },
+      "pixi_graphics": {
+        "shape_type": "ellipse",
+        "width": 1.5,
+        "height": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.9,
+        "fade_in_ms": 50,
+        "lifetime_ms": 2000,
+        "fade_out_ms": 800
+      },
+      "pixi_filters": {
+        "filter_type": "wave",
+        "amplitude": 0.2,
+        "wavelength": 0.8,
+        "duration_ms": 2000
       },
       "pixi_particles": {
-        "x": 13,
-        "y": 15,
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1500,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.5,
+        "spawn_height": 0.8,
+        "start_color": "#FF0000",
+        "end_color": "#808080",
+        "start_scale": 0.8,
+        "end_scale": 0.1,
+        "gravity_y": -2.0,
+        "speed": 1.5
+      }
+    },
+    {
+      "time_offset_ms": 16350,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_y": 1.5,
+        "scale_x": 0.5,
+        "duration_ms": 150,
+        "ease": "power4.in",
+        "color_tint": "#FFFFFF",
+        "tint_alpha": 0.9
+      }
+    },
+    {
+      "time_offset_ms": 16490,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 4,
+      "target_y": 8
+    },
+    {
+      "time_offset_ms": 16500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "canvas_layer": { "layer": "bg" },
+      "pixi_graphics": {
+        "shape_type": "ellipse",
+        "width": 1.5,
+        "height": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.9,
+        "fade_in_ms": 50,
+        "lifetime_ms": 2000,
+        "fade_out_ms": 800
+      },
+      "pixi_filters": {
+        "filter_type": "wave",
+        "amplitude": 0.2,
+        "wavelength": 0.8,
+        "duration_ms": 2000
+      },
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1500,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.5,
+        "spawn_height": 0.8,
+        "start_color": "#FF0000",
+        "end_color": "#808080",
+        "start_scale": 0.8,
+        "end_scale": 0.1,
+        "gravity_y": -2.0,
+        "speed": 1.5
+      }
+    },
+    {
+      "time_offset_ms": 16550,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_y": 1.0,
+        "scale_x": 1.0,
+        "duration_ms": 150,
+        "ease": "back.out(1.7)",
+        "color_tint": "#FFFFFF",
+        "tint_alpha": 0.0
+      }
+    },
+    {
+      "time_offset_ms": 16800,
+      "type": "SKILL",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16800,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "canvas_layer": { "layer": "fg" },
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "path_points": [[0,-2], [1.7,-1], [1.7,1], [0,2], [-1.7,1], [-1.7,-1]],
+        "is_closed_path": true,
+        "thickness": 0.15,
+        "color": "#D2B48C",
+        "alpha": 0.7,
+        "fade_in_ms": 200,
+        "lifetime_ms": 5000,
+        "fade_out_ms": 400
+      },
+      "gsap_tween": {
+        "scale_x": 1.05,
+        "scale_y": 1.05,
+        "duration_ms": 1500,
+        "ease": "sine.inOut",
+        "yoyo": true,
+        "repeat": -1
+      }
+    },
+    {
+      "time_offset_ms": 16900,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 8,
+        "emit_duration_ms": 4500,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.5,
+        "spawn_height": 3.5,
+        "start_color": "#FFD700",
+        "end_color": "#DAA520",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "gravity_y": 1.5,
+        "speed": 0.8
+      }
+    },
+    {
+      "time_offset_ms": 17200,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17200,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "canvas_layer": { "layer": "fg" },
+      "pixi_graphics": {
+        "shape_type": "circle",
+        "radius": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 1.0,
+        "line_width": 0.1,
+        "line_color": "#FFD700",
+        "line_alpha": 0.8,
+        "fade_in_ms": 100,
+        "lifetime_ms": 500,
+        "fade_out_ms": 50
+      },
+      "blend_mode": { "mode": "ADD" },
+      "gsap_tween": {
+        "motion_path_points": [[0, 0], [2, -1], [4, -2]],
+        "duration_ms": 500,
+        "ease": "power2.inOut",
+        "scale_x": 1.2,
+        "scale_y": 1.2,
+        "yoyo": true,
+        "repeat": 4
+      }
+    },
+    {
+      "time_offset_ms": 17700,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": -62,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17700,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_text": {
+        "content": "-62",
+        "color": "#FF4500",
+        "font_size": 2.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 17700,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 2.0,
+        "wavelength": 1.5,
+        "thickness": 0.5,
+        "duration_ms": 600
+      },
+      "gsap_tween": {
+        "local_shake_x": 0.5,
+        "local_shake_y": 0.5,
+        "duration_ms": 400,
+        "ease": "rough.ease",
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.6
+      }
+    },
+    {
+      "time_offset_ms": 17710,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
         "emitter_type": "burst",
-        "particle_count": 10,
-        "lifetime_ms": 200,
-        "start_color": "#FFFFFF",
-        "end_color": "#FFD700",
-        "start_scale": 0.1,
-        "end_scale": 0,
-        "speed": 4,
+        "burst_count": 100,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#8B0000",
+        "end_color": "#FF4500",
+        "start_scale": 1.5,
+        "end_scale": 0.2,
+        "speed": 4.5,
         "spread_angle": 360
       }
     },
     {
-      "time_offset_ms": 14500,
+      "time_offset_ms": 17720,
       "type": "VFX",
-      "target_id": "char_riko_02",
-      "pixi_text": {
-        "content": "-110",
-        "x": 13,
-        "y": 14.2,
-        "color": "#FFFFFF",
-        "font_size": 1.2,
-        "font_weight": "bold",
-        "drop_shadow": true,
-        "float_distance_y": -1.5,
-        "fade_duration_ms": 600
+      "target_id": "char_B1",
+      "canvas_layer": { "layer": "bg" },
+      "pixi_graphics": {
+        "shape_type": "rectangle",
+        "width": 3.0,
+        "height": 3.0,
+        "fill_color": "#1A1A1A",
+        "fill_alpha": 0.8,
+        "corner_radius": 0.5,
+        "fade_in_ms": 100,
+        "lifetime_ms": 3000,
+        "fade_out_ms": 1000
       },
-      "gsap_tween": {
-        "target_id": "char_riko_02",
-        "x": 13,
-        "y": 13.5,
-        "scale": 1.2,
-        "opacity": 0,
-        "rotation_deg": 0,
-        "duration_ms": 600,
-        "ease": "power2.out"
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 2500,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#555555",
+        "end_color": "#000000",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "gravity_y": -1.5,
+        "speed": 1.0
       }
     },
     {
-      "time_offset_ms": 14800,
-      "type": "NARRATIVE",
-      "content": "Gọng kìm của Buzz cắm ngập vào Riko. Trận chiến kết thúc trong máu và cát bụi. Toán cướp đã chiến thắng."
+      "time_offset_ms": 18000,
+      "type": "DIALOGUE",
+      "actor_id": "char_A1",
+      "content": "Cỗ máy dối trá, để xem lớp giáp thép của ngươi chịu được nhiệt độ bao nhiêu!",
+      "emotion": "AGGRESSIVE"
+    },
+    {
+      "time_offset_ms": 18200,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -5,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18200,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_text": {
+        "content": "-5 (Burn)",
+        "color": "#FF8C00",
+        "font_size": 1.2,
+        "font_weight": "bold",
+        "float_distance_y": -1.0,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 8,
+      "target_y": 3
+    },
+    {
+      "time_offset_ms": 19000,
+      "type": "MOVE",
+      "actor_id": "char_A2",
+      "target_x": 8,
+      "target_y": 9
+    },
+    {
+      "time_offset_ms": 19200,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A1",
+      "hp_change": -53,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 19200,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "path_points": [[0,0], [-4,5]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#00FF00",
+        "fade_in_ms": 0,
+        "lifetime_ms": 150,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 19250,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "local_shake_x": 0.3,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "content": "-53",
+        "color": "#FF0000",
+        "font_size": 1.5,
+        "font_weight": "bold",
+        "float_distance_y": -1.0,
+        "float_duration_ms": 600,
+        "fade_in_ms": 50,
+        "lifetime_ms": 500,
+        "fade_out_ms": 150
+      }
     }
   ]
 }
-
-
+{
+  "chunk_summary": "Nhận thấy X-Sniper đang tính toán lại góc bắn tử thần, Bolder bất chấp luồng khí độc đang ăn mòn cơ thể, lao lên thu hẹp khoảng cách. Một cú Đấm Phá Đất rúng động được tung ra, nghiền nát lớp giáp ngoài và làm chập mạch hệ thống của xạ thủ cơ khí. Không bỏ lỡ cơ hội, Ignis tiến vào tầm ngắm, tung Quả Cầu Lửa cuối cùng dứt điểm hoàn toàn. X-Sniper phát nổ trong vô vọng, đánh dấu chiến thắng đẫm máu cho phe Vệ Binh Ma Thuật.",
+  "is_game_over": true,
+  "winning_team": "team_A",
+  "updated_state": {
+    "char_A1": { "hp": 87, "x": 6, "y": 5 },
+    "char_A2": { "hp": 88, "x": 8, "y": 4 },
+    "char_B1": { "hp": 0, "x": 8, "y": 3 },
+    "char_B2": { "hp": 0, "x": 8, "y": 11 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 20000,
+      "type": "NARRATIVE",
+      "content": "Bolder cắn răng chịu đựng khí độc, sải bước lớn lao thẳng về phía X-Sniper. Không thể để cỗ máy kia khai hỏa thêm lần nào nữa!"
+    },
+    {
+      "time_offset_ms": 20100,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -5,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 20100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_text": {
+        "content": "-5 (Poison)",
+        "color": "#32CD32",
+        "font_size": 1.0,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 800,
+        "fade_in_ms": 50,
+        "lifetime_ms": 600,
+        "fade_out_ms": 150
+      }
+    },
+    {
+      "time_offset_ms": 20200,
+      "type": "MOVE",
+      "actor_id": "char_A2",
+      "target_x": 8,
+      "target_y": 4
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 6,
+      "target_y": 5
+    },
+    {
+      "time_offset_ms": 21500,
+      "type": "SKILL",
+      "actor_id": "char_A2",
+      "target_id": "char_B1",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 21500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "scale_y": 0.6,
+        "scale_x": 1.3,
+        "duration_ms": 300,
+        "ease": "power2.in"
+      }
+    },
+    {
+      "time_offset_ms": 21800,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B1",
+      "hp_change": -42,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 21800,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "scale_y": 1.0,
+        "scale_x": 1.0,
+        "duration_ms": 150,
+        "ease": "bounce.out"
+      },
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 1.2,
+        "wavelength": 2.0,
+        "duration_ms": 400
+      }
+    },
+    {
+      "time_offset_ms": 21800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_text": {
+        "content": "-42",
+        "color": "#8B4513",
+        "font_size": 1.8,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 600,
+        "fade_in_ms": 50,
+        "lifetime_ms": 700,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 21810,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "canvas_layer": {
+        "layer": "bg"
+      },
+      "pixi_mesh": {
+        "path_points": [[0,0], [0.5, 1.5], [-0.3, 2.5], [0.8, 3]],
+        "is_closed_path": false,
+        "thickness": 0.3,
+        "color": "#4A3B22",
+        "alpha": 0.9,
+        "distortion_amplitude": 0.1,
+        "fade_in_ms": 50,
+        "lifetime_ms": 1500,
+        "fade_out_ms": 500
+      }
+    },
+    {
+      "time_offset_ms": 21820,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "canvas_layer": {
+        "layer": "bg"
+      },
+      "pixi_mesh": {
+        "path_points": [[0,0], [1.5, 3], [-1.5, 3]],
+        "is_closed_path": true,
+        "color": "#8B4513",
+        "alpha": 1.0,
+        "distortion_amplitude": 0.5,
+        "animation_speed": 0.0,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 300
+      },
+      "pixi_particles": {
+        "emitter_type": "burst",
+        "burst_count": 60,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 2.0,
+        "start_color": "#A0522D",
+        "end_color": "#808080",
+        "start_scale": 1.0,
+        "end_scale": 0.2,
+        "speed": 3.5,
+        "gravity_y": 2.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 22000,
+      "type": "DIALOGUE",
+      "actor_id": "char_A1",
+      "content": "Trò chơi kết thúc rồi, tên rác rưởi bằng sắt!",
+      "emotion": "AGGRESSIVE"
+    },
+    {
+      "time_offset_ms": 22200,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": 0,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22200,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "canvas_layer": {
+        "layer": "fg"
+      },
+      "pixi_graphics": {
+        "shape_type": "circle",
+        "radius": 0.8,
+        "fill_color": "#FF4500",
+        "fill_alpha": 1.0,
+        "line_width": 0.1,
+        "line_color": "#FFD700",
+        "line_alpha": 0.8,
+        "fade_in_ms": 100,
+        "lifetime_ms": 500,
+        "fade_out_ms": 50
+      },
+      "blend_mode": {
+        "mode": "ADD"
+      },
+      "gsap_tween": {
+        "motion_path_points": [[0, 0], [2.5, -2.5], [5, 0]],
+        "duration_ms": 500,
+        "ease": "power2.inOut",
+        "scale_x": 1.2,
+        "scale_y": 1.2,
+        "yoyo": true,
+        "repeat": 4
+      }
+    },
+    {
+      "time_offset_ms": 22700,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": -65,
+      "is_critical": true
+    },
+    {
+      "time_offset_ms": 22700,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_text": {
+        "content": "-65 CRIT",
+        "color": "#FF0000",
+        "font_size": 2.5,
+        "font_weight": "bold",
+        "float_distance_y": -2.0,
+        "float_duration_ms": 1000,
+        "fade_in_ms": 50,
+        "lifetime_ms": 1000,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 22700,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_filters": {
+        "filter_type": "shockwave",
+        "amplitude": 2.0,
+        "wavelength": 1.5,
+        "thickness": 0.5,
+        "duration_ms": 600
+      },
+      "gsap_tween": {
+        "local_shake_x": 0.5,
+        "local_shake_y": 0.5,
+        "duration_ms": 400,
+        "ease": "rough.ease",
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.6
+      }
+    },
+    {
+      "time_offset_ms": 22710,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": {
+        "mode": "ADD"
+      },
+      "pixi_particles": {
+        "emitter_type": "burst",
+        "burst_count": 100,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#8B0000",
+        "end_color": "#FF4500",
+        "start_scale": 1.5,
+        "end_scale": 0.2,
+        "speed": 4.5,
+        "spread_angle": 360
+      }
+    },
+    {
+      "time_offset_ms": 22720,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "canvas_layer": {
+        "layer": "bg"
+      },
+      "pixi_graphics": {
+        "shape_type": "rectangle",
+        "width": 3.0,
+        "height": 3.0,
+        "fill_color": "#1A1A1A",
+        "fill_alpha": 0.8,
+        "corner_radius": 0.5,
+        "fade_in_ms": 100,
+        "lifetime_ms": 3000,
+        "fade_out_ms": 1000
+      },
+      "pixi_particles": {
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 2500,
+        "particle_lifetime_ms": 1000,
+        "spawn_width": 3.0,
+        "spawn_height": 3.0,
+        "start_color": "#555555",
+        "end_color": "#000000",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "gravity_y": -1.5,
+        "speed": 1.0
+      }
+    },
+    {
+      "time_offset_ms": 23500,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Cảnh báo... Hỏng hóc lõi động cơ... Nhiệm vụ thất bại...",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "NARRATIVE",
+      "content": "Cơ thể kim loại của X-Sniper sụp xuống trong tiếng lách tách của tĩnh điện. Khu di tích Nguyên Tử rốt cuộc cũng trở lại với sự tĩnh lặng chết chóc."
+    }
+  ]
+}
 
 `;
 // =========================================================================
@@ -2121,81 +2021,69 @@ export default function QuickTester() {
       return;
     }
 
-    // 2. Cập nhật dữ liệu nâng cấp (đã lượng hóa chi tiết) cho kịch bản Sa mạc
+    // 2. Cập nhật dữ liệu nâng cấp (đã lượng hóa chi tiết) cho kịch bản Khu Di Tích Nguyên Tử
     useMainStore.setState({
-      // Môi trường Sa mạc bão cát
-      mapPreviewUrl: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1000&auto=format&fit=crop', 
-      mapDescription: "Trạm Xăng Bỏ Hoang Trên Sa Mạc Chết: Kích thước 20x20. Bão cát mù mịt làm giảm 20% độ chính xác của các đòn đánh tầm xa. Xung quanh là xác xe phế liệu. ĐẶC BIỆT: Có 2 'Thùng Phi Xăng' ở tọa độ (12, 15) và (8, 6), được tính là chướng ngại vật. Nếu Thùng Phi Xăng nhận bất kỳ sát thương Lửa nào, nó sẽ phát nổ ngay lập tức, gây 300 sát thương diện rộng trong bán kính 2 ô xung quanh và để lại vũng lửa cháy trong 3 giây (gây 50 sát thương/giây nếu đứng trên đó).",
+      // Môi trường Khu Di Tích Nguyên Tử
+      mapPreviewUrl: 'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1000&auto=format&fit=crop', 
+      mapDescription: "Khu di tích Nguyên Tử: Kích thước 20x20. Chiến trường chìm trong sương mù và tàn tích máy móc cũ kỹ. ĐẶC BIỆT: Vùng trung tâm có rò rỉ 'Khí Độc', bất kỳ đơn vị nào bước vào sẽ bị trạng thái 'Poison' trừ HP liên tục. Bức tường sương mù làm giảm khả năng khóa mục tiêu nhưng không thể cản được các tia laser công nghệ cao.",
       
-      // Avatar giả lập cho các nhân vật
+      // Avatar giả lập cho các nhân vật (Màu sắc tương ứng với hệ Lửa, Đất, Cyber, Ám khí)
       uploadedShapes: [
-        { id: "shape-jax", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Jax&background=8B4513&color=fff&size=150&bold=true" },
-        { id: "shape-riko", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Riko&background=FF8C00&color=fff&size=150&bold=true" },
-        { id: "shape-krieg", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Krieg&background=8B0000&color=fff&size=150&bold=true" },
-        { id: "shape-buzz", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Buzz&background=2F4F4F&color=fff&size=150&bold=true" },
-        { id: "shape-viper", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Viper&background=006400&color=fff&size=150&bold=true" }
+        { id: "shape-ignis", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Ignis&background=FF4500&color=fff&size=150&bold=true" },
+        { id: "shape-bolder", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Bolder&background=8B4513&color=fff&size=150&bold=true" },
+        { id: "shape-xsniper", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=X-Sniper&background=00FFFF&color=000&size=150&bold=true" },
+        { id: "shape-blade9", file: null as any, previewUrl: "https://ui-avatars.com/api/?name=Blade-9&background=1A1A1A&color=fff&size=150&bold=true" }
       ],
 
-      // Đội hình A: Những người sống sót
+      // Đội hình A: Vệ Binh Ma Thuật
       teamA: [
         {
-          id: "char_jax_01",
+          id: "char_A1",
           team: 'A',
-          name: "Jax 'Gấu Sẹo'",
-          personality: "Trầm lỳ, kiên nhẫn. Một cựu binh sẵn sàng lấy thân mình làm lá chắn chắn đạn cho đồng đội. Thà gãy xương chứ tuyệt đối không lùi bước.",
-          basicAttackDesc: "Nện búa tạ: Tầm đánh 1 ô. Gây 100% Sát thương vật lý (220 dmg) lên 1 mục tiêu đơn. Tốc độ vung búa chậm.",
-          skillDesc: "Cú Nện Phá Đất: Thời gian gồng (cast time): 1 giây. Jax đập búa xuống đất tạo sóng xung kích hình nón (cone) hướng về phía trước, quét qua 3 ô. Sát thương: 350 Sát thương vật lý. Hiệu ứng: Đẩy lùi (Knockback) tất cả kẻ địch trúng chiêu lùi lại 1 ô và gây Choáng (Stun) trong 1.5 giây.",
-          stats: { hp: 1500, maxHp: 1500, agility: 30, damage: 220, range: 1 },
-          shapeId: "shape-jax",
-          position: { x: 10, y: 14 }
+          name: "Ignis 'Hỏa Thần'",
+          personality: "Bậc thầy phép thuật lửa, phản xạ chớp nhoáng. Luôn giữ khoảng cách an toàn, hóa thành tàn lửa để né đạn và tung hỏa lực thiêu rụi kẻ thù.",
+          basicAttackDesc: "Tàn Lửa: Tầm bắn 5 ô. Gây sát thương phép và để lại trạng thái Bỏng (Burn).",
+          skillDesc: "Quả Cầu Lửa Bùng Nổ: Tụ năng lượng ném một quả cầu lửa khổng lồ gây sát thương diện rộng. Đủ sức thiêu đốt lớp giáp cơ khí và làm lộ diện hoàn toàn kẻ địch đang tàng hình.",
+          stats: { hp: 150, maxHp: 150, agility: 80, damage: 65, range: 5 },
+          shapeId: "shape-ignis",
+          position: { x: 7, y: 15 }
         },
         {
-          id: "char_riko_02",
+          id: "char_A2",
           team: 'A',
-          name: "Riko 'Cáo Cát'",
-          personality: "Nhanh nhẹn, ranh mãnh và hay chửi thề khi gặp áp lực. Luôn tìm góc khuất để bắn lén chứ không giáp lá cà.",
-          basicAttackDesc: "Bắn nỏ tự chế: Tầm bắn 6 ô. Gây 100% Sát thương vật lý (150 dmg). Có 20% tỷ lệ đòn đánh xuyên giáp (gây sát thương chuẩn).",
-          skillDesc: "Mũi Tên Nổ: Bắn một mũi tên thuốc nổ vào 1 mục tiêu trong tầm 6 ô. Mũi tên dính chặt vào mục tiêu và đếm ngược 1 giây trước khi nổ. Phạm vi nổ: Bán kính 1 ô xung quanh mục tiêu (hình chữ thập). Sát thương nổ: 250 Sát thương Lửa (Fire dmg). Hiệu ứng: Thiêu đốt kẻ địch (mất 30 HP/giây trong 3 giây). Kỹ năng này CÓ THỂ kích nổ Thùng Phi Xăng trên bản đồ.",
-          stats: { hp: 700, maxHp: 700, agility: 90, damage: 150, range: 6 },
-          shapeId: "shape-riko",
-          position: { x: 11, y: 17 }
+          name: "Bolder 'Đá Tảng'",
+          personality: "Chiến binh lực lưỡng hệ Đất, kiên cường và dũng mãnh. Đóng vai trò làm khiên thịt, sẵn sàng lấy thân mình gánh sát thương xuyên giáp cho đồng đội.",
+          basicAttackDesc: "Khiên Đá: Cận chiến 1 ô. Đập đối thủ bằng lá chắn đá tảng, tạo lớp giáp ảo bảo vệ bản thân.",
+          skillDesc: "Earth Smash (Đấm Phá Đất): Giậm mạnh xuống đất tạo sóng xung kích rúng động. Nghiền nát mặt đất và lớp giáp ngoài của mục tiêu, gây choáng (Stun) và chập mạch hệ thống cơ khí.",
+          stats: { hp: 300, maxHp: 300, agility: 30, damage: 45, range: 1 },
+          shapeId: "shape-bolder",
+          position: { x: 7, y: 14 }
         }
       ],
 
-      // Đội hình B: Toán cướp sa mạc
+      // Đội hình B: Tập Đoàn Cơ Khí
       teamB: [
         {
-          id: "raider_krieg_boss",
+          id: "char_B1",
           team: 'B',
-          name: "Thủ lĩnh Krieg",
-          personality: "Thủ lĩnh toán cướp. Tâm thần, tàn bạo. Hành động vô cùng liều lĩnh và điên dại. Sẽ ưu tiên nhắm vào mục tiêu có HP thấp nhất.",
-          basicAttackDesc: "Cưa máy rỉ sét: Tầm đánh 1 ô. Gây 100% Sát thương vật lý (280 dmg). Mỗi đòn đánh trúng áp dụng cộng dồn 'Chảy Máu' gây 20 HP/giây trong 2 giây.",
-          skillDesc: "Vũ Điệu Đồ Tể: Lao thẳng về phía trước (Dash) tối đa 3 ô để tiếp cận mục tiêu, sau đó xoay cưa máy điên cuồng. Phạm vi: Tất cả các ô liền kề xung quanh Krieg (bán kính 1 ô). Sát thương: Chém 3 nhát liên tiếp, mỗi nhát 150 dmg (Tổng 450 dmg). Hiệu ứng: Kẻ địch trúng chiêu bị giảm 50% tốc độ di chuyển trong 2 giây.",
-          stats: { hp: 1800, maxHp: 1800, agility: 50, damage: 280, range: 1 },
-          shapeId: "shape-krieg",
-          position: { x: 10, y: 5 }
+          name: "X-Sniper",
+          personality: "Cỗ máy xạ thủ máu lạnh, AI tính toán quỹ đạo hoàn hảo. Luôn dịch chuyển tìm góc bắn thẳng tuyệt đối và khóa mục tiêu vào trục dọc.",
+          basicAttackDesc: "Laser bắn tỉa: Tầm bắn 8 ô. Bắn tia laser nhanh như chớp, khó lòng né tránh.",
+          skillDesc: "Đạn Xuyên Giáp / Mìn Lưới: Khóa mục tiêu và khai hỏa đạn xuyên thấu xé toạc không khí, gây sát thương cực lớn bất chấp phòng ngự. Có thể ném mìn lưới để khóa chặt chân (Root) kẻ địch lao tới.",
+          stats: { hp: 120, maxHp: 120, agility: 60, damage: 75, range: 8 },
+          shapeId: "shape-xsniper",
+          position: { x: 14, y: 6 }
         },
         {
-          id: "raider_buzz_01",
+          id: "char_B2",
           team: 'B',
-          name: "Buzz",
-          personality: "Kẻ nghiện chất kích thích, di chuyển lảo đảo nhưng lao vào con mồi cực kỳ nhanh. Thích tập kích lính bắn tỉa hoặc hỗ trợ.",
-          basicAttackDesc: "Vuốt sắt: Tầm đánh 1 ô. Tốc độ đánh cực nhanh. Gây 100% Sát thương vật lý (130 dmg).",
-          skillDesc: "Cú Vồ Khát Máu: Chỉ định 1 mục tiêu trong bán kính 4 ô. Lập tức nhảy vọt (Jump) xuyên qua các chướng ngại vật để đáp xuống một ô trống cạnh mục tiêu. Gây ngay lập tức 200 sát thương vật lý và Trói Chân (Root - không thể di chuyển nhưng vẫn có thể đánh) mục tiêu trong 1 giây.",
-          stats: { hp: 850, maxHp: 850, agility: 80, damage: 130, range: 1 },
-          shapeId: "shape-buzz",
-          position: { x: 8, y: 7 }
-        },
-        {
-          id: "raider_viper_02",
-          team: 'B',
-          name: "Viper",
-          personality: "Kẻ bắn tỉa máu lạnh. Tàn nhẫn và tính toán, luôn giữ khoảng cách tối đa với kẻ địch.",
-          basicAttackDesc: "Bắn tỉa súng trường: Tầm bắn 9 ô. Gây 100% Sát thương vật lý (200 dmg). Cần 1 giây ngắm bắn trước khi nổ súng.",
-          skillDesc: "Phát Đạn Xuyên Giáp: Thời gian ngắm bắn (cast time): 1.5 giây. Bắn một tia đạn đạo xuyên thấu theo một đường thẳng dài 10 ô, rộng 1 ô. Xuyên qua tất cả các mục tiêu (cả bạn lẫn thù) trên đường đạn bay. Sát thương: 400 Sát thương Chuẩn (True dmg - bỏ qua mọi kháng cự). Kẻ địch trúng đạn bị Đẩy Lùi 1 ô.",
-          stats: { hp: 600, maxHp: 600, agility: 65, damage: 200, range: 9 },
-          shapeId: "shape-viper",
-          position: { x: 15, y: 4 }
+          name: "Blade-9",
+          personality: "Sát thủ Drone tàng hình. Nhanh như bóng ma, thoắt ẩn thoắt hiện để ám sát, không một lời do dự.",
+          basicAttackDesc: "Cưa máy / Chém cơ khí: Cận chiến 1 ô. Tốc độ vung đòn cực cao.",
+          skillDesc: "Chém Kép Tử Thần: Kích hoạt tàng hình lướt nhanh về trận tuyến đối phương. Tung đòn chém kép xé rách lớp phòng ngự và gây trạng thái Chảy Máu (Bleed) nghiêm trọng.",
+          stats: { hp: 120, maxHp: 120, agility: 95, damage: 40, range: 1 },
+          shapeId: "shape-blade9",
+          position: { x: 8, y: 11 }
         }
       ],
 
@@ -2210,9 +2098,9 @@ export default function QuickTester() {
   return (
     <button
       onClick={handleQuickStart}
-      className="fixed top-4 right-4 z-50 bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.8)] border-2 border-orange-400 animate-pulse transition-all"
+      className="fixed top-4 right-4 z-50 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-full shadow-[0_0_20px_rgba(8,145,178,0.8)] border-2 border-cyan-400 animate-pulse transition-all"
     >
-      🚀 TEST BẢN ĐỒ SA MẠC NÂNG CẤP
+      🚀 TEST DI TÍCH NGUYÊN TỬ (AI DATA)
     </button>
   );
 }
