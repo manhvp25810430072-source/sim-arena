@@ -2103,4 +2103,4 @@ export default function QuickTester() {
       🚀 TEST DI TÍCH NGUYÊN TỬ (AI DATA)
     </button>
   )
-  
+}
