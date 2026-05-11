@@ -175,18 +175,18 @@ export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
   if (!bgCanvas || !fgCanvas) return;
 
   if (appBg) {
-    appBg.destroy(true, { children: true, texture: true });
+    appBg.destroy(false, { children: true, texture: true });
     appBg = null;
   }
   if (appFg) {
-    appFg.destroy(true, { children: true, texture: true });
+    appFg.destroy(false, { children: true, texture: true });
     appFg = null;
   }
 
-  appBg = new PIXI.Application({ backgroundAlpha: 0, width: 1000, height: 1000, clearBeforeRender: true });
+  appBg = new PIXI.Application();
   await appBg.init({ canvas: bgCanvas, width: 1000, height: 1000, backgroundAlpha: 0, clearBeforeRender: true });
 
-  appFg = new PIXI.Application({ backgroundAlpha: 0, width: 1000, height: 1000, clearBeforeRender: true });
+  appFg = new PIXI.Application();
   await appFg.init({ canvas: fgCanvas, width: 1000, height: 1000, backgroundAlpha: 0, clearBeforeRender: true });
 
   console.log('VFX Engine (PixiJS + GSAP + Particles + Filters) Nâng cấp Initialized!');
