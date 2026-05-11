@@ -225,7 +225,7 @@ const generateTexture = (type: string, renderer: PIXI.Renderer): PIXI.Texture =>
     gfx.fill({ color: 0xFF4500 });
   } else if (type === 'smoke') {
     gfx.circle(0, 0, 15).fill({ color: 0x888888, alpha: 0.5 });
-  } else if (type === 'spark') {
+  } else if (type === 'spark' || type === 'star') {
     gfx.moveTo(0, -10).lineTo(2, -2).lineTo(10, 0).lineTo(2, 2).lineTo(0, 10).lineTo(-2, 2).lineTo(-10, 0).lineTo(-2, -2).fill({ color: 0xFFFF00 });
   } else if (type === 'water') {
     gfx.circle(0, 0, 8).fill({ color: 0x00BFFF });
@@ -341,7 +341,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const strokeAlpha = stroke ? (payload.line_alpha ?? 1) * stroke.alpha : 0;
       const strokeWidth = (payload.line_width ?? (stroke ? 0.05 : 0)) * CELL_SIZE;
 
-      if (payload.shape_type === 'rect') {
+      if (payload.shape_type === 'rect' || payload.shape_type === 'rectangle') {
         const rectW = (payload.width ?? 1) * CELL_SIZE;
         const rectH = (payload.height ?? 1) * CELL_SIZE;
         const cornerRadius = (payload.corner_radius || 0) * CELL_SIZE;
@@ -352,6 +352,10 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             graphics.rect(cx - rectW / 2, cy - rectH / 2, rectW, rectH);
         }
         
+      } else if (payload.shape_type === 'ellipse') {
+        const ellipseW = (payload.width ?? 1) * CELL_SIZE / 2;
+        const ellipseH = (payload.height ?? 1) * CELL_SIZE / 2;
+        graphics.ellipse(cx, cy, ellipseW, ellipseH);
       } else if (payload.shape_type === 'line') {
           const points = payload.points || [];
           if(points.length > 0) {
@@ -470,7 +474,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       stage.addChild(container);
 
       // Sử dụng engine texture tự động sinh
-      const particleTexture = generateTexture(payload.texture_type || 'default', targetApp.renderer);
+      const particleTexture = generateTexture(payload.texture_type || payload.shape_type || 'default', targetApp.renderer);
 
       const particleLifetimeSec = (payload.particle_lifetime_ms || 1000) / 1000 / simulationSpeed;
       const lifeVarSec = (payload.lifetime_variance_ms || 0) / 1000 / simulationSpeed;
@@ -703,7 +707,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             
             // Xử lý động lực học hình dáng (Shape Dynamics)
             if (tStart !== 1.0 || tEnd !== 1.0) {
-               const baseTaper = tStart + (tEnd - tStart) * pointProgress;
+               const baseTaper = tStart 
+               + (tEnd - tStart) * pointProgress;
                // Hiệu ứng hạt đậu/giọt nước: Nếu vuốt nhọn cả 2 đầu, thân giữa sẽ phình to mượt mà
                const bulge = (tStart < 0.5 && tEnd < 0.5) ? (4 * pointProgress * (1 - pointProgress)) : 0;
                currentWidth = strokeWidth * Math.max(baseTaper, bulge);
@@ -752,7 +757,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const cx = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
       const cy = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
 
-      if (payload.filter_type === 'shockwave') {
+      if (payload.filter_type === 'shockwave' || payload.filter_type === 'wave') {
         const targetRadius = (payload.radius || 10) * CELL_SIZE;
         const shockwave = new ShockwaveFilter(
           { x: cx, y: cy },
