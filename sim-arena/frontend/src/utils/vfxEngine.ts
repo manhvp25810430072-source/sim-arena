@@ -484,13 +484,14 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   }
 
   // ------------------------------------------
-  // 2. PIXI GRAPHICS (Với Grid Units)
+  // 1. PIXI SPRITE (Với Grid Units)
   // ------------------------------------------
-  if (vfxEvent.pixi_graphics) {
-    const payload = vfxEvent.pixi_graphics;
-    const durationMs = payload.lifetime_ms || vfxEvent.duration_ms || 1000;
+  if (vfxEvent.pixi_sprite) {
+    const payload = vfxEvent.pixi_sprite;
+    const durationMs = payload.lifetime_ms || payload.fade_duration_ms || 1500;
 
     scheduleEffect(() => {
+      try {
       const graphics = new PIXI.Graphics();
       if (blendMode !== null) graphics.blendMode = blendMode as any;
 
@@ -562,7 +563,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
       stage.addChild(graphics);
       handleLifecycle(graphics, payload, simulationSpeed, stage);
-
+      } catch (error) {
+        console.warn('[VFX] pixi_sprite error:', error);
+      }
     }, sequence, durationMs, simulationSpeed);
   }
 
@@ -574,6 +577,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     const durationMs = payload.lifetime_ms || payload.fade_duration_ms || 1500;
 
     scheduleEffect(() => {
+      try {
       const dropShadowDistanceX = (payload.drop_shadow_distance_x || 0) * CELL_SIZE;
       const dropShadowDistanceY = (payload.drop_shadow_distance_y || 0) * CELL_SIZE;
 
@@ -616,7 +620,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       });
 
       handleLifecycle(textObj, payload, simulationSpeed, stage);
-
+      } catch (error) {
+        console.warn('[VFX] pixi_text error:', error);
+      }
     }, sequence, durationMs, simulationSpeed);
   }
 
@@ -628,7 +634,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     const durationMs = payload.emit_duration_ms || payload.lifetime_ms || 1000;
 
     scheduleEffect(() => {
-      const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
+      try {
+        const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
       const originX = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
       const originY = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
 
@@ -804,7 +811,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           container.destroy();
         }
       }, (durationMs + (particleLifetimeSec * 1000) + 500) / simulationSpeed));
-
+      } catch (error) {
+        console.warn('[VFX] pixi_particles error:', error);
+      }
     }, sequence, durationMs, simulationSpeed);
   }
 
@@ -816,8 +825,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     const durationMs = payload.lifetime_ms || vfxEvent.duration_ms || 500;
 
     scheduleEffect(() => {
-      const points = payload.path_points || [];
-      if (points.length < 2) return;
+      try {
+        const points = payload.path_points || [];
+        if (points.length < 2) return;
 
       const graphics = new PIXI.Graphics();
       if (blendMode !== null) graphics.blendMode = blendMode as any;
@@ -949,6 +959,83 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         meshTicker.destroy();
         activeTickers.delete(meshTicker);
       });
+      } catch (error) {
+        console.warn('[VFX] pixi_mesh error:', error);
+      }
+    }, sequence, durationMs, simulationSpeed);
+  }
+
+  // ------------------------------------------
+  // 2. PIXI GRAPHICS (Với Grid Units)
+  // ------------------------------------------
+  if (vfxEvent.pixi_graphics) {
+    const payload = vfxEvent.pixi_graphics;
+    const durationMs = payload.lifetime_ms || vfxEvent.duration_ms || 1000;
+
+    scheduleEffect(() => {
+      try {
+        const graphics = new PIXI.Graphics();
+        if (blendMode !== null) graphics.blendMode = blendMode as any;
+
+        const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
+        const cx = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
+        const cy = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
+
+        const fill = payload.fill_color ? parseColor(payload.fill_color) : null;
+        const stroke = payload.line_color ? parseColor(payload.line_color) : null;
+        const fillAlpha = fill ? (payload.fill_alpha ?? 1) * fill.alpha : 0;
+        const strokeAlpha = stroke ? (payload.line_alpha ?? 1) * stroke.alpha : 0;
+        const strokeWidth = (payload.line_width ?? (stroke ? 0.05 : 0)) * CELL_SIZE;
+
+        if (payload.shape_type === 'rect' || payload.shape_type === 'rectangle') {
+          const rectW = (payload.width ?? 1) * CELL_SIZE;
+          const rectH = (payload.height ?? 1) * CELL_SIZE;
+          const cornerRadius = (payload.corner_radius || 0) * CELL_SIZE;
+          if (cornerRadius > 0) {
+            graphics.roundRect(cx - rectW / 2, cy - rectH / 2, rectW, rectH, cornerRadius);
+          } else {
+            graphics.rect(cx - rectW / 2, cy - rectH / 2, rectW, rectH);
+          }
+        } else if (payload.shape_type === 'ellipse') {
+          const ellipseW = (payload.width ?? 1) * CELL_SIZE / 2;
+          const ellipseH = (payload.height ?? 1) * CELL_SIZE / 2;
+          graphics.ellipse(cx, cy, ellipseW, ellipseH);
+        } else if (payload.shape_type === 'line') {
+          const pts = payload.points || [];
+          if (pts.length > 0) {
+            graphics.moveTo(pts[0][0] * CELL_SIZE, pts[0][1] * CELL_SIZE);
+            for (let i = 1; i < pts.length; i++) {
+              graphics.lineTo(pts[i][0] * CELL_SIZE, pts[i][1] * CELL_SIZE);
+            }
+          }
+        } else if (payload.is_pie_slice || payload.start_angle_deg !== undefined || payload.end_angle_deg !== undefined) {
+          const radius = (payload.radius ?? 1) * CELL_SIZE;
+          const startAngle = (payload.start_angle_deg || 0) * (Math.PI / 180);
+          const endAngle = (payload.end_angle_deg || 360) * (Math.PI / 180);
+          if (payload.is_pie_slice) graphics.moveTo(cx, cy);
+          graphics.arc(cx, cy, radius, startAngle, endAngle);
+          if (payload.is_pie_slice) graphics.lineTo(cx, cy);
+        } else {
+          const radius = (payload.radius ?? 1) * CELL_SIZE;
+          graphics.circle(cx, cy, radius);
+        }
+
+        if (fill) graphics.fill({ color: fill.color, alpha: fillAlpha });
+        if (stroke && strokeWidth > 0) {
+          const strokeStyleObj: any = { width: strokeWidth, color: stroke.color, alpha: strokeAlpha };
+          if (payload.line_dash) strokeStyleObj.dashArray = payload.line_dash.map((d: number) => d * CELL_SIZE);
+          graphics.stroke(strokeStyleObj);
+        }
+
+        if (payload.scale_x !== undefined) graphics.scale.x = payload.scale_x;
+        if (payload.scale_y !== undefined) graphics.scale.y = payload.scale_y;
+        if (payload.rotation_deg !== undefined) graphics.angle = payload.rotation_deg;
+
+        stage.addChild(graphics);
+        handleLifecycle(graphics, payload, simulationSpeed, stage);
+      } catch (error) {
+        console.warn('[VFX] pixi_graphics error:', error);
+      }
     }, sequence, durationMs, simulationSpeed);
   }
 
@@ -960,6 +1047,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     const durationMs = payload.duration_ms || 1000;
 
     scheduleEffect(() => {
+      try {
       const targetId = payload.target_id || vfxEvent.target_id;
       if (!targetId || targetId === 'GLOBAL') return;
 
@@ -1033,6 +1121,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             }
           }
         });
+      }
+      } catch (error) {
+        console.warn('[VFX] pixi_filters error:', error);
       }
     }, sequence, durationMs, simulationSpeed);
   }
