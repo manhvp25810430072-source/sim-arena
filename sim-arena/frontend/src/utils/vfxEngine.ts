@@ -5,14 +5,22 @@ import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useMainStore } from '../store/useMainStore';
 import * as particles from '@pixi/particle-emitter';
 import { ShockwaveFilter } from 'pixi-filters';
+
 // Đăng ký RoughEase và MotionPathPlugin để xử lý rung lắc & quỹ đạo cong
 gsap.registerPlugin(RoughEase, MotionPathPlugin);
-
 
 let appBg: PIXI.Application | null = null;
 let appFg: PIXI.Application | null = null;
 
+let isReady = false;
+let initToken = 0;
+let pendingQueue: Array<{ event: any; speed: number }> = [];
+let resizeObserver: ResizeObserver | null = null;
+let resizeTarget: HTMLElement | null = null;
+
 const CELL_SIZE = 50; // Kích thước của 1 ô lưới
+const GRID_SIZE = 20;
+const BASE_SIZE = GRID_SIZE * CELL_SIZE;
 
 type TimerHandle = ReturnType<typeof setTimeout>;
 type IntervalHandle = ReturnType<typeof setInterval>;
@@ -46,6 +54,114 @@ const clearTracked = () => {
     ticker.destroy();
   });
   activeTickers.clear();
+};
+
+const updateRendererLayout = () => {
+  if (!resizeTarget) return;
+
+  const rect = resizeTarget.getBoundingClientRect();
+  const width = Math.max(1, rect.width);
+  const height = Math.max(1, rect.height);
+  const size = Math.min(width, height);
+  const scale = size / BASE_SIZE;
+
+  [appBg, appFg].forEach((app) => {
+    if (!app) return;
+    app.renderer.resize(width, height);
+    app.stage.scale.set(scale);
+    app.stage.position.set((width - BASE_SIZE * scale) / 2, (height - BASE_SIZE * scale) / 2);
+  });
+};
+
+const attachResizeObserver = (target: HTMLElement) => {
+  if (resizeObserver) resizeObserver.disconnect();
+  resizeTarget = target;
+  resizeObserver = new ResizeObserver(() => updateRendererLayout());
+  resizeObserver.observe(target);
+  updateRendererLayout();
+};
+
+const detachResizeObserver = () => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+  resizeTarget = null;
+};
+
+const safeDestroyApp = (app: PIXI.Application | null) => {
+  if (!app) return;
+
+  const anyApp = app as any;
+  try {
+    if (typeof anyApp._cancelResize === 'function') {
+      app.destroy(true, { children: true, texture: true });
+      return;
+    }
+  } catch {
+    // Fallback below
+  }
+
+  try {
+    app.stage?.removeChildren();
+  } catch {
+    // ignore
+  }
+  try {
+    app.stage?.destroy?.({ children: true });
+  } catch {
+    // ignore
+  }
+  try {
+    app.renderer?.destroy?.(true);
+  } catch {
+    // ignore
+  }
+  try {
+    app.destroy?.();
+  } catch {
+    // ignore
+  }
+};
+
+const waitForCanvases = (
+  bgCanvasId: string,
+  fgCanvasId: string,
+  boardId: string,
+  timeoutMs = 2000
+) => new Promise<{
+  bgCanvas: HTMLCanvasElement;
+  fgCanvas: HTMLCanvasElement;
+  board: HTMLElement;
+} | null>((resolve) => {
+  const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+  const tick = () => {
+    const bgCanvas = document.getElementById(bgCanvasId) as HTMLCanvasElement | null;
+    const fgCanvas = document.getElementById(fgCanvasId) as HTMLCanvasElement | null;
+    const board = document.getElementById(boardId) as HTMLElement | null;
+
+    if (bgCanvas && fgCanvas && board) {
+      resolve({ bgCanvas, fgCanvas, board });
+      return;
+    }
+
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (now - start >= timeoutMs) {
+      resolve(null);
+      return;
+    }
+
+    requestAnimationFrame(tick);
+  };
+
+  tick();
+});
+
+const flushQueue = () => {
+  if (!isReady) return;
+  const queued = pendingQueue.splice(0, pendingQueue.length);
+  queued.forEach(({ event, speed }) => executeVFX(event, speed));
 };
 
 const resolveTargetPosition = (targetId?: string) => {
@@ -169,31 +285,58 @@ const handleLifecycle = (
 };
 
 export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
-  const bgCanvas = document.getElementById(bgCanvasId) as HTMLCanvasElement;
-  const fgCanvas = document.getElementById(fgCanvasId) as HTMLCanvasElement;
+  const token = ++initToken;
+  isReady = false;
 
-  if (!bgCanvas || !fgCanvas) return;
+  const ready = await waitForCanvases(bgCanvasId, fgCanvasId, 'arena-board');
+  if (!ready || token !== initToken) return;
 
-  if (appBg) {
-    appBg.destroy(false, { children: true, texture: true });
-    appBg = null;
-  }
-  if (appFg) {
-    appFg.destroy(false, { children: true, texture: true });
-    appFg = null;
-  }
+  const { bgCanvas, fgCanvas, board } = ready;
+
+  clearTracked();
+  detachResizeObserver();
+  safeDestroyApp(appBg);
+  safeDestroyApp(appFg);
+  appBg = null;
+  appFg = null;
 
   appBg = new PIXI.Application();
-  await appBg.init({ canvas: bgCanvas, width: 1000, height: 1000, backgroundAlpha: 0, clearBeforeRender: true });
+  await appBg.init({
+    canvas: bgCanvas,
+    backgroundAlpha: 0,
+    autoDensity: true,
+    resolution: window.devicePixelRatio || 1,
+    clearBeforeRender: true
+  });
 
   appFg = new PIXI.Application();
-  await appFg.init({ canvas: fgCanvas, width: 1000, height: 1000, backgroundAlpha: 0, clearBeforeRender: true });
+  await appFg.init({
+    canvas: fgCanvas,
+    backgroundAlpha: 0,
+    autoDensity: true,
+    resolution: window.devicePixelRatio || 1,
+    clearBeforeRender: true
+  });
+
+  if (token !== initToken) {
+    safeDestroyApp(appBg);
+    safeDestroyApp(appFg);
+    appBg = null;
+    appFg = null;
+    return;
+  }
+
+  attachResizeObserver(board);
+
+  isReady = true;
+  flushQueue();
 
   console.log('VFX Engine (PixiJS + GSAP + Particles + Filters) Nâng cấp Initialized!');
 };
 
 export const clearAllVFX = () => {
   clearTracked();
+  pendingQueue.length = 0;
   if (appBg) {
     appBg.stage.removeChildren();
     appBg.stage.filters = [];
@@ -218,6 +361,17 @@ export const clearAllVFX = () => {
   });
 };
 
+export const destroyVFXEngine = () => {
+  isReady = false;
+  pendingQueue.length = 0;
+  detachResizeObserver();
+  clearAllVFX();
+  safeDestroyApp(appBg);
+  safeDestroyApp(appFg);
+  appBg = null;
+  appFg = null;
+};
+
 const generateTexture = (type: string, renderer: PIXI.Renderer): PIXI.Texture => {
   const gfx = new PIXI.Graphics();
   if (type === 'fire') {
@@ -236,7 +390,10 @@ const generateTexture = (type: string, renderer: PIXI.Renderer): PIXI.Texture =>
 };
 
 export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
-  if (!appBg || !appFg) return;
+  if (!appBg || !appFg || !isReady) {
+    pendingQueue.push({ event: vfxEvent, speed: simulationSpeed });
+    return;
+  }
 
   const targetApp = vfxEvent.canvas_layer?.layer === 'bg' ? appBg : appFg;
   const stage = targetApp.stage;
@@ -248,7 +405,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   // ------------------------------------------
   if (vfxEvent.gsap_tween) {
     const {
-      target_id, x, y, offset_x, offset_y, motion_path_points,
+      target_id, x, y, from_x, from_y, offset_x, offset_y, motion_path_points,
       scale_x, scale_y, skew_x, skew_y, transform_origin, opacity, rotation_deg, color_tint, tint_alpha,
       duration_ms, ease, local_shake_x, local_shake_y,
       repeat, yoyo
@@ -256,6 +413,13 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
     const domTarget = target_id === 'GLOBAL' ? '#arena-board' : `#char-${target_id || vfxEvent.target_id}`;
     const duration = ((duration_ms ?? 500) / 1000) / simulationSpeed;
+
+    // 🚀 VÁ LỖI 1: Setup tọa độ xuất phát (từ from_x, from_y) để tránh lỗi giật cục / Teleport
+    if (from_x !== undefined && from_y !== undefined) {
+      let fX = from_x; if (offset_x) fX += offset_x;
+      let fY = from_y; if (offset_y) fY += offset_y;
+      gsap.set(domTarget, { left: `${fX * 5}%`, top: `${fY * 5}%` });
+    }
 
     if (local_shake_x || local_shake_y) {
       const sx = (local_shake_x || 0) * CELL_SIZE;
@@ -499,35 +663,80 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const spawnW = (payload.spawn_width || 0) * CELL_SIZE;
       const spawnH = (payload.spawn_height || 0) * CELL_SIZE;
       
-      const behaviors: any[] = [
-          { type: 'alpha', config: { alpha: { list: [{ value: payload.start_alpha ?? startColor.alpha, time: 0 }, { value: payload.end_alpha ?? endColor.alpha, time: 1 }], isStepped: false } } },
-          { type: 'scale', config: { scale: { list: [{ value: payload.start_scale || 1, time: 0 }, { value: payload.end_scale || 0.1, time: 1 }], isStepped: false }, minMult: scaleMult } },
-          { type: 'color', config: { color: { list: [{ value: startColor.hexString, time: 0 }, { value: endColor.hexString, time: 1 }], isStepped: false } } },
-          { type: 'moveSpeed', config: { speed: { list: [{ value: speedPx, time: 0 }, { value: speedPx * (1 - (payload.friction || 0)), time: 1 }], isStepped: false }, minMult: speedMult } },
-          { type: 'moveAcceleration', config: { x: (payload.wind_x || 0) * CELL_SIZE, y: gravity } },
-          { type: 'rotation', config: { minStart: minStartAngle, maxStart: maxStartAngle, minSpeed: -rotSpeedVar, maxSpeed: rotSpeedVar } },
-          /* TẠM TẮT: Đợi implement Custom Behavior cho radial/tangential acceleration để tránh Emitter ném lỗi crash 
-          ...(payload.radial_acceleration || payload.tangential_acceleration ? [{
-            type: 'customAcceleration', 
-            config: { radial: payload.radial_acceleration || 0, tangential: payload.tangential_acceleration || 0 }
-          }] : []),
-          */
-          { type: 'blendMode', config: { blendMode: blendMode || 'normal' } }
+      const epsilon = 0.0001;
+      const startAlpha = payload.start_alpha ?? startColor.alpha;
+      const endAlpha = payload.end_alpha ?? endColor.alpha;
+      const startScale = payload.start_scale ?? 1;
+      const endScale = payload.end_scale ?? 0.1;
+      const endSpeed = Math.max(0, speedPx * (1 - (payload.friction || 0)));
+      const startHex = startColor.hexString;
+      const endHex = endColor.hexString;
 
+      const behaviors: any[] = [
+        { type: 'textureSingle', config: { texture: particleTexture } }
       ];
 
+      if (Math.abs(startAlpha - endAlpha) <= epsilon) {
+        behaviors.push({ type: 'alphaStatic', config: { alpha: startAlpha } });
+      } else {
+        behaviors.push({
+          type: 'alpha',
+          config: { alpha: { list: [{ value: startAlpha, time: 0 }, { value: endAlpha, time: 1 }], isStepped: false } }
+        });
+      }
+
+      if (Math.abs(startScale - endScale) <= epsilon) {
+        behaviors.push({ type: 'scaleStatic', config: { scale: startScale } });
+      } else {
+        behaviors.push({
+          type: 'scale',
+          config: { scale: { list: [{ value: startScale, time: 0 }, { value: endScale, time: 1 }], isStepped: false }, minMult: scaleMult }
+        });
+      }
+
+      if (startHex.toLowerCase() === endHex.toLowerCase()) {
+        behaviors.push({ type: 'colorStatic', config: { color: startHex } });
+      } else {
+        behaviors.push({
+          type: 'color',
+          config: { color: { list: [{ value: startHex, time: 0 }, { value: endHex, time: 1 }], isStepped: false } }
+        });
+      }
+
+      if (Math.abs(speedPx - endSpeed) <= epsilon) {
+        behaviors.push({ type: 'moveSpeedStatic', config: { speed: speedPx } });
+      } else {
+        behaviors.push({
+          type: 'moveSpeed',
+          config: { speed: { list: [{ value: speedPx, time: 0 }, { value: endSpeed, time: 1 }], isStepped: false }, minMult: speedMult }
+        });
+      }
+
+      behaviors.push(
+        { type: 'moveAcceleration', config: { x: (payload.wind_x || 0) * CELL_SIZE, y: gravity } },
+        { type: 'rotation', config: { minStart: minStartAngle, maxStart: maxStartAngle, minSpeed: -rotSpeedVar, maxSpeed: rotSpeedVar } },
+        { type: 'blendMode', config: { blendMode: blendMode || 'normal' } }
+      );
+
       const spawnRadius = (payload.spawn_radius || 0) * CELL_SIZE;
-      
+      let hasSpawnShape = false;
+
       if (spawnRadius > 0) {
         behaviors.push({
           type: 'spawnShape',
           config: { type: 'torus', data: { x: 0, y: 0, radius: spawnRadius, innerRadius: 0 } }
         });
+        hasSpawnShape = true;
       } else if (spawnW > 0 || spawnH > 0) {
         behaviors.push({
           type: 'spawnShape',
-          config: { type: 'rect', data: { x: -spawnW/2, y: -spawnH/2, w: spawnW, h: spawnH } }
+          config: { type: 'rect', data: { x: -spawnW / 2, y: -spawnH / 2, w: spawnW, h: spawnH } }
         });
+        hasSpawnShape = true;
+      }
+
+      if (!hasSpawnShape) {
+        behaviors.push({ type: 'spawnPoint', config: { x: 0, y: 0 } });
       }
 
       const config: particles.EmitterConfigV3 = {
@@ -540,7 +749,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         behaviors: behaviors
       };
 
-      const emitter = new particles.Emitter(container as any, particles.upgradeConfig(config, [particleTexture]));
+      const emitter = new particles.Emitter(container as any, config);
       
       if (payload.emitter_type === 'burst') {
         emitter.emit = true;
@@ -717,7 +926,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             const strokeOptions: any = { 
               width: currentWidth, 
               color: stroke.color, 
-              alpha: stroke.alpha,
+              // 🚀 VÁ LỖI 2: Ưu tiên lấy Alpha từ payload (AI cấp) để xử lý tàng hình/làm mờ
+              alpha: payload.alpha !== undefined ? payload.alpha : stroke.alpha,
               cap: payload.cap_style || 'round',
               join: 'round'
             };

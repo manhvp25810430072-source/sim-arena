@@ -3,6 +3,7 @@ import { useMainStore } from '../../store/useMainStore';
 import DroppableCell from './DroppableCell';
 import type { Character } from '../../store/useMainStore';
 import gsap from 'gsap';
+import { initVFXEngine, destroyVFXEngine } from '../../utils/vfxEngine';
 
 // ---------------------------------------------------------
 // COMPONENT CON: NHÂN VẬT TRÊN BÀN CỜ
@@ -64,6 +65,14 @@ export default function ArenaBoard() {
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const displayLogs = liveLogs.filter(log => log.type === 'NARRATIVE' || log.type === 'DIALOGUE');
+
+  useEffect(() => {
+    initVFXEngine('vfx-bg-layer', 'vfx-fg-layer');
+
+    return () => {
+      destroyVFXEngine();
+    };
+  }, []);
 
   useEffect(() => {
     if (logContainerRef.current) {

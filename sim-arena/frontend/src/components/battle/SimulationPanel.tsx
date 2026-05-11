@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMainStore } from '../../store/useMainStore';
 // 🚀 NÂNG CẤP: Import Động cơ Kỹ xảo
-import { initVFXEngine, executeVFX, clearAllVFX as clearPixiVFX } from '../../utils/vfxEngine';
+import { executeVFX, clearAllVFX as clearPixiVFX } from '../../utils/vfxEngine';
 
 export default function SimulationPanel() {
   const {
@@ -28,9 +28,6 @@ export default function SimulationPanel() {
   const dialogueClearTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
-    // 🚀 Khởi tạo Engine Kỹ xảo ngay khi Panel giả lập xuất hiện
-    initVFXEngine('vfx-bg-layer', 'vfx-fg-layer');
-
     return () => {
       timeoutRefs.current.forEach(clearTimeout);
       Object.values(dialogueClearTimers.current).forEach(clearTimeout);
