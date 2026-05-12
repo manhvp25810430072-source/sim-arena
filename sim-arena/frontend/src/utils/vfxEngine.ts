@@ -3,7 +3,6 @@ import { gsap } from 'gsap';
 import { RoughEase } from 'gsap/EasePack';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useMainStore } from '../store/useMainStore';
-import * as particles from '@pixi/particle-emitter';
 import { ShockwaveFilter } from 'pixi-filters';
 
 // Đăng ký RoughEase và MotionPathPlugin để xử lý rung lắc & quỹ đạo cong
@@ -372,23 +371,6 @@ export const destroyVFXEngine = () => {
   appFg = null;
 };
 
-const generateTexture = (type: string, renderer: PIXI.Renderer): PIXI.Texture => {
-  const gfx = new PIXI.Graphics();
-  if (type === 'fire') {
-    gfx.moveTo(0, 10).bezierCurveTo(-10, 10, -5, -10, 0, -15).bezierCurveTo(5, -10, 10, 10, 0, 10);
-    gfx.fill({ color: 0xFF4500 });
-  } else if (type === 'smoke') {
-    gfx.circle(0, 0, 15).fill({ color: 0x888888, alpha: 0.5 });
-  } else if (type === 'spark' || type === 'star') {
-    gfx.moveTo(0, -10).lineTo(2, -2).lineTo(10, 0).lineTo(2, 2).lineTo(0, 10).lineTo(-2, 2).lineTo(-10, 0).lineTo(-2, -2).fill({ color: 0xFFFF00 });
-  } else if (type === 'water') {
-    gfx.circle(0, 0, 8).fill({ color: 0x00BFFF });
-  } else {
-    gfx.circle(0, 0, 10).fill({ color: 0xFFFFFF });
-  }
-  return renderer.generateTexture(gfx);
-};
-
 export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   if (!appBg || !appFg || !isReady) {
     pendingQueue.push({ event: vfxEvent, speed: simulationSpeed });
@@ -404,7 +386,8 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   // 1. GSAP TWEEN
   // ------------------------------------------
   if (vfxEvent.gsap_tween) {
-    const {
+    try {
+      const {
       target_id, x, y, from_x, from_y, offset_x, offset_y, motion_path_points,
       scale_x, scale_y, skew_x, skew_y, transform_origin, opacity, rotation_deg, color_tint, tint_alpha,
       duration_ms, ease, local_shake_x, local_shake_y,
@@ -481,6 +464,9 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     }
 
     gsap.to(domTarget, toConfig);
+    } catch (error) {
+      console.warn('[VFX] gsap_tween error:', error);
+    }
   }
 
   // ------------------------------------------
@@ -627,7 +613,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   }
 
   // ------------------------------------------
-  // 4. PIXI PARTICLES ENGINE 
+  // 4. PIXI PARTICLES ENGINE (CUSTOM V8)
   // ------------------------------------------
   if (vfxEvent.pixi_particles) {
     const payload = vfxEvent.pixi_particles;
@@ -636,183 +622,78 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     scheduleEffect(() => {
       try {
         const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
-      const originX = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
-      const originY = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
+        const originX = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
+        const originY = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
 
-      const container = new PIXI.Container();
-      container.x = originX;
-      container.y = originY;
-      stage.addChild(container);
+        const container = new PIXI.Container();
+        container.x = originX;
+        container.y = originY;
+        stage.addChild(container);
 
-      // Sử dụng engine texture tự động sinh
-      const particleTexture = generateTexture(payload.texture_type || payload.shape_type || 'default', targetApp.renderer);
-
-      const particleLifetimeSec = (payload.particle_lifetime_ms || 1000) / 1000 / simulationSpeed;
-      const lifeVarSec = (payload.lifetime_variance_ms || 0) / 1000 / simulationSpeed;
-      const minLifetime = Math.max(0.01, particleLifetimeSec - lifeVarSec);
-      const startColor = parseColor(payload.start_color, '#ffffff');
-      const endColor = parseColor(payload.end_color ?? payload.start_color, '#ffffff');
-      
-      // Áp dụng variance (độ nhiễu) cho tốc độ và kích thước
-      const speedPx = (payload.speed ?? 2) * CELL_SIZE;
-      const speedMult = payload.speed_variance ? (1 - payload.speed_variance) : 1; 
-      const scaleMult = payload.start_scale_variance ? (1 - payload.start_scale_variance) : 1;
-      
-      const gravity = (payload.gravity_y || 0) * CELL_SIZE * 10;
-      
-      // Áp dụng góc phun (emit_angle) và tốc độ xoay hạt (rotation_speed_variance)
-      const spread = payload.spread_angle ?? 360;
-      const emitAngle = payload.emit_angle ?? 0;
-      const minStartAngle = emitAngle - spread / 2;
-      const maxStartAngle = emitAngle + spread / 2;
-      const rotSpeedVar = payload.rotation_speed_variance ?? 0;
-      
-      const spawnW = (payload.spawn_width || 0) * CELL_SIZE;
-      const spawnH = (payload.spawn_height || 0) * CELL_SIZE;
-      
-      const epsilon = 0.0001;
-      const startAlpha = payload.start_alpha ?? startColor.alpha;
-      const endAlpha = payload.end_alpha ?? endColor.alpha;
-      const startScale = payload.start_scale ?? 1;
-      const endScale = payload.end_scale ?? 0.1;
-      const endSpeed = Math.max(0, speedPx * (1 - (payload.friction || 0)));
-      const startHex = startColor.hexString;
-      const endHex = endColor.hexString;
-
-      const behaviors: any[] = [
-        { type: 'textureSingle', config: { texture: particleTexture } }
-      ];
-
-      if (Math.abs(startAlpha - endAlpha) <= epsilon) {
-        behaviors.push({ type: 'alphaStatic', config: { alpha: startAlpha } });
-      } else {
-        behaviors.push({
-          type: 'alpha',
-          config: { alpha: { list: [{ value: startAlpha, time: 0 }, { value: endAlpha, time: 1 }], isStepped: false } }
-        });
-      }
-
-      if (Math.abs(startScale - endScale) <= epsilon) {
-        behaviors.push({ type: 'scaleStatic', config: { scale: startScale } });
-      } else {
-        behaviors.push({
-          type: 'scale',
-          config: { scale: { list: [{ value: startScale, time: 0 }, { value: endScale, time: 1 }], isStepped: false }, minMult: scaleMult }
-        });
-      }
-
-      if (startHex.toLowerCase() === endHex.toLowerCase()) {
-        behaviors.push({ type: 'colorStatic', config: { color: startHex } });
-      } else {
-        behaviors.push({
-          type: 'color',
-          config: { color: { list: [{ value: startHex, time: 0 }, { value: endHex, time: 1 }], isStepped: false } }
-        });
-      }
-
-      if (Math.abs(speedPx - endSpeed) <= epsilon) {
-        behaviors.push({ type: 'moveSpeedStatic', config: { speed: speedPx } });
-      } else {
-        behaviors.push({
-          type: 'moveSpeed',
-          config: { speed: { list: [{ value: speedPx, time: 0 }, { value: endSpeed, time: 1 }], isStepped: false }, minMult: speedMult }
-        });
-      }
-
-      behaviors.push(
-        { type: 'moveAcceleration', config: { x: (payload.wind_x || 0) * CELL_SIZE, y: gravity } },
-        { type: 'rotation', config: { minStart: minStartAngle, maxStart: maxStartAngle, minSpeed: -rotSpeedVar, maxSpeed: rotSpeedVar } },
-        { type: 'blendMode', config: { blendMode: blendMode || 'normal' } }
-      );
-
-      const spawnRadius = (payload.spawn_radius || 0) * CELL_SIZE;
-      let hasSpawnShape = false;
-
-      if (spawnRadius > 0) {
-        behaviors.push({
-          type: 'spawnShape',
-          config: { type: 'torus', data: { x: 0, y: 0, radius: spawnRadius, innerRadius: 0 } }
-        });
-        hasSpawnShape = true;
-      } else if (spawnW > 0 || spawnH > 0) {
-        behaviors.push({
-          type: 'spawnShape',
-          config: { type: 'rect', data: { x: -spawnW / 2, y: -spawnH / 2, w: spawnW, h: spawnH } }
-        });
-        hasSpawnShape = true;
-      }
-
-      if (!hasSpawnShape) {
-        behaviors.push({ type: 'spawnPoint', config: { x: 0, y: 0 } });
-      }
-
-      const config: particles.EmitterConfigV3 = {
-        lifetime: { min: minLifetime, max: particleLifetimeSec },
-        frequency: payload.emitter_type === 'burst' ? 1000 : (payload.emit_rate ? 1 / payload.emit_rate : 0.05),
-        emitterLifetime: durationMs / 1000 / simulationSpeed,
-        maxParticles: payload.burst_count || payload.particle_count || 100,
-        addAtBack: false,
-        pos: { x: 0, y: 0 },
-        behaviors: behaviors
-      };
-
-      const emitter = new particles.Emitter(container as any, config);
-      
-      if (payload.emitter_type === 'burst') {
-        emitter.emit = true;
-        emitter.playOnce(() => emitter.destroy());
-      } else {
-        emitter.emit = true;
-      }
-
-      let elapsed = Date.now();
-      const radialAcc = (payload.radial_acceleration || 0) * CELL_SIZE;
-      const tangentAcc = (payload.tangential_acceleration || 0) * CELL_SIZE;
-
-      const emitterTicker = trackTicker(new PIXI.Ticker());
-      emitterTicker.add(() => {
-        const now = Date.now();
-        const dt = (now - elapsed) * 0.001;
-
-        // Can thiệp vật lý vector nâng cao cho từng hạt
-        if (radialAcc !== 0 || tangentAcc !== 0) {
-          const particles = (emitter as any).children || [];
-          for (let i = 0; i < particles.length; i++) {
-            const p = particles[i] as any;
-            if (!p) continue;
-            
-            const dx = p.x;
-            const dy = p.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist > 0.1) {
-              const nx = dx / dist;
-              const ny = dy / dist;
-              // Gia tốc hướng tâm & tiếp tuyến
-              p.velocity.x += nx * radialAcc * dt - ny * tangentAcc * dt;
-              p.velocity.y += ny * radialAcc * dt + nx * tangentAcc * dt;
-            }
+        // Lấy thông số từ payload của AI
+        const particleCount = payload.burst_count || payload.particle_count || 30;
+        const speed = (payload.speed ?? 2) * CELL_SIZE;
+        const startColor = parseColor(payload.start_color, '#ffffff');
+        const endColor = parseColor(payload.end_color ?? payload.start_color, '#ffffff');
+        const spread = payload.spread_angle ?? 360;
+        const emitAngle = payload.emit_angle ?? 0;
+        const gravity = (payload.gravity_y || 0) * CELL_SIZE * 10;
+        const particleLifetime = (payload.particle_lifetime_ms || 1000) / 1000 / simulationSpeed;
+        
+        for (let i = 0; i < particleCount; i++) {
+          const p = new PIXI.Graphics();
+          
+          // Vẽ hình dáng hạt
+          if (payload.shape_type === 'star') {
+            p.moveTo(0, -5).lineTo(1, -1).lineTo(5, 0).lineTo(1, 1).lineTo(0, 5).lineTo(-1, 1).lineTo(-5, 0).lineTo(-1, -1).fill({ color: startColor.color, alpha: startColor.alpha });
+          } else if (payload.shape_type === 'rect') {
+            p.rect(-3, -3, 6, 6).fill({ color: startColor.color, alpha: startColor.alpha });
+          } else {
+            p.circle(0, 0, 4).fill({ color: startColor.color, alpha: startColor.alpha });
           }
+          
+          if (blendMode !== null) p.blendMode = blendMode as any;
+          
+          // Phân bố hạt ngẫu nhiên trong vùng spawn
+          const spawnW = (payload.spawn_width || 0) * CELL_SIZE;
+          const spawnH = (payload.spawn_height || 0) * CELL_SIZE;
+          p.x = (Math.random() - 0.5) * spawnW;
+          p.y = (Math.random() - 0.5) * spawnH;
+          
+          p.scale.set(payload.start_scale ?? 1);
+          container.addChild(p);
+
+          // Tính toán quỹ đạo bay của từng hạt
+          const angle = (emitAngle - spread / 2 + Math.random() * spread) * (Math.PI / 180);
+          const velocityX = Math.cos(angle) * speed * (0.5 + Math.random() * 0.5);
+          const velocityY = Math.sin(angle) * speed * (0.5 + Math.random() * 0.5);
+
+          // Hoạt ảnh GSAP cho mỗi hạt
+          gsap.to(p, {
+            x: p.x + velocityX * particleLifetime,
+            y: p.y + velocityY * particleLifetime + gravity * particleLifetime,
+            alpha: payload.end_alpha ?? endColor.alpha,
+            scaleX: payload.end_scale ?? 0.1,
+            scaleY: payload.end_scale ?? 0.1,
+            rotation: (Math.random() - 0.5) * Math.PI * 4,
+            duration: particleLifetime,
+            ease: 'power1.out',
+            onComplete: () => {
+              if (!p.destroyed) p.destroy();
+            }
+          });
         }
 
-        emitter.update(dt);
-        elapsed = now;
-      });
-      emitterTicker.start();
+        // Hủy container khi toàn bộ hiệu ứng kết thúc
+        trackTimeout(setTimeout(() => {
+          if (!container.destroyed) {
+            stage.removeChild(container);
+            container.destroy({ children: true });
+          }
+        }, (durationMs + particleLifetime * 1000 + 500) / simulationSpeed));
 
-      trackTimeout(setTimeout(() => {
-        emitterTicker.stop();
-        emitterTicker.destroy();
-        activeTickers.delete(emitterTicker);
-        emitter.destroy();
-        particleTexture.destroy(true);
-        if (!container.destroyed) {
-          stage.removeChild(container);
-          container.destroy();
-        }
-      }, (durationMs + (particleLifetimeSec * 1000) + 500) / simulationSpeed));
       } catch (error) {
-        console.warn('[VFX] pixi_particles error:', error);
+        console.warn('[VFX] custom pixi_particles error:', error);
       }
     }, sequence, durationMs, simulationSpeed);
   }
