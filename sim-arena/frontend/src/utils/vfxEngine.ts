@@ -390,7 +390,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const {
       target_id, x, y, from_x, from_y, offset_x, offset_y, motion_path_points,
       scale_x, scale_y, skew_x, skew_y, transform_origin, opacity, rotation_deg, color_tint, tint_alpha,
-      duration_ms, ease, local_shake_x, local_shake_y,
+      duration_ms, delay_ms, ease, local_shake_x, local_shake_y,
       repeat, yoyo
     } = vfxEvent.gsap_tween;
 
@@ -414,10 +414,12 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       );
     }
 
+    const specificDelay = delay_ms !== undefined ? delay_ms : sequence.delayMs;
+
     const toConfig: gsap.TweenVars = {
       duration,
       ease: ease || 'power1.out', // Sẽ tự nhận diện 'rough.ease' vì đã register
-      delay: (sequence.delayMs / 1000) / simulationSpeed,
+      delay: (specificDelay / 1000) / simulationSpeed,
       repeat: sequence.repeat ?? repeat ?? 0,
       yoyo: sequence.yoyo || yoyo || false,
       overwrite: 'auto'
@@ -469,91 +471,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     }
   }
 
-  // ------------------------------------------
-  // 1. PIXI SPRITE (Với Grid Units)
-  // ------------------------------------------
-  if (vfxEvent.pixi_sprite) {
-    const payload = vfxEvent.pixi_sprite;
-    const durationMs = payload.lifetime_ms || payload.fade_duration_ms || 1500;
-
-    scheduleEffect(() => {
-      try {
-      const graphics = new PIXI.Graphics();
-      if (blendMode !== null) graphics.blendMode = blendMode as any;
-
-      const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
-      
-      const cx = ((payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0)) * CELL_SIZE;
-      const cy = ((payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0)) * CELL_SIZE;
-
-      const fill = payload.fill_color ? parseColor(payload.fill_color) : null;
-      const stroke = payload.line_color ? parseColor(payload.line_color) : null;
-      const fillAlpha = fill ? (payload.fill_alpha ?? 1) * fill.alpha : 0;
-      const strokeAlpha = stroke ? (payload.line_alpha ?? 1) * stroke.alpha : 0;
-      const strokeWidth = (payload.line_width ?? (stroke ? 0.05 : 0)) * CELL_SIZE;
-
-      if (payload.shape_type === 'rect' || payload.shape_type === 'rectangle') {
-        const rectW = (payload.width ?? 1) * CELL_SIZE;
-        const rectH = (payload.height ?? 1) * CELL_SIZE;
-        const cornerRadius = (payload.corner_radius || 0) * CELL_SIZE;
-        
-        if (cornerRadius > 0) {
-            graphics.roundRect(cx - rectW / 2, cy - rectH / 2, rectW, rectH, cornerRadius);
-        } else {
-            graphics.rect(cx - rectW / 2, cy - rectH / 2, rectW, rectH);
-        }
-        
-      } else if (payload.shape_type === 'ellipse') {
-        const ellipseW = (payload.width ?? 1) * CELL_SIZE / 2;
-        const ellipseH = (payload.height ?? 1) * CELL_SIZE / 2;
-        graphics.ellipse(cx, cy, ellipseW, ellipseH);
-      } else if (payload.shape_type === 'line') {
-          const points = payload.points || [];
-          if(points.length > 0) {
-             const startX = points[0][0] * CELL_SIZE;
-             const startY = points[0][1] * CELL_SIZE;
-             graphics.moveTo(startX, startY);
-             for(let i=1; i < points.length; i++){
-                 graphics.lineTo(points[i][0] * CELL_SIZE, points[i][1] * CELL_SIZE);
-             }
-          }
-      } else if (payload.is_pie_slice || payload.start_angle_deg !== undefined || payload.end_angle_deg !== undefined) {
-        // NÂNG CẤP: Hỗ trợ vẽ hình quạt (Pie slice) hoặc cung tròn (Arc)
-        const radius = (payload.radius ?? 1) * CELL_SIZE;
-        const startAngle = (payload.start_angle_deg || 0) * (Math.PI / 180);
-        const endAngle = (payload.end_angle_deg || 360) * (Math.PI / 180);
-        if (payload.is_pie_slice) graphics.moveTo(cx, cy);
-        graphics.arc(cx, cy, radius, startAngle, endAngle);
-        if (payload.is_pie_slice) graphics.lineTo(cx, cy);
-      } else { 
-        const radius = (payload.radius ?? 1) * CELL_SIZE;
-        graphics.circle(cx, cy, radius);
-      }
-
-      const styleObj: any = {};
-      if (fill) {
-         styleObj.color = fill.color;
-         styleObj.alpha = fillAlpha;
-         graphics.fill(styleObj);
-      }
-      
-      if (stroke && strokeWidth > 0) {
-          const strokeStyleObj: any = { width: strokeWidth, color: stroke.color, alpha: strokeAlpha };
-          if(payload.line_dash) strokeStyleObj.dashArray = payload.line_dash.map((d: number) => d * CELL_SIZE);
-          graphics.stroke(strokeStyleObj);
-      }
-
-      if (payload.scale_x !== undefined) graphics.scale.x = payload.scale_x;
-      if (payload.scale_y !== undefined) graphics.scale.y = payload.scale_y;
-      if (payload.rotation_deg !== undefined) graphics.angle = payload.rotation_deg;
-
-      stage.addChild(graphics);
-      handleLifecycle(graphics, payload, simulationSpeed, stage);
-      } catch (error) {
-        console.warn('[VFX] pixi_sprite error:', error);
-      }
-    }, sequence, durationMs, simulationSpeed);
-  }
+  
 
   // ------------------------------------------
   // 3. PIXI TEXT (Với Grid Units)
@@ -567,12 +485,15 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       const dropShadowDistanceX = (payload.drop_shadow_distance_x || 0) * CELL_SIZE;
       const dropShadowDistanceY = (payload.drop_shadow_distance_y || 0) * CELL_SIZE;
 
+      const parsedFill = parseColor(payload.color, '#FFFFFF');
+      const parsedStroke = parseColor(payload.stroke_color, '#000000');
+
       const textStyle = new PIXI.TextStyle({
         fontFamily: payload.font_family || '"Arial Black", Arial, sans-serif',
         fontSize: (payload.font_size || 0.5) * CELL_SIZE,
-        fill: payload.color || '#FFFFFF',
+        fill: parsedFill.hexString,
         fontWeight: (payload.font_weight as any) || 'bold',
-        stroke: payload.stroke_color || '#000000',
+        stroke: parsedStroke.hexString,
         strokeThickness: (payload.stroke_thickness || 0.05) * CELL_SIZE,
         dropShadow: payload.drop_shadow || dropShadowDistanceX > 0 || dropShadowDistanceY > 0,
         dropShadowDistance: Math.max(Math.abs(dropShadowDistanceX), Math.abs(dropShadowDistanceY)),
@@ -592,6 +513,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
       if (payload.scale_x !== undefined) textObj.scale.x = payload.scale_x;
       if (payload.scale_y !== undefined) textObj.scale.y = payload.scale_y;
 
+      textObj.alpha = parsedFill.alpha; // Đồng bộ kênh alpha từ parseColor
       if (blendMode !== null) textObj.blendMode = blendMode as any;
       stage.addChild(textObj);
 
@@ -613,10 +535,11 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   }
 
   // ------------------------------------------
-  // 4. PIXI PARTICLES ENGINE (CUSTOM V8)
+  // 4. PIXI PARTICLES ENGINE (CUSTOM V8 - FIXED)
   // ------------------------------------------
   if (vfxEvent.pixi_particles) {
     const payload = vfxEvent.pixi_particles;
+    const isContinuous = payload.emitter_type === 'stream' || payload.emitter_type === 'fountain' || payload.emitter_type === 'continuous';
     const durationMs = payload.emit_duration_ms || payload.lifetime_ms || 1000;
 
     scheduleEffect(() => {
@@ -630,20 +553,31 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         container.y = originY;
         stage.addChild(container);
 
-        // Lấy thông số từ payload của AI
-        const particleCount = payload.burst_count || payload.particle_count || 30;
-        const speed = (payload.speed ?? 2) * CELL_SIZE;
+        // Map các thông số vật lý (ĐÃ BỔ SUNG ĐẦY ĐỦ CELL_SIZE MAPING)
+        const baseSpeed = (payload.speed ?? 2) * CELL_SIZE;
+        const speedVariance = (payload.speed_variance ?? 0) * CELL_SIZE;
         const startColor = parseColor(payload.start_color, '#ffffff');
         const endColor = parseColor(payload.end_color ?? payload.start_color, '#ffffff');
         const spread = payload.spread_angle ?? 360;
         const emitAngle = payload.emit_angle ?? 0;
-        const gravity = (payload.gravity_y || 0) * CELL_SIZE * 10;
-        const particleLifetime = (payload.particle_lifetime_ms || 1000) / 1000 / simulationSpeed;
         
-        for (let i = 0; i < particleCount; i++) {
+        const gravity = (payload.gravity_y || 0) * CELL_SIZE * 10;
+        const windX = (payload.wind_x || 0) * CELL_SIZE * 10;
+        const radialAccel = (payload.radial_acceleration || 0) * CELL_SIZE;
+        const tangentialAccel = (payload.tangential_acceleration || 0) * CELL_SIZE;
+        const startAlpha = payload.start_alpha !== undefined ? payload.start_alpha : startColor.alpha;
+        
+        const spawnW = (payload.spawn_width || 0) * CELL_SIZE;
+        const spawnH = (payload.spawn_height || 0) * CELL_SIZE;
+        const spawnRadius = (payload.spawn_radius || 0) * CELL_SIZE;
+        
+        const baseParticleLifetime = (payload.particle_lifetime_ms || 1000) / 1000 / simulationSpeed;
+        const lifetimeVariance = (payload.lifetime_variance_ms || 0) / 1000 / simulationSpeed;
+
+        // Hàm sinh 1 hạt đơn lẻ
+        const spawnParticle = () => {
           const p = new PIXI.Graphics();
           
-          // Vẽ hình dáng hạt
           if (payload.shape_type === 'star') {
             p.moveTo(0, -5).lineTo(1, -1).lineTo(5, 0).lineTo(1, 1).lineTo(0, 5).lineTo(-1, 1).lineTo(-5, 0).lineTo(-1, -1).fill({ color: startColor.color, alpha: startColor.alpha });
           } else if (payload.shape_type === 'rect') {
@@ -654,43 +588,86 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           
           if (blendMode !== null) p.blendMode = blendMode as any;
           
-          // Phân bố hạt ngẫu nhiên trong vùng spawn
-          const spawnW = (payload.spawn_width || 0) * CELL_SIZE;
-          const spawnH = (payload.spawn_height || 0) * CELL_SIZE;
-          p.x = (Math.random() - 0.5) * spawnW;
-          p.y = (Math.random() - 0.5) * spawnH;
+          // Logic vị trí xuất hiện
+          if (spawnRadius > 0) {
+            const r = Math.random() * spawnRadius;
+            const theta = Math.random() * 2 * Math.PI;
+            p.x = r * Math.cos(theta);
+            p.y = r * Math.sin(theta);
+          } else {
+            p.x = (Math.random() - 0.5) * spawnW;
+            p.y = (Math.random() - 0.5) * spawnH;
+          }
           
-          p.scale.set(payload.start_scale ?? 1);
+          p.alpha = startAlpha;
+          
+          // NÂNG CẤP: Tính toán độ dao động kích thước hạt (start_scale_variance)
+          const scaleVar = payload.start_scale_variance || 0;
+          const finalStartScale = Math.max(0.01, (payload.start_scale ?? 1) + (Math.random() * 2 - 1) * scaleVar);
+          p.scale.set(finalStartScale);
+          
           container.addChild(p);
 
-          // Tính toán quỹ đạo bay của từng hạt
+          // Động học (Hỗ trợ Variance)
           const angle = (emitAngle - spread / 2 + Math.random() * spread) * (Math.PI / 180);
-          const velocityX = Math.cos(angle) * speed * (0.5 + Math.random() * 0.5);
-          const velocityY = Math.sin(angle) * speed * (0.5 + Math.random() * 0.5);
+          const actualSpeed = baseSpeed + (Math.random() * 2 - 1) * speedVariance;
+          const velocityX = Math.cos(angle) * actualSpeed;
+          const velocityY = Math.sin(angle) * actualSpeed;
+          
+          const actualLifetime = Math.max(0.1, baseParticleLifetime + (Math.random() * 2 - 1) * lifetimeVariance);
 
-          // Hoạt ảnh GSAP cho mỗi hạt
+          // Xử lý lực cản (Friction) làm giảm quãng đường đi được theo thời gian
+          const friction = Math.max(0, Math.min(payload.friction || 0, 0.99));
+          const distanceMultiplier = Math.pow(1 - friction, actualLifetime);
+
+          const finalX = p.x + (velocityX * actualLifetime * distanceMultiplier) + (windX * actualLifetime) + (tangentialAccel * actualLifetime * actualLifetime);
+          const finalY = p.y + (velocityY * actualLifetime * distanceMultiplier) + (gravity * actualLifetime) + (radialAccel * actualLifetime * actualLifetime);
+
+          // Xử lý gia tốc quay
+          const rotSpeedVar = payload.rotation_speed_variance !== undefined ? payload.rotation_speed_variance : Math.PI * 4;
+          const targetRotation = (Math.random() - 0.5) * rotSpeedVar;
+
           gsap.to(p, {
-            x: p.x + velocityX * particleLifetime,
-            y: p.y + velocityY * particleLifetime + gravity * particleLifetime,
+            x: finalX,
+            y: finalY,
             alpha: payload.end_alpha ?? endColor.alpha,
             scaleX: payload.end_scale ?? 0.1,
             scaleY: payload.end_scale ?? 0.1,
-            rotation: (Math.random() - 0.5) * Math.PI * 4,
-            duration: particleLifetime,
+            rotation: targetRotation,
+            duration: actualLifetime,
             ease: 'power1.out',
             onComplete: () => {
               if (!p.destroyed) p.destroy();
             }
           });
+        };
+
+        // Logic điều phối súng bắn
+        if (isContinuous) {
+          const emitRate = payload.emit_rate || 30;
+          const intervalMs = Math.max(16, 1000 / emitRate) / simulationSpeed;
+          
+          const emitterInterval = trackInterval(setInterval(spawnParticle, intervalMs));
+          
+          trackTimeout(setTimeout(() => {
+            clearInterval(emitterInterval);
+            activeIntervals.delete(emitterInterval);
+          }, durationMs / simulationSpeed));
+
+        } else {
+          const particleCount = payload.burst_count || 30;
+          for (let i = 0; i < particleCount; i++) spawnParticle();
         }
 
-        // Hủy container khi toàn bộ hiệu ứng kết thúc
+        // Hủy container an toàn
+        const totalGCWaitTime = (durationMs / simulationSpeed) + (baseParticleLifetime + lifetimeVariance) * 1000 + 500;
+        
         trackTimeout(setTimeout(() => {
           if (!container.destroyed) {
             stage.removeChild(container);
             container.destroy({ children: true });
           }
-        }, (durationMs + particleLifetime * 1000 + 500) / simulationSpeed));
+        }, totalGCWaitTime));
 
       } catch (error) {
         console.warn('[VFX] custom pixi_particles error:', error);
@@ -716,11 +693,15 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
       const stroke = parseColor(payload.color, '#ffffff');
       const strokeWidth = (payload.thickness ?? 0.2) * CELL_SIZE;
-      const offsetX = (payload.offset_x || 0) * CELL_SIZE;
-      const offsetY = (payload.offset_y || 0) * CELL_SIZE;
+      // Map base points (Đã neo theo vị trí gốc của nhân vật)
+      const fallbackPos = resolveTargetPosition(vfxEvent.target_id);
+      const baseX = (payload.x !== undefined ? payload.x : fallbackPos.x) + (payload.offset_x || 0);
+      const baseY = (payload.y !== undefined ? payload.y : fallbackPos.y) + (payload.offset_y || 0);
 
-      // Map base points
-      let basePoints: Array<{ x: number; y: number }> = points.map((p: number[]) => ({ x: (p[0] * CELL_SIZE) + offsetX, y: (p[1] * CELL_SIZE) + offsetY }));
+      let basePoints: Array<{ x: number; y: number }> = points.map((p: number[]) => ({ 
+        x: (baseX + p[0]) * CELL_SIZE, 
+        y: (baseY + p[1]) * CELL_SIZE 
+      }));
 
       // Tự động chia nhỏ đoạn thẳng nếu AI chỉ cấp 2 điểm (A->B) để tạo khớp uốn lượn
       if (basePoints.length === 2) {
@@ -884,10 +865,21 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         } else if (payload.shape_type === 'line') {
           const pts = payload.points || [];
           if (pts.length > 0) {
-            graphics.moveTo(pts[0][0] * CELL_SIZE, pts[0][1] * CELL_SIZE);
+            // Đã cộng thêm cx, cy để dời nét vẽ về đúng vị trí nhân vật
+            graphics.moveTo(cx + pts[0][0] * CELL_SIZE, cy + pts[0][1] * CELL_SIZE);
             for (let i = 1; i < pts.length; i++) {
-              graphics.lineTo(pts[i][0] * CELL_SIZE, pts[i][1] * CELL_SIZE);
+              graphics.lineTo(cx + pts[i][0] * CELL_SIZE, cy + pts[i][1] * CELL_SIZE);
             }
+          }
+        } else if (payload.shape_type === 'polygon') {
+          // Bổ sung hỗ trợ vẽ đa giác (polygon) từ mảng 1 chiều
+          const pts = payload.points || [];
+          if (pts.length >= 4) { 
+            graphics.moveTo(cx + pts[0] * CELL_SIZE, cy + pts[1] * CELL_SIZE);
+            for (let i = 2; i < pts.length; i += 2) {
+              graphics.lineTo(cx + pts[i] * CELL_SIZE, cy + pts[i+1] * CELL_SIZE);
+            }
+            graphics.closePath();
           }
         } else if (payload.is_pie_slice || payload.start_angle_deg !== undefined || payload.end_angle_deg !== undefined) {
           const radius = (payload.radius ?? 1) * CELL_SIZE;
@@ -938,15 +930,13 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
       if (payload.filter_type === 'shockwave' || payload.filter_type === 'wave') {
         const targetRadius = (payload.radius || 10) * CELL_SIZE;
-        const shockwave = new ShockwaveFilter(
-          { x: cx, y: cy },
-          {
-            amplitude: (payload.amplitude || 3) * 10,
-            wavelength: (payload.wavelength || 1.5) * CELL_SIZE,
-            brightness: 1,
-            radius: -1 // Bắt đầu từ 0
-          }
-        );
+        const shockwave = new ShockwaveFilter({
+          center: { x: cx, y: cy },
+          amplitude: (payload.amplitude || 3) * (payload.intensity || 1) * 10,
+          wavelength: (payload.wavelength || 1.5) * CELL_SIZE,
+          brightness: 1,
+          radius: -1 // Bắt đầu từ 0
+        });
         
         stage.filters = [...(stage.filters || []), shockwave];
 
@@ -997,9 +987,25 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           duration: (durationMs / 1000) / simulationSpeed,
           ease: 'power1.out',
           onComplete: () => {
-            if (stage.filters) {
-              stage.filters = stage.filters.filter(f => f !== blurFilter);
-            }
+            if (stage.filters) stage.filters = stage.filters.filter(f => f !== blurFilter);
+          }
+        });
+      } else {
+        // Hướng mở rộng: Fallback cho mọi filter_type AI "bịa" ra (VD: glitch, pixelate, invert...)
+        // Dùng ColorMatrixFilter nháy màu (hue) để báo hiệu có filter chạy
+        const fallbackFilter = new PIXI.ColorMatrixFilter();
+        stage.filters = [...(stage.filters || []), fallbackFilter];
+        
+        const intensity = payload.intensity || 1;
+        
+        gsap.to({ val: 0 }, {
+          val: 360 * intensity,
+          duration: (durationMs / 1000) / simulationSpeed,
+          onUpdate: function() {
+             fallbackFilter.hue(this.targets()[0].val, false);
+          },
+          onComplete: () => {
+            if (stage.filters) stage.filters = stage.filters.filter(f => f !== fallbackFilter);
           }
         });
       }

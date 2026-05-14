@@ -78,6 +78,10 @@ export default function SimulationPanel() {
             break;
             
           case 'MOVE':
+            const currentState = useMainStore.getState();
+            const movingChar = [...currentState.teamA, ...currentState.teamB].find(c => c.id === event.actor_id);
+            if (movingChar && movingChar.stats.hp <= 0) break; // BỎ QUA NẾU ĐÃ CHẾT
+
             addLiveLog({ type: 'MOVE', content: `Di chuyển tới (${event.target_x}, ${event.target_y})`, charId: event.actor_id });
             let duration = 500; 
             const pastEventsForActor = Master_Timeline.filter(

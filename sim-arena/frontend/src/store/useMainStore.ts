@@ -68,6 +68,7 @@ interface MainState {
   clearAllVFX: () => void;
   
   setSimulationSpeed: (speed: number) => void;
+  syncUpdatedState: (updatedState: Record<string, { hp: number, x: number, y: number }>) => void;
 }
 
 export const useMainStore = create<MainState>((set) => ({
@@ -189,5 +190,23 @@ export const useMainStore = create<MainState>((set) => ({
 
   clearAllVFX: () => set({ activeVFX: {} }),
 
-  setSimulationSpeed: (speed) => set({ simulationSpeed: speed })
+  setSimulationSpeed: (speed) => set({ simulationSpeed: speed }),
+
+  syncUpdatedState: (updatedState) => set((state) => {
+    const syncChar = (c: Character) => {
+      const aiData = updatedState[c.id];
+      if (aiData) {
+        return { 
+          ...c, 
+          stats: { ...c.stats, hp: aiData.hp },
+          position: { x: aiData.x, y: aiData.y }
+        };
+      }
+      return c;
+    };
+    return {
+      teamA: state.teamA.map(syncChar),
+      teamB: state.teamB.map(syncChar)
+    };
+  })
 }))

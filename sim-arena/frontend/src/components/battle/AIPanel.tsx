@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMainStore } from '../../store/useMainStore';
 
 export default function AIPanel() {
-  const { teamA, teamB, mapDescription, setMasterTimeline, setAppStage } = useMainStore();
+  const { teamA, teamB, mapDescription, setMasterTimeline, setAppStage, Master_Timeline, syncUpdatedState } = useMainStore();
   const [isLoading, setIsLoading] = useState(false);
   const [aiResult, setAiResult] = useState<any>(null);
 
@@ -31,11 +31,18 @@ export default function AIPanel() {
       });
 
       // 2. Đóng gói dữ liệu chuẩn bị gửi
+      let currentMaxTimeMs = 0;
+      if (Master_Timeline && Master_Timeline.length > 0) {
+        currentMaxTimeMs = Math.max(...Master_Timeline.map((t: any) => t.time_offset_ms || 0));
+      }
+      const nextStartMs = currentMaxTimeMs === 0 ? 0 : Math.ceil(currentMaxTimeMs / 1000) * 1000;
+      const nextEndMs = nextStartMs + 5000;
+
       const payload = {
         map_description: mapDescription || "Sân đấu tiêu chuẩn",
         current_grid_state: currentGridState,
-        start_ms: 0,      // Bắt đầu từ giây số 0
-        end_ms: 5000,    // Kịch bản dài 5 giây (5000 ms)
+        start_ms: nextStartMs,
+        end_ms: nextEndMs,
         is_regenerate: isRegenerate
       };
 
@@ -68,6 +75,9 @@ export default function AIPanel() {
   const handleApprove = () => {
     if (aiResult && aiResult.timeline) {
       setMasterTimeline(aiResult.timeline); // Nạp kịch bản vào Store
+      if (aiResult.updated_state) {
+        syncUpdatedState(aiResult.updated_state); // Đồng bộ chốt sổ dữ liệu HP và Tọa độ
+      }
       setAppStage('PHASE_5_SIMULATING');    // Chuyển sang Màn hình Diễn (Phase 5)
     }
   };
