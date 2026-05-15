@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Chấp nhận hi sinh tính thực tế một chút nhưng mà mang lại trải nghiệm tốt hơn cho người xem */
+
+/* 1. Ghìm tấm kính chứa hiệu ứng (bão tuyết, nổ) lùi xuống một lớp */
+canvas#fg-canvas {
+  z-index: 10 !important;
+}
+
+/* 2. Bốc toàn bộ hệ thống sa bàn (chứa lưới và các nhân vật) đè lên trên cùng */
+#arena-board {
+  position: relative !important;
+  z-index: 9999 !important;
+}

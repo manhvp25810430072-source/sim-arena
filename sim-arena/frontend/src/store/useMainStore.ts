@@ -20,7 +20,7 @@ export interface Character {
 
 export interface LogEvent {
   id: string;
-  type: 'SYSTEM' | 'NARRATIVE' | 'DIALOGUE' | 'COMBAT' | 'MOVE';
+  type: 'SYSTEM' | 'NARRATIVE' | 'DIALOGUE' | 'COMBAT' | 'MOVE' | 'ATTACK' | 'SKILL' | 'VFX';
   content: string;
   charId?: string; 
 }

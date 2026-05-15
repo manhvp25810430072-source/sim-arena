@@ -267,6 +267,7 @@ const handleLifecycle = (
         ease: 'power1.inOut',
         onComplete: () => {
           if (!obj.destroyed) {
+            gsap.killTweensOf(obj);
             stage.removeChild(obj);
             obj.destroy();
           }
@@ -275,6 +276,7 @@ const handleLifecycle = (
       });
     } else {
       if (!obj.destroyed) {
+        gsap.killTweensOf(obj);
         stage.removeChild(obj);
         obj.destroy();
       }
@@ -345,6 +347,7 @@ export const clearAllVFX = () => {
     appFg.stage.filters = [];
   }
   gsap.killTweensOf('*');
+  gsap.globalTimeline.clear(); // 🚀 VÁ LỖI: Dọn sạch mọi tween JS chạy ngầm
 
   const board = document.getElementById('arena-board');
   if (board) {
@@ -493,8 +496,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         fontSize: (payload.font_size || 0.5) * CELL_SIZE,
         fill: parsedFill.hexString,
         fontWeight: (payload.font_weight as any) || 'bold',
-        stroke: parsedStroke.hexString,
-        strokeThickness: (payload.stroke_thickness || 0.05) * CELL_SIZE,
+        stroke: { color: parsedStroke.hexString, width: (payload.stroke_thickness || 0.05) * CELL_SIZE },
         dropShadow: payload.drop_shadow || dropShadowDistanceX > 0 || dropShadowDistanceY > 0,
         dropShadowDistance: Math.max(Math.abs(dropShadowDistanceX), Math.abs(dropShadowDistanceY)),
         dropShadowColor: payload.drop_shadow_color || '#000000',
@@ -627,16 +629,25 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           const rotSpeedVar = payload.rotation_speed_variance !== undefined ? payload.rotation_speed_variance : Math.PI * 4;
           const targetRotation = (Math.random() - 0.5) * rotSpeedVar;
 
+          const endScale = payload.end_scale ?? 0.1;
+          
+          // 🚀 VÁ LỖI: Lưu lại tween scale để kiểm soát sinh tử
+          const scaleTween = gsap.to(p.scale, {
+            x: endScale,
+            y: endScale,
+            duration: actualLifetime,
+            ease: 'power1.out'
+          });
+
           gsap.to(p, {
             x: finalX,
             y: finalY,
             alpha: payload.end_alpha ?? endColor.alpha,
-            scaleX: payload.end_scale ?? 0.1,
-            scaleY: payload.end_scale ?? 0.1,
             rotation: targetRotation,
             duration: actualLifetime,
             ease: 'power1.out',
             onComplete: () => {
+              scaleTween.kill(); // Dừng biến đổi scale trước khi kết liễu hạt
               if (!p.destroyed) p.destroy();
             }
           });
@@ -988,6 +999,31 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
           ease: 'power1.out',
           onComplete: () => {
             if (stage.filters) stage.filters = stage.filters.filter(f => f !== blurFilter);
+          }
+        });
+      } else if (payload.filter_type === 'frost') {
+        // [VÁ LỖI]: Xử lý hiệu ứng Băng giá (Frost) thay vì nhảy vào fallback
+        const frostFilter = new PIXI.ColorMatrixFilter();
+        stage.filters = [...(stage.filters || []), frostFilter];
+        
+        const tintColor = parseColor(payload.color, '#E0FFFF');
+        const initialIntensity = payload.intensity || 0.8;
+        
+        // GSAP tween qua proxy object để update ma trận màu liên tục
+        gsap.to({ val: initialIntensity }, {
+          val: 0,
+          duration: (durationMs / 1000) / simulationSpeed,
+          ease: 'power1.inOut',
+          onUpdate: function() {
+            const currentIntensity = this.targets()[0].val;
+            frostFilter.reset(); // Reset trước khi apply đè layer mới
+            if (currentIntensity > 0) {
+              // Phủ màu băng giá
+              frostFilter.tint(tintColor.color, false);
+            }
+          },
+          onComplete: () => {
+            if (stage.filters) stage.filters = stage.filters.filter(f => f !== frostFilter);
           }
         });
       } else {
