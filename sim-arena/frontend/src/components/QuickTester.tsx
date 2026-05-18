@@ -7,58 +7,319 @@ import { useMainStore } from '../store/useMainStore';
 const RAW_DATA_STRING = `
 
 {
-  "chunk_summary": "Trận chiến tại Lò Luyện Ngục mở màn với cái nóng khắc nghiệt bòn rút sinh lực của tất cả. Tận dụng tốc độ vượt trội, Nyx lao đến tập kích Lyra trong chớp mắt. Tuy nhiên, cô nàng xạ thủ không hề hoảng sợ, lập tức lùi lại và xả 'Bão Đạn' hất văng sát thủ bóng tối. Cùng lúc đó, cỗ máy thịt Karn và bức tường thép Braum lao vào nhau, trao đổi những đòn đánh vật lý nặng nề giữa cơn mưa tàn lửa.",
+  "chunk_summary": "Khởi đầu trận chiến tại Lò Luyện Ngục, hơi nóng bốc lên ngùn ngụt. Karn Đao Phủ điên cuồng lao về phía Braum, tung lưỡi hái xích kéo giật Thiết Tường về phía mình, làm nứt vỡ lớp giáp của hắn. Từ phía sau, Lyra lạnh lùng nã đạn plasma vào Karn để yểm trợ. Cùng lúc đó, Nyx lợi dụng bóng tối lướt đi với tốc độ kinh hồn, áp sát và chém một nhát chí mạng vào Lyra. Bức xạ nhiệt của sàn đấu bắt đầu thiêu đốt tất cả.",
   "is_game_over": false,
   "winning_team": null,
   "updated_state": {
-    "char_A1": { "hp": 307, "x": 6, "y": 15 },
-    "char_A2": { "hp": 671, "x": 9, "y": 12 },
-    "char_B1": { "hp": 260, "x": 9, "y": 13 },
-    "char_B2": { "hp": 623, "x": 10, "y": 11 }
+    "char_A1": { "hp": 307, "x": 7, "y": 17 },
+    "char_A2": { "hp": 665, "x": 8, "y": 14 },
+    "char_B1": { "hp": 385, "x": 6, "y": 17 },
+    "char_B2": { "hp": 622, "x": 8, "y": 13 }
   },
   "timeline": [
     {
-      "time_offset_ms": 100,
-      "type": "NARRATIVE",
-      "content": "Cái nóng của Lò Luyện Ngục bắt đầu bào mòn sinh lực. Lửa bao trùm chiến trường."
+      "time_offset_ms": 0,
+      "type": "VFX",
+      "target_id": "GLOBAL",
+      "canvas_layer": { "layer": "bg" },
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "forge_embers",
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 5000,
+        "particle_lifetime_ms": 3000,
+        "spawn_width": 20.0,
+        "spawn_height": 20.0,
+        "start_color": "#FF4500",
+        "end_color": "#FF0000",
+        "start_scale": 0.15,
+        "end_scale": 0.0,
+        "start_alpha": 0.8,
+        "end_alpha": 0.0,
+        "speed": 0.8,
+        "gravity_y": -1.5,
+        "wind_x": 0.5
+      }
     },
     {
       "time_offset_ms": 500,
+      "type": "NARRATIVE",
+      "content": "Sức nóng của Lò Luyện Ngục bắt đầu bóp nghẹt không gian..."
+    },
+    {
+      "time_offset_ms": 1000,
       "type": "MOVE",
-      "actor_id": "char_B1",
-      "target_x": 9,
+      "actor_id": "char_B2",
+      "target_x": 8,
       "target_y": 13
     },
     {
-      "time_offset_ms": 600,
+      "time_offset_ms": 1200,
       "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 7,
-      "target_y": 14
+      "actor_id": "char_B1",
+      "target_x": 6,
+      "target_y": 17
     },
     {
-      "time_offset_ms": 700,
-      "type": "MOVE",
+      "time_offset_ms": 2000,
+      "type": "DIALOGUE",
       "actor_id": "char_B2",
-      "target_x": 10,
-      "target_y": 11
+      "content": "GRAAAAH! Lại đây thằng người sắt!",
+      "emotion": "RAGE"
     },
     {
-      "time_offset_ms": 800,
+      "time_offset_ms": 2100,
+      "type": "SKILL",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -70,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 2100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_mesh": {
+        "vfx_id": "karn_chain",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#696969",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 400,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 2400,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "x": -3.0,
+        "duration_ms": 200,
+        "ease": "power2.in"
+      }
+    },
+    {
+      "time_offset_ms": 2400,
       "type": "MOVE",
       "actor_id": "char_A2",
       "target_x": 8,
       "target_y": 14
     },
     {
-      "time_offset_ms": 1800,
-      "type": "DIALOGUE",
-      "actor_id": "char_B1",
-      "content": "Chết trong im lặng đi...",
-      "emotion": "COLD"
+      "time_offset_ms": 2450,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "karn_drag_dust",
+        "emitter_type": "continuous",
+        "emit_rate": 30,
+        "emit_duration_ms": 150,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 1.0,
+        "start_color": "#8B4513",
+        "end_color": "#D2B48C",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "speed": 1.0,
+        "gravity_y": -1.0
+      }
     },
     {
-      "time_offset_ms": 2000,
+      "time_offset_ms": 2500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "armor_break_shards",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.0,
+        "spawn_height": 1.0,
+        "start_color": "#C0C0C0",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 3.0,
+        "gravity_y": 5.0,
+        "spread_angle": 360
+      },
+      "gsap_tween": {
+        "color_tint": "#C0C0C0",
+        "tint_alpha": 0.5,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 3
+      }
+    },
+    {
+      "time_offset_ms": 2500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-70",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 2550,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 2600,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_impact_shards",
+        "emitter_type": "burst",
+        "burst_count": 20,
+        "particle_lifetime_ms": 500,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.0,
+        "speed": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 3000,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 7,
+      "target_y": 17
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B2",
+      "hp_change": -43,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_plasma_beam",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.4,
+        "color": "#00FFFF",
+        "alpha": 1.0,
+        "style": "energy_beam",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 3500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_plasma_core",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.15,
+        "color": "#FFFFFF",
+        "alpha": 1.0,
+        "style": "energy_beam",
+        "fade_in_ms": 20,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 3600,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_particles": {
+        "vfx_id": "lyra_beam_shatter",
+        "emitter_type": "burst",
+        "burst_count": 30,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 4.0,
+        "spawn_height": 0.2,
+        "offset_x": -2.0,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.05,
+        "speed": 1.5,
+        "gravity_y": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 3600,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-43",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 4500,
       "type": "ATTACK",
       "actor_id": "char_B1",
       "target_id": "char_A1",
@@ -66,786 +327,2157 @@ const RAW_DATA_STRING = `
       "is_critical": false
     },
     {
-      "time_offset_ms": 2000,
+      "time_offset_ms": 4500,
       "type": "VFX",
       "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
       "pixi_mesh": {
-        "path_points": [[-0.8, -1.0], [0, 0], [-0.8, 1.0]],
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
         "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 0.05,
-        "taper_end": 0.05,
+        "thickness": 0.6,
         "color": "#000000",
         "alpha": 0.9,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
       }
     },
     {
-      "time_offset_ms": 2050,
+      "time_offset_ms": 4550,
       "type": "VFX",
       "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[-0.9, -1.1], [-0.1, 0], [-0.9, 1.1]],
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
         "is_closed_path": false,
         "thickness": 0.2,
-        "color": "#800080",
-        "alpha": 0.7,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
       }
     },
     {
-      "time_offset_ms": 2050,
+      "time_offset_ms": 4600,
       "type": "VFX",
       "target_id": "char_A1",
       "gsap_tween": {
+        "scale_x": 0.8,
+        "scale_y": 0.8,
         "color_tint": "#FF0000",
         "tint_alpha": 0.8,
         "duration_ms": 150,
         "yoyo": true,
         "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 2050,
-      "type": "VFX",
-      "target_id": "char_A1",
+      },
       "pixi_text": {
+        "vfx_id": "lyra_dmg_text",
         "content": "-58",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
+        "font_family": "Arial",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
         "float_duration_ms": 400,
         "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 2200,
+      "time_offset_ms": 4900,
+      "type": "NARRATIVE",
+      "content": "Sàn nung chảy bòn rút sinh lực của mọi kẻ đứng trên đó."
+    },
+    {
+      "time_offset_ms": 4900,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 4900,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 4900,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 4900,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    }
+  ]
+}
+{
+  "chunk_summary": "Lyra phản đạn cực gắt bằng Bão Đạn, đẩy lùi Nyx và giữ khoảng cách an toàn. Cùng lúc, Braum giáng đòn Rung Chấn Dung Nham hất tung Karn để bảo vệ chủ nhân. Tuy nhiên, mặt sàn Lò Luyện Ngục bắt đầu phát huy tác dụng tàn phá: giáp của Braum và Karn nóng chảy vì đứng yên quá lâu. Nyx thoắt ẩn thoắt hiện, xuyên qua Lyra với Ảo Ảnh Sát Tự, để lại những vết chém rỉ máu. Trận chiến ngày càng đẫm máu trong cái nóng nghẹt thở.",
+  "is_game_over": false,
+  "winning_team": null,
+  "updated_state": {
+    "char_A1": { "hp": 232, "x": 7, "y": 18 },
+    "char_A2": { "hp": 593, "x": 8, "y": 14 },
+    "char_B1": { "hp": 320, "x": 8, "y": 19 },
+    "char_B2": { "hp": 529, "x": 8, "y": 13 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 5200,
       "type": "DIALOGUE",
       "actor_id": "char_A1",
-      "content": "Cái bóng phiền phức! Tránh ra!",
-      "emotion": "ARROGANT"
+      "content": "Tránh xa ta ra, thứ đột biến gớm ghiếc!",
+      "emotion": "DISGUST"
     },
     {
-      "time_offset_ms": 2400,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 6,
-      "target_y": 15
-    },
-    {
-      "time_offset_ms": 2500,
+      "time_offset_ms": 5200,
       "type": "SKILL",
       "actor_id": "char_A1",
       "target_id": "char_B1",
-      "hp_change": -125,
+      "hp_change": -65,
       "is_critical": false
     },
     {
-      "time_offset_ms": 2500,
+      "time_offset_ms": 5200,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 7,
+      "target_y": 18
+    },
+    {
+      "time_offset_ms": 5200,
       "type": "VFX",
       "target_id": "char_A1",
       "gsap_tween": {
         "x": -1.0,
         "duration_ms": 200,
-        "ease": "power1.out"
+        "ease": "power2.out"
       }
     },
     {
-      "time_offset_ms": 2500,
+      "time_offset_ms": 5200,
       "type": "VFX",
       "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "lyra_dash_smoke",
+        "emitter_type": "burst",
+        "burst_count": 15,
+        "particle_lifetime_ms": 500,
+        "start_color": "#888888",
+        "end_color": "#444444",
+        "start_scale": 0.5,
+        "end_scale": 1.0,
+        "start_alpha": 0.6,
+        "end_alpha": 0.0,
+        "speed": 0.5
+      }
+    },
+    {
+      "time_offset_ms": 5400,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[0, 0], [1, 0]],
+        "vfx_id": "lyra_bullet_1",
+        "path_points": [[-3, 0], [0, 0]],
         "is_closed_path": false,
-        "thickness": 0.8,
-        "color": "#ADD8E6",
-        "alpha": 0.5,
-        "fade_in_ms": 0,
-        "lifetime_ms": 200,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 2700,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.2,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 2700,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 2750,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.3,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 2900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.4,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 2900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 2950,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.4,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 3100,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.6,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 3100,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.3,
-        "end_scale": 2.0,
-        "speed": 6.0,
-        "emit_angle": 0,
-        "spread_angle": 45,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 3150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.6,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 3150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "color_tint": "#8B0000",
-        "tint_alpha": 0.9,
-        "duration_ms": 100,
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 3150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_text": {
-        "content": "-125",
-        "color": "#FF0000",
-        "font_size": 0.6,
-        "float_distance_x": 0.3,
-        "float_distance_y": -0.8,
-        "float_duration_ms": 400,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
       }
     },
     {
-      "time_offset_ms": 3200,
-      "type": "MOVE",
-      "actor_id": "char_A2",
-      "target_x": 9,
-      "target_y": 12
+      "time_offset_ms": 5400,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "lyra_spiral_smoke",
+        "emitter_type": "continuous",
+        "emit_rate": 30,
+        "emit_duration_ms": 200,
+        "particle_lifetime_ms": 300,
+        "spawn_width": 3.0,
+        "offset_x": -1.5,
+        "start_color": "#FF4500",
+        "end_color": "#808080",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 2.0,
+        "rotation_speed_variance": 360
+      }
     },
     {
-      "time_offset_ms": 3500,
-      "type": "ATTACK",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -42,
-      "is_critical": false
+      "time_offset_ms": 5500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_bullet_2",
+        "path_points": [[-3, 0.2], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
     },
     {
-      "time_offset_ms": 3500,
+      "time_offset_ms": 5500,
+      "type": "NARRATIVE",
+      "content": "Lớp giáp kim loại bắt đầu chảy rữa vì sức nóng tích tụ từ mặt sàn!"
+    },
+    {
+      "time_offset_ms": 5500,
       "type": "VFX",
       "target_id": "char_A2",
       "gsap_tween": {
-        "x": 0.5,
-        "duration_ms": 150,
+        "color_tint": "#FF8C00",
+        "tint_alpha": 0.6,
+        "duration_ms": 300,
+        "ease": "power1.inOut"
+      }
+    },
+    {
+      "time_offset_ms": 5600,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "armor_drip",
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 1900,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FFA500",
+        "end_color": "#FF4500",
+        "start_scale": 0.2,
+        "end_scale": 0.1,
+        "speed": 0.5,
+        "gravity_y": 4.0
+      }
+    },
+    {
+      "time_offset_ms": 5500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "color_tint": "#FF8C00",
+        "tint_alpha": 0.6,
+        "duration_ms": 300,
+        "ease": "power1.inOut"
+      }
+    },
+    {
+      "time_offset_ms": 5600,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "armor_drip",
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 1900,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FFA500",
+        "end_color": "#FF4500",
+        "start_scale": 0.2,
+        "end_scale": 0.1,
+        "speed": 0.5,
+        "gravity_y": 4.0
+      }
+    },
+    {
+      "time_offset_ms": 5600,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_bullet_3",
+        "path_points": [[-3, -0.2], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 5650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "x": 1.0,
+        "duration_ms": 300,
+        "ease": "power3.out"
+      }
+    },
+    {
+      "time_offset_ms": 5650,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 6,
+      "target_y": 16
+    },
+    {
+      "time_offset_ms": 5650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "lyra_target_sparks",
+        "emitter_type": "burst",
+        "burst_count": 40,
+        "particle_lifetime_ms": 600,
+        "start_color": "#FF5500",
+        "end_color": "#FFCC00",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 4.0,
+        "friction": 0.9,
+        "spread_angle": 120,
+        "emit_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 5650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "opacity": 0.5,
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "nyx_dmg_text",
+        "content": "-65",
+        "font_family": "Arial",
+        "color": "#FFFFFF",
+        "font_size": 0.6,
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 6000,
+      "type": "SKILL",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -45,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 6000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "y": -0.5,
+        "duration_ms": 200,
         "ease": "power2.out",
         "yoyo": true,
         "repeat": 1
       }
     },
     {
-      "time_offset_ms": 3600,
+      "time_offset_ms": 6400,
       "type": "VFX",
       "target_id": "char_A2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.0], [1.2, 0], [0.5, 1.0]],
-        "is_closed_path": false,
-        "thickness": 0.6,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#708090",
-        "alpha": 0.8,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
+      "canvas_layer": { "layer": "bg" },
+      "blend_mode": { "mode": "ADD" },
+      "pixi_graphics": {
+        "vfx_id": "magma_shockwave",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.6,
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 6400,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_filters": {
+        "target_vfx_id": "magma_shockwave",
+        "filter_type": "shockwave",
+        "amplitude": 1.2,
+        "wavelength": 0.8,
+        "thickness": 0.4,
+        "duration_ms": 500
+      }
+    },
+    {
+      "time_offset_ms": 6450,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "y": -1.0,
+        "duration_ms": 200,
+        "ease": "power2.out"
+      }
+    },
+    {
+      "time_offset_ms": 6500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "magma_spikes",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 800,
+        "spawn_radius": 2.0,
+        "start_color": "#FF3300",
+        "end_color": "#330000",
+        "start_scale": 0.6,
+        "end_scale": 0.2,
+        "speed": 3.0,
+        "gravity_y": 8.0,
+        "emit_angle": -90,
+        "spread_angle": 60
+      }
+    },
+    {
+      "time_offset_ms": 6650,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "y": 0.0,
+        "duration_ms": 150,
+        "ease": "bounce.out"
+      }
+    },
+    {
+      "time_offset_ms": 6650,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-45",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 3650,
+      "time_offset_ms": 6700,
       "type": "VFX",
       "target_id": "char_B2",
+      "gsap_tween": {
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "ease": "sine.inOut",
+        "repeat": 9,
+        "yoyo": true
+      },
+      "blend_mode": { "mode": "ADD" },
       "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.5,
-        "start_color": "#A9A9A9",
-        "end_color": "#D3D3D3",
-        "start_scale": 0.6,
+        "vfx_id": "stun_stars",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 400,
+        "spawn_radius": 0.6,
+        "offset_y": -1.2,
+        "start_color": "#FFFF00",
+        "end_color": "#FFA500",
+        "start_scale": 0.3,
         "end_scale": 0.1,
-        "speed": 3.0,
+        "speed": 2.0,
+        "tangential_acceleration": 6.0
+      }
+    },
+    {
+      "time_offset_ms": 6700,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "slow_mud",
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.2,
+        "offset_y": 0.5,
+        "start_color": "#8B0000",
+        "end_color": "#3E0000",
+        "start_scale": 0.5,
+        "end_scale": 0.8,
+        "speed": 0.1
+      }
+    },
+    {
+      "time_offset_ms": 6800,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "magma_landing_dust",
+        "emitter_type": "burst",
+        "burst_count": 20,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 1.5,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#330000",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 2.0,
+        "gravity_y": -1.0,
         "spread_angle": 180
       }
     },
     {
-      "time_offset_ms": 3650,
+      "time_offset_ms": 7000,
       "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
       }
     },
     {
-      "time_offset_ms": 3650,
+      "time_offset_ms": 7000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 7000,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 7000,
       "type": "VFX",
       "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 7500,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Ngươi không thoát khỏi bóng tối đâu...",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 7500,
+      "type": "SKILL",
+      "actor_id": "char_B1",
+      "target_id": "char_A1",
+      "hp_change": -75,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 7500,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 8,
+      "target_y": 19
+    },
+    {
+      "time_offset_ms": 7500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "scale_x": 2.0,
+        "x": 4.0,
+        "duration_ms": 300,
+        "ease": "power2.inOut"
+      }
+    },
+    {
+      "time_offset_ms": 7650,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_graphics": {
+        "vfx_id": "nyx_shadow_clone",
+        "shape_type": "rect",
+        "width": 1.0,
+        "height": 2.0,
+        "fill_color": "#000000",
+        "fill_alpha": 0.8,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 0
+      }
+    },
+    {
+      "time_offset_ms": 7650,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "pixi_filters": {
+        "target_vfx_id": "nyx_shadow_clone",
+        "filter_type": "glitch",
+        "slices": 10,
+        "duration_ms": 850
+      }
+    },
+    {
+      "time_offset_ms": 8000,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "NGHIỀN NÁT NGƯƠI!",
+      "emotion": "RAGE"
+    },
+    {
+      "time_offset_ms": 8000,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -72,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 8000,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_graphics": {
+        "vfx_id": "karn_axe_swipe",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "start_angle_deg": -45,
+        "end_angle_deg": 45,
+        "is_pie_slice": true,
+        "fill_color": "#8B0000",
+        "fill_alpha": 0.7,
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 8100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_axe_sparks",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 500,
+        "spawn_radius": 1.0,
+        "start_color": "#FF4500",
+        "end_color": "#800000",
+        "start_scale": 0.3,
+        "end_scale": 0.05,
+        "speed": 3.0,
+        "friction": 0.9,
+        "spread_angle": 90
+      }
+    },
+    {
+      "time_offset_ms": 8100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
       "pixi_text": {
-        "content": "-42",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
+        "vfx_id": "braum_dmg_text",
+        "content": "-72",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
         "float_duration_ms": 300,
         "fade_in_ms": 0,
-        "lifetime_ms": 150,
+        "lifetime_ms": 250,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 4000,
-      "type": "DIALOGUE",
-      "actor_id": "char_B2",
-      "content": "Nghiền nát đống sắt vụn của ngươi!",
-      "emotion": "RAGE"
+      "time_offset_ms": 8150,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
     },
     {
-      "time_offset_ms": 4200,
-      "type": "ATTACK",
-      "actor_id": "char_B2",
+      "time_offset_ms": 8500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "nyx_purple_mist",
+        "emitter_type": "burst",
+        "burst_count": 50,
+        "particle_lifetime_ms": 800,
+        "spawn_radius": 1.5,
+        "start_color": "#4B0082",
+        "end_color": "#000000",
+        "start_scale": 0.8,
+        "end_scale": 1.5,
+        "start_alpha": 0.8,
+        "end_alpha": 0.0,
+        "speed": 1.0,
+        "spread_angle": 360
+      }
+    },
+    {
+      "time_offset_ms": 8500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "nyx_dark_needles",
+        "emitter_type": "burst",
+        "burst_count": 30,
+        "particle_lifetime_ms": 300,
+        "shape_type": "line",
+        "path_points": [[0, 0], [0, -0.5]],
+        "start_color": "#8A2BE2",
+        "end_color": "#000000",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "speed": 6.0,
+        "spread_angle": 360
+      }
+    },
+    {
+      "time_offset_ms": 8500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_x": 0.8,
+        "scale_y": 0.8,
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.8,
+        "duration_ms": 150,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "lyra_dmg_text",
+        "content": "-75",
+        "font_family": "Arial",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 8550,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "bleed_drops",
+        "emitter_type": "continuous",
+        "emit_rate": 10,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.5,
+        "start_color": "#8B0000",
+        "end_color": "#A52A2A",
+        "start_scale": 0.2,
+        "end_scale": 0.3,
+        "speed": 1.5,
+        "gravity_y": 4.0
+      }
+    },
+    {
+      "time_offset_ms": 8550,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "blind_mist",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 1.0,
+        "spawn_height": 0.5,
+        "offset_y": -0.5,
+        "start_color": "#800080",
+        "end_color": "#4B0082",
+        "start_scale": 0.6,
+        "end_scale": 0.8,
+        "start_alpha": 0.7,
+        "end_alpha": 0.0,
+        "speed": 0.2,
+        "wind_x": 0.2
+      }
+    },
+    {
+      "time_offset_ms": 9000,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 9000,
+      "type": "VFX",
       "target_id": "char_A2",
-      "hp_change": -64,
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 9000,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 9000,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 9500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -48,
       "is_critical": false
     },
     {
-      "time_offset_ms": 4200,
+      "time_offset_ms": 9500,
       "type": "VFX",
       "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
         "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
+        "alpha": 0.8,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
       }
     },
     {
-      "time_offset_ms": 4300,
+      "time_offset_ms": 9650,
       "type": "VFX",
       "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
       }
     },
     {
-      "time_offset_ms": 4300,
+      "time_offset_ms": 9650,
       "type": "VFX",
-      "target_id": "char_A2",
+      "target_id": "char_B2",
       "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 4300,
-      "type": "VFX",
-      "target_id": "char_A2",
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
       "pixi_text": {
-        "content": "-64",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
+        "vfx_id": "karn_dmg_text",
+        "content": "-48",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
         "float_duration_ms": 300,
         "fade_in_ms": 0,
-        "lifetime_ms": 100,
+        "lifetime_ms": 200,
         "fade_out_ms": 100
       }
     }
   ]
 }
 {
-  "chunk_summary": "Braum kích hoạt giao thức bảo vệ tối đa, dậm mạnh tạo sóng xung kích dung nham làm choáng cả Karn và Nyx. Ngay khi tỉnh lại, Karn điên cuồng vung xích sắt móc trúng Braum, kéo lê và phá nát lớp giáp của gã khổng lồ. Lợi dụng sự hỗn loạn, Nyx hóa bóng lướt xuyên qua tàn lửa, tập kích thành công Lyra. Cùng lúc, cái nóng khủng khiếp của Lò Luyện Ngục tiếp tục bào mòn sinh lực của tất cả những kẻ đang đứng trên sàn đấu.",
+  "chunk_summary": "Nhiệt độ cực độ của Lò Luyện Ngục bắt đầu bòn rút sinh mệnh của cả hai phe. Giáp của Braum bị nung chảy do đứng yên quá lâu, khiến hắn nhận lượng sát thương khổng lồ từ đòn rìu của Karn. Lyra và Nyx liên tục luân chuyển vị trí để tránh sức nóng rát gót, đồng thời liên tục tung ra các đòn tấn công chí mạng vào nhau trong làn khói mờ mịt.",
   "is_game_over": false,
   "winning_team": null,
   "updated_state": {
-    "char_A1": { "hp": 232, "x": 6, "y": 15 },
-    "char_A2": { "hp": 591, "x": 9, "y": 12 },
-    "char_B1": { "hp": 203, "x": 7, "y": 14 },
-    "char_B2": { "hp": 522, "x": 10, "y": 11 }
+    "char_A1": { "hp": 164, "x": 6, "y": 16 },
+    "char_A2": { "hp": 504, "x": 8, "y": 14 },
+    "char_B1": { "hp": 258, "x": 7, "y": 17 },
+    "char_B2": { "hp": 472, "x": 8, "y": 13 }
   },
   "timeline": [
     {
-      "time_offset_ms": 5100,
+      "time_offset_ms": 10100,
       "type": "NARRATIVE",
-      "content": "Sàn kim loại tiếp tục sôi sục. Hơi nóng nung chảy mọi hàng phòng ngự!"
+      "content": "Sức nóng của Lò Luyện Ngục đạt ngưỡng cực đoan, thiêu đốt sinh mệnh của tất cả!"
     },
     {
-      "time_offset_ms": 5300,
-      "type": "DIALOGUE",
-      "actor_id": "char_A2",
-      "content": "Phát hiện đe dọa diện rộng. Kích hoạt Rung Chấn.",
-      "emotion": "ROBOTIC"
-    },
-    {
-      "time_offset_ms": 5500,
-      "type": "SKILL",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -38,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 5500,
-      "type": "SKILL",
-      "actor_id": "char_A2",
-      "target_id": "char_B1",
-      "hp_change": -42,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 5500,
+      "time_offset_ms": 10200,
       "type": "VFX",
       "target_id": "char_A2",
       "gsap_tween": {
-        "scale_x": 0.8,
-        "scale_y": 1.2,
-        "y": -0.8,
-        "duration_ms": 150,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 5650,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.3,
-        "scale_y": 0.7,
-        "y": 0,
-        "duration_ms": 100,
-        "ease": "power2.in"
-      }
-    },
-    {
-      "time_offset_ms": 5750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 2.0,
-        "line_width": 0.4,
-        "line_color": "#FFA500",
-        "fill_color": "#FFD700",
-        "fill_alpha": 0.3,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 250,
-        "scale_x": 0.1,
-        "scale_y": 0.1
-      }
-    },
-    {
-      "time_offset_ms": 5750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.0,
-        "scale_y": 1.0,
+        "color_tint": "#FF8C00",
+        "tint_alpha": 0.6,
         "duration_ms": 300,
-        "ease": "power2.out"
+        "ease": "power1.inOut"
       }
     },
     {
-      "time_offset_ms": 5850,
+      "time_offset_ms": 10300,
       "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "y": -1.2,
-        "duration_ms": 250,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 5850,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "y": -1.2,
-        "duration_ms": 250,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 5900,
-      "type": "VFX",
-      "target_id": "char_B2",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_particles": {
+        "vfx_id": "armor_drip",
         "emitter_type": "continuous",
-        "emit_duration_ms": 400,
+        "emit_rate": 15,
+        "emit_duration_ms": 1900,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FFA500",
+        "end_color": "#FF4500",
+        "start_scale": 0.2,
+        "end_scale": 0.1,
+        "speed": 0.5,
+        "gravity_y": 4.0
+      }
+    },
+    {
+      "time_offset_ms": 10500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 10500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 10500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 10500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 10500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
         "emit_rate": 20,
-        "spawn_width": 1.2,
-        "spawn_height": 1.2,
-        "start_color": "#FFD700",
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
         "end_color": "#FFA500",
         "start_scale": 0.4,
         "end_scale": 0.1,
-        "particle_lifetime_ms": 300,
-        "blend_mode": "ADD"
+        "speed": 1.5,
+        "gravity_y": -3.0
       }
     },
     {
-      "time_offset_ms": 5900,
+      "time_offset_ms": 10500,
       "type": "VFX",
-      "target_id": "char_B1",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_particles": {
+        "vfx_id": "burn_flames",
         "emitter_type": "continuous",
-        "emit_duration_ms": 400,
         "emit_rate": 20,
-        "spawn_width": 1.2,
-        "spawn_height": 1.2,
-        "start_color": "#FFD700",
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
         "end_color": "#FFA500",
         "start_scale": 0.4,
         "end_scale": 0.1,
-        "particle_lifetime_ms": 300,
-        "blend_mode": "ADD"
+        "speed": 1.5,
+        "gravity_y": -3.0
       }
     },
     {
-      "time_offset_ms": 5850,
+      "time_offset_ms": 10500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 10500,
       "type": "VFX",
       "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 11000,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 6,
+      "target_y": 16
+    },
+    {
+      "time_offset_ms": 11500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11800,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": -47,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 11800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_plasma_beam",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.4,
+        "color": "#00FFFF",
+        "alpha": 1.0,
+        "style": "energy_beam",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 11800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_plasma_core",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.15,
+        "color": "#FFFFFF",
+        "alpha": 1.0,
+        "style": "energy_beam",
+        "fade_in_ms": 20,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 11900,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_particles": {
+        "vfx_id": "lyra_beam_shatter",
+        "emitter_type": "burst",
+        "burst_count": 30,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 4.0,
+        "spawn_height": 0.2,
+        "offset_x": -2.0,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.05,
+        "speed": 1.5,
+        "gravity_y": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 11900,
+      "type": "VFX",
+      "target_id": "char_B1",
       "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 5850,
-      "type": "VFX",
-      "target_id": "char_B2",
+        "opacity": 0.5,
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
       "pixi_text": {
-        "content": "-38",
+        "vfx_id": "nyx_dmg_text",
+        "content": "-47",
+        "font_family": "Arial",
         "color": "#FFFFFF",
         "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 5850,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "color_tint": "#8B0000",
-        "tint_alpha": 0.9,
-        "duration_ms": 100,
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 5850,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_text": {
-        "content": "-42",
-        "color": "#FF0000",
-        "font_size": 0.6,
-        "float_distance_x": 0.3,
-        "float_distance_y": -0.8,
+        "float_distance_y": -1.5,
         "float_duration_ms": 400,
         "fade_in_ms": 50,
-        "lifetime_ms": 150,
+        "lifetime_ms": 300,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 5900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 0.5,
-        "offset_y": -1.2,
-        "line_width": 0.1,
-        "line_color": "#FFD700",
-        "line_dash": [0.2, 0.4],
-        "fade_in_ms": 100,
-        "lifetime_ms": 1000,
-        "fade_out_ms": 200,
-        "rotation_deg": 360
-      }
-    },
-    {
-      "time_offset_ms": 5900,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 0.5,
-        "offset_y": -1.2,
-        "line_width": 0.1,
-        "line_color": "#FFD700",
-        "line_dash": [0.2, 0.4],
-        "fade_in_ms": 100,
-        "lifetime_ms": 1000,
-        "fade_out_ms": 200,
-        "rotation_deg": 360
-      }
-    },
-    {
-      "time_offset_ms": 6800,
+      "time_offset_ms": 12000,
       "type": "DIALOGUE",
       "actor_id": "char_B2",
-      "content": "GRAARRR! Kẻ cản đường phải bị xé xác!",
+      "content": "VỠ VỤN ĐI KẺ CẢN ĐƯỜNG!",
       "emotion": "RAGE"
     },
     {
-      "time_offset_ms": 7000,
-      "type": "SKILL",
+      "time_offset_ms": 12000,
+      "type": "ATTACK",
       "actor_id": "char_B2",
       "target_id": "char_A2",
-      "hp_change": -65,
+      "hp_change": -74,
       "is_critical": false
     },
     {
-      "time_offset_ms": 7000,
+      "time_offset_ms": 12000,
       "type": "VFX",
       "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [5.0, 0]],
-        "is_closed_path": false,
-        "thickness": 0.3,
-        "color": "#696969",
-        "alpha": 1.0,
-        "fade_in_ms": 100,
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_graphics": {
+        "vfx_id": "karn_axe_swipe",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "start_angle_deg": -45,
+        "end_angle_deg": 45,
+        "is_pie_slice": true,
+        "fill_color": "#8B0000",
+        "fill_alpha": 0.7,
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 12100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_axe_sparks",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 500,
+        "spawn_radius": 1.0,
+        "start_color": "#FF4500",
+        "end_color": "#800000",
+        "start_scale": 0.3,
+        "end_scale": 0.05,
+        "speed": 3.0,
+        "friction": 0.9,
+        "spread_angle": 90
+      }
+    },
+    {
+      "time_offset_ms": 12100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-74",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
         "lifetime_ms": 250,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 7250,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "x": -4.0,
-        "duration_ms": 150,
-        "ease": "power3.in"
-      }
-    },
-    {
-      "time_offset_ms": 7250,
+      "time_offset_ms": 12150,
       "type": "VFX",
       "target_id": "char_A2",
       "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 150,
-        "emit_rate": 30,
-        "spawn_radius": 0.4,
-        "start_color": "#A9A9A9",
-        "end_color": "#808080",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 200,
-        "speed": 2.0
-      }
-    },
-    {
-      "time_offset_ms": 7400,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
         "emitter_type": "burst",
-        "burst_count": 25,
-        "spawn_radius": 0.6,
-        "start_color": "#808080",
-        "end_color": "#696969",
-        "start_scale": 0.4,
-        "end_scale": 0.05,
+        "burst_count": 10,
         "particle_lifetime_ms": 400,
-        "speed": 3.5,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
         "gravity_y": 5.0
       }
     },
     {
-      "time_offset_ms": 7250,
-      "type": "VFX",
+      "time_offset_ms": 12500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 12500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
       "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 12500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 12500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13000,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 7,
+      "target_y": 17
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
       }
     },
     {
-      "time_offset_ms": 7250,
+      "time_offset_ms": 13500,
       "type": "VFX",
       "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 13500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 13600,
+      "type": "DIALOGUE",
+      "actor_id": "char_A1",
+      "content": "Chết tiệt, cái nền rác rưởi này đang nướng chín chúng ta!",
+      "emotion": "ANGRY"
+    },
+    {
+      "time_offset_ms": 13800,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A1",
+      "hp_change": -53,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 13800,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
+        "color": "#000000",
+        "alpha": 0.9,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 13850,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
+      }
+    },
+    {
+      "time_offset_ms": 13900,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "scale_x": 0.8,
+        "scale_y": 0.8,
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.8,
+        "duration_ms": 150,
+        "yoyo": true,
+        "repeat": 1
+      },
       "pixi_text": {
-        "content": "-65",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
+        "vfx_id": "lyra_dmg_text",
+        "content": "-53",
+        "font_family": "Arial",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 7800,
+      "time_offset_ms": 14500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 14500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 14500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 14500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 14800,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -42,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 14800,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
+        "is_closed_path": false,
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
+        "alpha": 0.8,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
+      }
+    },
+    {
+      "time_offset_ms": 14950,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 14950,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-42",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 100
+      }
+    }
+  ]
+}
+{
+  "chunk_summary": "Sức ép của Lò Luyện Ngục được đẩy lên đến đỉnh điểm, liên tục thiêu đốt sinh lực của cả bốn chiến binh. Lyra mở màn bằng Bão Đạn gắt gao đẩy lùi Nyx, nhưng bóng ma sát thủ lập tức đáp trả bằng Ảo Ảnh Sát Tự, đâm xuyên và làm mù mắt cô. Ở mặt trận tuyến trên, Karn điên cuồng vung xích kéo giật Braum lại gần, bẻ nát lớp giáp của hắn. Braum kiên cố đáp trả bằng một cú dậm Rung Chấn Dung Nham, hất văng gã đồ tể khát máu lên không trung.",
+  "is_game_over": false,
+  "winning_team": null,
+  "updated_state": {
+    "char_A1": { "hp": 89, "x": 6, "y": 15 },
+    "char_A2": { "hp": 424, "x": 8, "y": 12 },
+    "char_B1": { "hp": 163, "x": 6, "y": 14 },
+    "char_B2": { "hp": 412, "x": 8, "y": 11 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 15200,
+      "type": "DIALOGUE",
+      "actor_id": "char_A1",
+      "content": "Tránh xa ta ra, cặn bã!",
+      "emotion": "ANGRY"
+    },
+    {
+      "time_offset_ms": 15200,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 6,
+      "target_y": 15
+    },
+    {
+      "time_offset_ms": 15200,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "x": -1.0,
+        "duration_ms": 200,
+        "ease": "power2.out"
+      }
+    },
+    {
+      "time_offset_ms": 15200,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "lyra_dash_smoke",
+        "emitter_type": "burst",
+        "burst_count": 15,
+        "particle_lifetime_ms": 500,
+        "start_color": "#888888",
+        "end_color": "#444444",
+        "start_scale": 0.5,
+        "end_scale": 1.0,
+        "start_alpha": 0.6,
+        "end_alpha": 0.0,
+        "speed": 0.5
+      }
+    },
+    {
+      "time_offset_ms": 15400,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_bullet_1",
+        "path_points": [[-3, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 15400,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "lyra_spiral_smoke",
+        "emitter_type": "continuous",
+        "emit_rate": 30,
+        "emit_duration_ms": 200,
+        "particle_lifetime_ms": 300,
+        "spawn_width": 3.0,
+        "offset_x": -1.5,
+        "start_color": "#FF4500",
+        "end_color": "#808080",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 2.0,
+        "rotation_speed_variance": 360
+      }
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "NARRATIVE",
+      "content": "Nhiệt độ thảm khốc của Lò Luyện Ngục làm bốc hơi mọi lượng oxy..."
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_bullet_2",
+        "path_points": [[-3, 0.2], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 15600,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_bullet_3",
+        "path_points": [[-3, -0.2], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.5,
+        "color": "#FF2200",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
+      }
+    },
+    {
+      "time_offset_ms": 15650,
       "type": "MOVE",
       "actor_id": "char_B1",
       "target_x": 7,
+      "target_y": 18
+    },
+    {
+      "time_offset_ms": 15650,
+      "type": "SKILL",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
+      "hp_change": -80,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 15650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "x": 1.0,
+        "duration_ms": 300,
+        "ease": "power3.out"
+      }
+    },
+    {
+      "time_offset_ms": 15650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "lyra_target_sparks",
+        "emitter_type": "burst",
+        "burst_count": 40,
+        "particle_lifetime_ms": 600,
+        "start_color": "#FF5500",
+        "end_color": "#FFCC00",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 4.0,
+        "friction": 0.9,
+        "spread_angle": 120,
+        "emit_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 15650,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "opacity": 0.5,
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "nyx_dmg_text",
+        "content": "-80",
+        "font_family": "Arial",
+        "color": "#FFFFFF",
+        "font_size": 0.6,
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 16000,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 6,
       "target_y": 14
     },
     {
-      "time_offset_ms": 8000,
+      "time_offset_ms": 16000,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "scale_x": 2.0,
+        "x": 4.0,
+        "duration_ms": 300,
+        "ease": "power2.inOut"
+      }
+    },
+    {
+      "time_offset_ms": 16150,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_graphics": {
+        "vfx_id": "nyx_shadow_clone",
+        "shape_type": "rect",
+        "width": 1.0,
+        "height": 2.0,
+        "fill_color": "#000000",
+        "fill_alpha": 0.8,
+        "fade_in_ms": 50,
+        "lifetime_ms": 800,
+        "fade_out_ms": 0
+      }
+    },
+    {
+      "time_offset_ms": 16150,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "pixi_filters": {
+        "target_vfx_id": "nyx_shadow_clone",
+        "filter_type": "glitch",
+        "slices": 10,
+        "duration_ms": 850
+      }
+    },
+    {
+      "time_offset_ms": 16500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 16800,
+      "type": "MOVE",
+      "actor_id": "char_B2",
+      "target_x": 8,
+      "target_y": 11
+    },
+    {
+      "time_offset_ms": 17000,
       "type": "SKILL",
       "actor_id": "char_B1",
       "target_id": "char_A1",
@@ -853,460 +2485,2867 @@ const RAW_DATA_STRING = `
       "is_critical": false
     },
     {
-      "time_offset_ms": 8000,
+      "time_offset_ms": 17000,
       "type": "VFX",
-      "target_id": "char_B1",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
       "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 1000,
-        "emit_rate": 15,
+        "vfx_id": "nyx_purple_mist",
+        "emitter_type": "burst",
+        "burst_count": 50,
+        "particle_lifetime_ms": 800,
         "spawn_radius": 1.5,
-        "start_color": "#1A1A1A",
+        "start_color": "#4B0082",
         "end_color": "#000000",
         "start_scale": 0.8,
+        "end_scale": 1.5,
+        "start_alpha": 0.8,
+        "end_alpha": 0.0,
+        "speed": 1.0,
+        "spread_angle": 360
+      }
+    },
+    {
+      "time_offset_ms": 17000,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "nyx_dark_needles",
+        "emitter_type": "burst",
+        "burst_count": 30,
+        "particle_lifetime_ms": 300,
+        "shape_type": "line",
+        "path_points": [[0, 0], [0, -0.5]],
+        "start_color": "#8A2BE2",
+        "end_color": "#000000",
+        "start_scale": 0.5,
         "end_scale": 0.1,
-        "speed": 0.5,
-        "particle_lifetime_ms": 800
+        "speed": 6.0,
+        "spread_angle": 360
       }
     },
     {
-      "time_offset_ms": 9000,
+      "time_offset_ms": 17000,
       "type": "VFX",
-      "target_id": "char_B1",
+      "target_id": "char_A1",
       "gsap_tween": {
-        "x": 4.0,
-        "duration_ms": 250,
-        "ease": "power2.inOut"
+        "scale_x": 0.8,
+        "scale_y": 0.8,
+        "color_tint": "#FF0000",
+        "tint_alpha": 0.8,
+        "duration_ms": 150,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "lyra_dmg_text",
+        "content": "-60",
+        "font_family": "Arial",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 9000,
+      "time_offset_ms": 17000,
       "type": "VFX",
-      "target_id": "char_B1",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "blind_mist",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 800,
+        "spawn_width": 1.0,
+        "spawn_height": 0.5,
+        "offset_y": -0.5,
+        "start_color": "#800080",
+        "end_color": "#4B0082",
+        "start_scale": 0.6,
+        "end_scale": 0.8,
+        "start_alpha": 0.7,
+        "end_alpha": 0.0,
+        "speed": 0.2,
+        "wind_x": 0.2
+      }
+    },
+    {
+      "time_offset_ms": 17000,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "bleed_drops",
+        "emitter_type": "continuous",
+        "emit_rate": 10,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.5,
+        "start_color": "#8B0000",
+        "end_color": "#A52A2A",
+        "start_scale": 0.2,
+        "end_scale": 0.3,
+        "speed": 1.5,
+        "gravity_y": 4.0
+      }
+    },
+    {
+      "time_offset_ms": 17100,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "KHÔNG THỂ CHẠY!",
+      "emotion": "RAGE"
+    },
+    {
+      "time_offset_ms": 17100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
       "pixi_mesh": {
-        "path_points": [[-4.0, 0], [0, 0]],
+        "vfx_id": "karn_chain",
+        "path_points": [[-4, 0], [0, 0]],
         "is_closed_path": false,
-        "thickness": 0.8,
-        "color": "#333333",
-        "alpha": 0.8,
-        "fade_in_ms": 50,
+        "thickness": 0.2,
+        "color": "#696969",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 400,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 17400,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "x": -3.0,
+        "duration_ms": 200,
+        "ease": "power2.in"
+      }
+    },
+    {
+      "time_offset_ms": 17400,
+      "type": "MOVE",
+      "actor_id": "char_A2",
+      "target_x": 8,
+      "target_y": 12
+    },
+    {
+      "time_offset_ms": 17450,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "karn_drag_dust",
+        "emitter_type": "continuous",
+        "emit_rate": 30,
+        "emit_duration_ms": 150,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 1.0,
+        "start_color": "#8B4513",
+        "end_color": "#D2B48C",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "speed": 1.0,
+        "gravity_y": -1.0
+      }
+    },
+    {
+      "time_offset_ms": 17500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17600,
+      "type": "SKILL",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -65,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 17600,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_impact_shards",
+        "emitter_type": "burst",
+        "burst_count": 20,
+        "particle_lifetime_ms": 500,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.0,
+        "speed": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 17600,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "armor_break_shards",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.0,
+        "spawn_height": 1.0,
+        "start_color": "#C0C0C0",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 3.0,
+        "gravity_y": 5.0,
+        "spread_angle": 360
+      },
+      "gsap_tween": {
+        "color_tint": "#C0C0C0",
+        "tint_alpha": 0.5,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 3
+      }
+    },
+    {
+      "time_offset_ms": 17600,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-65",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 17650,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 18000,
+      "type": "DIALOGUE",
+      "actor_id": "char_A2",
+      "content": "MỤC TIÊU NGUY HIỂM. TRIỆT TIÊU.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 18000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "y": -0.5,
+        "duration_ms": 200,
+        "ease": "power2.out",
+        "yoyo": true,
+        "repeat": 1
+      }
+    },
+    {
+      "time_offset_ms": 18400,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "canvas_layer": { "layer": "bg" },
+      "blend_mode": { "mode": "ADD" },
+      "pixi_graphics": {
+        "vfx_id": "magma_shockwave",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "fill_color": "#FF4500",
+        "fill_alpha": 0.6,
+        "fade_in_ms": 100,
         "lifetime_ms": 300,
         "fade_out_ms": 200
       }
     },
     {
-      "time_offset_ms": 9250,
+      "time_offset_ms": 18400,
       "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 40,
-        "spawn_radius": 0.8,
-        "start_color": "#8B0000",
-        "end_color": "#4A0000",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 700,
-        "speed": 3.0,
-        "spread_angle": 360,
-        "gravity_y": 3.0
+      "target_id": "char_A2",
+      "pixi_filters": {
+        "target_vfx_id": "magma_shockwave",
+        "filter_type": "shockwave",
+        "amplitude": 1.2,
+        "wavelength": 0.8,
+        "thickness": 0.4,
+        "duration_ms": 500
       }
     },
     {
-      "time_offset_ms": 9250,
+      "time_offset_ms": 18450,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "y": -1.0,
+        "duration_ms": 200,
+        "ease": "power2.out"
+      }
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "SKILL",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -45,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "magma_spikes",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 800,
+        "spawn_radius": 2.0,
+        "start_color": "#FF3300",
+        "end_color": "#330000",
+        "start_scale": 0.6,
+        "end_scale": 0.2,
+        "speed": 3.0,
+        "gravity_y": 8.0,
+        "emit_angle": -90,
+        "spread_angle": 60
+      }
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-45",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "ease": "sine.inOut",
+        "repeat": 9,
+        "yoyo": true
+      },
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "stun_stars",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 400,
+        "spawn_radius": 0.6,
+        "offset_y": -1.2,
+        "start_color": "#FFFF00",
+        "end_color": "#FFA500",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 2.0,
+        "tangential_acceleration": 6.0
+      }
+    },
+    {
+      "time_offset_ms": 18500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "slow_mud",
+        "emitter_type": "continuous",
+        "emit_rate": 15,
+        "emit_duration_ms": 1000,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.2,
+        "offset_y": 0.5,
+        "start_color": "#8B0000",
+        "end_color": "#3E0000",
+        "start_scale": 0.5,
+        "end_scale": 0.8,
+        "speed": 0.1
+      }
+    },
+    {
+      "time_offset_ms": 18650,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "y": 0.0,
+        "duration_ms": 150,
+        "ease": "bounce.out"
+      }
+    },
+    {
+      "time_offset_ms": 18800,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "magma_landing_dust",
+        "emitter_type": "burst",
+        "burst_count": 20,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 1.5,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#330000",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 2.0,
+        "gravity_y": -1.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 19500,
+      "type": "NARRATIVE",
+      "content": "Sàn đấu tiếp tục biến thành bể magma lỏng, không chừa một ai..."
+    },
+    {
+      "time_offset_ms": 19500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 19500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 19500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 19500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    }
+  ]
+}
+{
+  "chunk_summary": "Sức nóng của Lò Luyện Ngục tiếp tục ăn mòn sinh lực của cả hai phe. Lyra rơi vào tình trạng nguy kịch, cố gắng lùi lại để tránh lưỡi dao tử thần của Nyx nhưng vẫn bị chém trúng. Ở tuyến trên, Karn điên cuồng vung rìu xé toạc giáp của Braum, buộc cỗ máy phòng ngự này phải giáng khiên đáp trả. Bất chấp thương tích rỉ máu, Lyra vẫn lạnh lùng nã một phát đạn plasma thẳng vào cái bóng của Nyx.",
+  "is_game_over": false,
+  "winning_team": null,
+  "updated_state": {
+    "char_A1": { "hp": 28, "x": 3, "y": 17 },
+    "char_A2": { "hp": 357, "x": 8, "y": 12 },
+    "char_B1": { "hp": 106, "x": 5, "y": 16 },
+    "char_B2": { "hp": 365, "x": 8, "y": 11 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 20000,
+      "type": "NARRATIVE",
+      "content": "Không khí cô đặc lại vì nhiệt độ cực hạn. Lò Luyện Ngục đang nuốt chửng tất cả!"
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 20500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 21000,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 4,
+      "target_y": 16
+    },
+    {
+      "time_offset_ms": 21200,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 5,
+      "target_y": 16
+    },
+    {
+      "time_offset_ms": 21400,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Sự im lặng của cái chết đang gọi tên ngươi.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 21500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A1",
+      "hp_change": -52,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 21500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
+        "color": "#000000",
+        "alpha": 0.9,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 21550,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
+      }
+    },
+    {
+      "time_offset_ms": 21600,
       "type": "VFX",
       "target_id": "char_A1",
       "gsap_tween": {
+        "scale_x": 0.8,
+        "scale_y": 0.8,
         "color_tint": "#FF0000",
         "tint_alpha": 0.8,
         "duration_ms": 150,
         "yoyo": true,
         "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 9250,
-      "type": "VFX",
-      "target_id": "char_A1",
+      },
       "pixi_text": {
-        "content": "-60",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
+        "vfx_id": "lyra_dmg_text",
+        "content": "-52",
+        "font_family": "Arial",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
         "float_duration_ms": 400,
         "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 8500,
+      "time_offset_ms": 21900,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "RÁCH NÁT RA ĐI, CỖ MÁY VÔ DỤNG!",
+      "emotion": "RAGE"
+    },
+    {
+      "time_offset_ms": 22000,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -58,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_graphics": {
+        "vfx_id": "karn_axe_swipe",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "start_angle_deg": -45,
+        "end_angle_deg": 45,
+        "is_pie_slice": true,
+        "fill_color": "#8B0000",
+        "fill_alpha": 0.7,
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 22100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_axe_sparks",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 500,
+        "spawn_radius": 1.0,
+        "start_color": "#FF4500",
+        "end_color": "#800000",
+        "start_scale": 0.3,
+        "end_scale": 0.05,
+        "speed": 3.0,
+        "friction": 0.9,
+        "spread_angle": 90
+      }
+    },
+    {
+      "time_offset_ms": 22100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-58",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 22150,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 22500,
       "type": "ATTACK",
       "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
       "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 22500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 22900,
+      "type": "DIALOGUE",
+      "actor_id": "char_A2",
+      "content": "MỨC NĂNG LƯỢNG NGUY KỊCH. ƯU TIÊN BẢO VỆ CHỦ NHÂN.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 23000,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -38,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 23000,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
+        "is_closed_path": false,
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
+        "alpha": 0.8,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
+      }
+    },
+    {
+      "time_offset_ms": 23150,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 23150,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-38",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 23500,
+      "type": "MOVE",
+      "actor_id": "char_A1",
+      "target_x": 3,
+      "target_y": 17
+    },
+    {
+      "time_offset_ms": 23700,
+      "type": "DIALOGUE",
+      "actor_id": "char_A1",
+      "content": "Nhận đạn đi, thứ phế thải!",
+      "emotion": "ANGRY"
+    },
+    {
+      "time_offset_ms": 23800,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_B1",
       "hp_change": -48,
       "is_critical": false
     },
     {
-      "time_offset_ms": 8500,
+      "time_offset_ms": 23800,
       "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.1,
-        "start_color": "#00FFFF",
-        "end_color": "#8A2BE2",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 1.5,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 8550,
-      "type": "VFX",
-      "target_id": "char_A1",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[0, 0], [4, 0]],
+        "vfx_id": "lyra_plasma_beam",
+        "path_points": [[-4, 0], [0, 0]],
         "is_closed_path": false,
         "thickness": 0.4,
-        "taper_start": 1.0,
-        "taper_end": 0.1,
         "color": "#00FFFF",
         "alpha": 1.0,
-        "blend_mode": "ADD",
-        "animation_speed": 5.0,
+        "style": "energy_beam",
         "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 50
-      }
-    },
-    {
-      "time_offset_ms": 8650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 300,
-        "spawn_width": 0.5,
-        "spawn_height": 0.5,
-        "start_color": "#8A2BE2",
-        "end_color": "#00FFFF",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4.0,
-        "spread_angle": 180,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 8650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 8650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-48",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
         "lifetime_ms": 150,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 9800,
-      "type": "NARRATIVE",
-      "content": "Toàn bộ chiến trường bốc cháy dữ dội!"
-    },
-    {
-      "time_offset_ms": 9900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 9900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 9900,
+      "time_offset_ms": 23800,
       "type": "VFX",
       "target_id": "char_B1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "lyra_plasma_core",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.15,
+        "color": "#FFFFFF",
+        "alpha": 1.0,
+        "style": "energy_beam",
+        "fade_in_ms": 20,
+        "lifetime_ms": 100,
+        "fade_out_ms": 50
       }
     },
     {
-      "time_offset_ms": 9900,
+      "time_offset_ms": 23900,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "SCREEN" },
+      "pixi_particles": {
+        "vfx_id": "lyra_beam_shatter",
+        "emitter_type": "burst",
+        "burst_count": 30,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 4.0,
+        "spawn_height": 0.2,
+        "offset_x": -2.0,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.05,
+        "speed": 1.5,
+        "gravity_y": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 23900,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "opacity": 0.5,
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "nyx_dmg_text",
+        "content": "-48",
+        "font_family": "Arial",
+        "color": "#FFFFFF",
+        "font_size": 0.6,
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "ATTACK",
+      "actor_id": "char_A1",
+      "target_id": "char_A1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 24500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 24500,
       "type": "VFX",
       "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_particles": {
+        "vfx_id": "burn_flames",
         "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
         "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
         "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
+        "gravity_y": -3.0
       }
     }
   ]
 }
 {
-  "chunk_summary": "Sức nóng của Lò Luyện Ngục tiếp tục bào mòn sinh lực các chiến binh. Nyx áp sát tung những nhát chém vô ảnh vào Lyra, nhưng nữ xạ thủ lập tức tạo khoảng cách và đáp trả bằng luồng plasma rực sáng. Cùng lúc, Karn và Braum lao vào cuộc chiến thể lực tàn khốc, liên tục tung ra các đòn rìu đẫm máu và đập khiên chát chúa giữa cơn mưa tàn lửa.",
+  "chunk_summary": "Nyx Bóng Đêm tàn nhẫn lướt tới và kết liễu Lyra bằng một nhát chém chí mạng, vĩnh viễn dập tắt tia lửa của cô kỹ sư. Mất đi mục tiêu bảo vệ tối thượng, hệ thống logic của Braum ghi nhận lỗi nghiêm trọng và lập tức chuyển sang chế độ tử chiến. Mặc kệ lớp giáp rỉ sét đang tan chảy dưới cái nóng kinh hoàng, Thiết Tường điên cuồng vung khiên ăn thua đủ với Karn và Nyx. Trận đấu giờ đây chỉ còn là một cuộc tàn sát đẫm máu trên biển lửa.",
   "is_game_over": false,
   "winning_team": null,
   "updated_state": {
-    "char_A1": { "hp": 172, "x": 5, "y": 17 },
-    "char_A2": { "hp": 516, "x": 9, "y": 12 },
-    "char_B1": { "hp": 133, "x": 7, "y": 14 },
-    "char_B2": { "hp": 467, "x": 10, "y": 11 }
+    "char_A1": { "hp": 0, "x": 3, "y": 17 },
+    "char_A2": { "hp": 205, "x": 8, "y": 12 },
+    "char_B1": { "hp": 91, "x": 7, "y": 13 },
+    "char_B2": { "hp": 302, "x": 8, "y": 11 }
   },
   "timeline": [
     {
-      "time_offset_ms": 10200,
+      "time_offset_ms": 25200,
       "type": "NARRATIVE",
-      "content": "Nhiệt độ Lò Luyện Ngục không ngừng tăng lên. Mọi thứ đang nóng chảy!"
+      "content": "Lyra lảo đảo vì mất máu. Cỗ máy chém của quái vật không hề nương tay!"
     },
     {
-      "time_offset_ms": 10500,
+      "time_offset_ms": 25500,
       "type": "ATTACK",
-      "actor_id": "char_B1",
+      "actor_id": "char_A1",
       "target_id": "char_A1",
-      "hp_change": -45,
+      "hp_change": -3,
       "is_critical": false
     },
     {
-      "time_offset_ms": 10500,
+      "time_offset_ms": 25500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 25500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 25500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 25500,
       "type": "VFX",
       "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 25500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 25500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 25500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 25800,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Trò chơi kết thúc rồi, kỹ sư nhỏ bé.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 26000,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 4,
+      "target_y": 17
+    },
+    {
+      "time_offset_ms": 26000,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B2",
+      "hp_change": -48,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 26000,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[-0.8, -1.0], [0, 0], [-0.8, 1.0]],
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
         "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 0.05,
-        "taper_end": 0.05,
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
+        "alpha": 0.8,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
+      }
+    },
+    {
+      "time_offset_ms": 26150,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 26150,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "gsap_tween": {
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
+        "duration_ms": 150,
+        "ease": "rough.ease"
+      },
+      "pixi_text": {
+        "vfx_id": "karn_dmg_text",
+        "content": "-48",
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
+        "float_distance_y": -1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 200,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 26200,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A1",
+      "hp_change": -25,
+      "is_critical": true
+    },
+    {
+      "time_offset_ms": 26200,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
         "color": "#000000",
         "alpha": 0.9,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
       }
     },
     {
-      "time_offset_ms": 10550,
+      "time_offset_ms": 26250,
       "type": "VFX",
       "target_id": "char_A1",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[-0.9, -1.1], [-0.1, 0], [-0.9, 1.1]],
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
         "is_closed_path": false,
         "thickness": 0.2,
-        "color": "#800080",
-        "alpha": 0.7,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
       }
     },
     {
-      "time_offset_ms": 10500,
+      "time_offset_ms": 26200,
       "type": "VFX",
       "target_id": "char_A1",
       "gsap_tween": {
+        "scale_x": 0.8,
+        "scale_y": 0.8,
         "color_tint": "#FF0000",
         "tint_alpha": 0.8,
         "duration_ms": 150,
         "yoyo": true,
         "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 10500,
-      "type": "VFX",
-      "target_id": "char_A1",
+      },
       "pixi_text": {
-        "content": "-45",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
+        "vfx_id": "lyra_dmg_text",
+        "content": "-25 FATAL",
+        "font_family": "Arial",
+        "color": "#FF00FF",
+        "font_size": 0.8,
+        "font_weight": "bold",
+        "float_distance_y": -1.5,
         "float_duration_ms": 400,
         "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 11500,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 5,
-      "target_y": 17
-    },
-    {
-      "time_offset_ms": 12000,
-      "type": "ATTACK",
-      "actor_id": "char_A1",
-      "target_id": "char_B1",
-      "hp_change": -55,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 12000,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.1,
-        "start_color": "#00FFFF",
-        "end_color": "#8A2BE2",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 1.5,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 12050,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [4, 0]],
-        "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 1.0,
-        "taper_end": 0.1,
-        "color": "#00FFFF",
-        "alpha": 1.0,
-        "blend_mode": "ADD",
-        "animation_speed": 5.0,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 50
-      }
-    },
-    {
-      "time_offset_ms": 12150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 300,
-        "spawn_width": 0.5,
-        "spawn_height": 0.5,
-        "start_color": "#8A2BE2",
-        "end_color": "#00FFFF",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4.0,
-        "spread_angle": 180,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 12000,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "color_tint": "#8B0000",
-        "tint_alpha": 0.9,
-        "duration_ms": 100,
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 12000,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_text": {
-        "content": "-55",
-        "color": "#FF0000",
-        "font_size": 0.6,
-        "float_distance_x": 0.3,
-        "float_distance_y": -0.8,
-        "float_duration_ms": 400,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
+        "lifetime_ms": 300,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 12500,
+      "time_offset_ms": 26200,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -72,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 26200,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_graphics": {
+        "vfx_id": "karn_axe_swipe",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "start_angle_deg": -45,
+        "end_angle_deg": 45,
+        "is_pie_slice": true,
+        "fill_color": "#8B0000",
+        "fill_alpha": 0.7,
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 26300,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_axe_sparks",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 500,
+        "spawn_radius": 1.0,
+        "start_color": "#FF4500",
+        "end_color": "#800000",
+        "start_scale": 0.3,
+        "end_scale": 0.05,
+        "speed": 3.0,
+        "friction": 0.9,
+        "spread_angle": 90
+      }
+    },
+    {
+      "time_offset_ms": 26300,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-72",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 26350,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "VFX",
+      "target_id": "char_A1",
+      "gsap_tween": {
+        "opacity": 0.0,
+        "duration_ms": 1000,
+        "ease": "power2.out"
+      }
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 26500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 27000,
+      "type": "DIALOGUE",
+      "actor_id": "char_A2",
+      "content": "MẤT TÍN HIỆU CHỦ NHÂN. CHUYỂN SANG CHẾ ĐỘ TỬ CHIẾN.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 27200,
+      "type": "MOVE",
+      "actor_id": "char_B1",
+      "target_x": 7,
+      "target_y": 13
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 27500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 28500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 29000,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": -65,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 29000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
+        "color": "#000000",
+        "alpha": 0.9,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 29050,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
+      }
+    },
+    {
+      "time_offset_ms": 29100,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-65",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 29150,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 29500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    }
+  ]
+}
+{
+  "chunk_summary": "Với sự sụp đổ của Lyra, Braum kích hoạt giao thức tử chiến cuối cùng. Dù lớp giáp đang tan chảy thành magma dưới cái nóng tột độ của Lò Luyện Ngục, Thiết Tường vẫn điên cuồng vung khiên chống trả. Karn và Nyx liên tục dội những đòn chí mạng, xé toạc từng mảnh kim loại của Braum. Cuối cùng, một nhát chém xuyên thấu của Nyx đã dứt điểm cỗ máy khổng lồ. Kỷ Nguyên Công Nghệ chính thức bị nghiền nát.",
+  "is_game_over": true,
+  "winning_team": "team_B",
+  "updated_state": {
+    "char_A1": { "hp": 0, "x": 3, "y": 17 },
+    "char_A2": { "hp": 0, "x": 8, "y": 12 },
+    "char_B1": { "hp": 32, "x": 7, "y": 13 },
+    "char_B2": { "hp": 247, "x": 8, "y": 11 }
+  },
+  "timeline": [
+    {
+      "time_offset_ms": 30000,
+      "type": "NARRATIVE",
+      "content": "Giao thức bảo vệ thất bại! Braum tiến vào trạng thái tử chiến cuối cùng."
+    },
+    {
+      "time_offset_ms": 30100,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -60,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 30100,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_graphics": {
+        "vfx_id": "karn_axe_swipe",
+        "shape_type": "circle",
+        "radius": 2.0,
+        "start_angle_deg": -45,
+        "end_angle_deg": 45,
+        "is_pie_slice": true,
+        "fill_color": "#8B0000",
+        "fill_alpha": 0.7,
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 200
+      }
+    },
+    {
+      "time_offset_ms": 30200,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_axe_sparks",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 500,
+        "spawn_radius": 1.0,
+        "start_color": "#FF4500",
+        "end_color": "#800000",
+        "start_scale": 0.3,
+        "end_scale": 0.05,
+        "speed": 3.0,
+        "friction": 0.9,
+        "spread_angle": 90
+      }
+    },
+    {
+      "time_offset_ms": 30200,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-60",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 30250,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 30500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 30800,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_B1",
+      "hp_change": -44,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 30800,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
+        "is_closed_path": false,
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
+        "alpha": 0.8,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
+      }
+    },
+    {
+      "time_offset_ms": 30950,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 30950,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "gsap_tween": {
+        "opacity": 0.5,
+        "local_shake_x": 0.05,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "nyx_dmg_text",
+        "content": "-44",
+        "font_family": "Arial",
+        "color": "#FFFFFF",
+        "font_size": 0.6,
+        "float_distance_y": -1.5,
+        "float_duration_ms": 400,
+        "fade_in_ms": 50,
+        "lifetime_ms": 300,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 31500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 31800,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": -55,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 31800,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
+        "color": "#000000",
+        "alpha": 0.9,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 31850,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
+      }
+    },
+    {
+      "time_offset_ms": 31900,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-55",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 31950,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "pixi_particles": {
+        "vfx_id": "braum_armor_chips",
+        "emitter_type": "burst",
+        "burst_count": 10,
+        "particle_lifetime_ms": 400,
+        "start_color": "#A9A9A9",
+        "end_color": "#696969",
+        "start_scale": 0.15,
+        "end_scale": 0.05,
+        "speed": 2.0,
+        "gravity_y": 5.0
+      }
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 32500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 33000,
+      "type": "DIALOGUE",
+      "actor_id": "char_B2",
+      "content": "CHẾT ĐI, TÊN KHỔNG LỒ NGU NGỐC!",
+      "emotion": "RAGE"
+    },
+    {
+      "time_offset_ms": 33500,
+      "type": "SKILL",
+      "actor_id": "char_B2",
+      "target_id": "char_A2",
+      "hp_change": -70,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 33000,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_mesh": {
+        "vfx_id": "karn_chain",
+        "path_points": [[-4, 0], [0, 0]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#696969",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 400,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 33300,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "x": -3.0,
+        "duration_ms": 200,
+        "ease": "power2.in"
+      }
+    },
+    {
+      "time_offset_ms": 33350,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "NORMAL" },
+      "pixi_particles": {
+        "vfx_id": "karn_drag_dust",
+        "emitter_type": "continuous",
+        "emit_rate": 30,
+        "emit_duration_ms": 150,
+        "particle_lifetime_ms": 400,
+        "spawn_width": 1.0,
+        "start_color": "#8B4513",
+        "end_color": "#D2B48C",
+        "start_scale": 0.5,
+        "end_scale": 0.1,
+        "speed": 1.0,
+        "gravity_y": -1.0
+      }
+    },
+    {
+      "time_offset_ms": 33500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "karn_impact_shards",
+        "emitter_type": "burst",
+        "burst_count": 20,
+        "particle_lifetime_ms": 500,
+        "start_color": "#00FFFF",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.2,
+        "end_scale": 0.0,
+        "speed": 4.0,
+        "spread_angle": 180
+      }
+    },
+    {
+      "time_offset_ms": 33500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "armor_break_shards",
+        "emitter_type": "burst",
+        "burst_count": 25,
+        "particle_lifetime_ms": 600,
+        "spawn_width": 1.0,
+        "spawn_height": 1.0,
+        "start_color": "#C0C0C0",
+        "end_color": "#FFFFFF",
+        "start_scale": 0.3,
+        "end_scale": 0.1,
+        "speed": 3.0,
+        "gravity_y": 5.0,
+        "spread_angle": 360
+      },
+      "gsap_tween": {
+        "color_tint": "#C0C0C0",
+        "tint_alpha": 0.5,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 3
+      }
+    },
+    {
+      "time_offset_ms": 33500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "color_tint": "#808080",
+        "tint_alpha": 0.8,
+        "duration_ms": 100,
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "braum_dmg_text",
+        "content": "-70",
+        "font_family": "Arial",
+        "color": "#A9A9A9",
+        "font_size": 0.9,
+        "font_weight": "900",
+        "float_distance_y": 1.0,
+        "float_duration_ms": 300,
+        "fade_in_ms": 0,
+        "lifetime_ms": 250,
+        "fade_out_ms": 100
+      }
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "ATTACK",
+      "actor_id": "char_A2",
+      "target_id": "char_A2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "VFX",
+      "target_id": "char_B1",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 33600,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 33800,
       "type": "ATTACK",
       "actor_id": "char_A2",
       "target_id": "char_B2",
@@ -1314,2326 +5353,256 @@ const RAW_DATA_STRING = `
       "is_critical": false
     },
     {
-      "time_offset_ms": 12500,
+      "time_offset_ms": 33800,
       "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "x": 0.5,
-        "duration_ms": 150,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 12600,
-      "type": "VFX",
-      "target_id": "char_A2",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_mesh": {
-        "path_points": [[0.5, -1.0], [1.2, 0], [0.5, 1.0]],
+        "vfx_id": "braum_shield_arc",
+        "path_points": [[-0.5, -1.0], [0, 0], [-0.5, 1.0]],
         "is_closed_path": false,
-        "thickness": 0.6,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#708090",
+        "thickness": 0.8,
+        "cap_style": "square",
+        "color": "#C0C0C0",
         "alpha": 0.8,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
+        "style": "dash_trail",
+        "fade_in_ms": 100,
+        "lifetime_ms": 300,
+        "fade_out_ms": 400
       }
     },
     {
-      "time_offset_ms": 12650,
+      "time_offset_ms": 33950,
       "type": "VFX",
       "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.5,
-        "start_color": "#A9A9A9",
-        "end_color": "#D3D3D3",
-        "start_scale": 0.6,
-        "end_scale": 0.1,
-        "speed": 3.0,
-        "spread_angle": 180
+      "pixi_filters": {
+        "target_vfx_id": "braum_shield_arc",
+        "filter_type": "blur",
+        "blur": 2.0,
+        "duration_ms": 300
       }
     },
     {
-      "time_offset_ms": 12500,
+      "time_offset_ms": 33950,
       "type": "VFX",
       "target_id": "char_B2",
       "gsap_tween": {
-        "local_shake_x": 0.1,
+        "scale_x": 1.1,
+        "scale_y": 1.1,
+        "local_shake_x": 0.08,
+        "color_tint": "#8B0000",
+        "tint_alpha": 0.7,
         "duration_ms": 150,
         "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 12500,
-      "type": "VFX",
-      "target_id": "char_B2",
+      },
       "pixi_text": {
+        "vfx_id": "karn_dmg_text",
         "content": "-40",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
+        "font_family": "Impact",
+        "color": "#FF0000",
+        "font_size": 0.7,
         "float_distance_y": -1.0,
         "float_duration_ms": 300,
         "fade_in_ms": 0,
-        "lifetime_ms": 150,
+        "lifetime_ms": 200,
         "fade_out_ms": 100
       }
     },
     {
-      "time_offset_ms": 13500,
+      "time_offset_ms": 34500,
       "type": "ATTACK",
-      "actor_id": "char_B2",
+      "actor_id": "char_A2",
       "target_id": "char_A2",
-      "hp_change": -60,
+      "hp_change": -3,
       "is_critical": false
     },
     {
-      "time_offset_ms": 13500,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
-        "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 13600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
-      }
-    },
-    {
-      "time_offset_ms": 13500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 13500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-60",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 14500,
-      "type": "DIALOGUE",
-      "actor_id": "char_A1",
-      "content": "Ngươi múa dao chậm quá đấy, cái bóng xám xịt ạ!",
-      "emotion": "ARROGANT"
-    },
-    {
-      "time_offset_ms": 14900,
-      "type": "NARRATIVE",
-      "content": "Cả 4 chiến binh liên tục mất đi sinh lực do nhiệt lượng khổng lồ từ sàn đấu."
-    }
-  ]
-}
-{
-  "chunk_summary": "Lyra giải phóng toàn bộ hỏa lực với 'Bão Đạn', đẩy lùi và băm vằn Nyx. Cảm nhận được cơ thể đang dần tan chảy do nhiệt độ cực hạn của Lò Luyện Ngục, sát thủ bóng tối liều mạng lướt đi tung đòn ảo ảnh cuối cùng vào Lyra. Trong khi đó, Karn và Braum vẫn điên cuồng trao đổi sát thương cận chiến trước khi Braum dậm mạnh tạo dư chấn làm choáng ác thú. Vài giây sau, sinh lực cạn kiệt, Nyx hoàn toàn gục ngã và hóa thành tro bụi giữa biển lửa.",
-  "is_game_over": false,
-  "winning_team": null,
-  "updated_state": {
-    "char_A1": { "hp": 69, "x": 4, "y": 18 },
-    "char_A2": { "hp": 443, "x": 9, "y": 12 },
-    "char_B1": { "hp": 0, "x": 7, "y": 15 },
-    "char_B2": { "hp": 410, "x": 10, "y": 11 }
-  },
-  "timeline": [
-    {
-      "time_offset_ms": 15000,
-      "type": "NARRATIVE",
-      "content": "Lò Luyện Ngục đang sôi lên! Mọi thứ dần bốc hơi dưới chân các chiến binh."
-    },
-    {
-      "time_offset_ms": 15200,
-      "type": "DIALOGUE",
-      "actor_id": "char_A1",
-      "content": "Cháy thành tro đi, đồ rác rưởi!",
-      "emotion": "ARROGANT"
-    },
-    {
-      "time_offset_ms": 15500,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 4,
-      "target_y": 18
-    },
-    {
-      "time_offset_ms": 15500,
-      "type": "MOVE",
+      "time_offset_ms": 34500,
+      "type": "ATTACK",
       "actor_id": "char_B1",
-      "target_x": 8,
-      "target_y": 13
+      "target_id": "char_B1",
+      "hp_change": -3,
+      "is_critical": false
     },
     {
-      "time_offset_ms": 15500,
-      "type": "SKILL",
-      "actor_id": "char_A1",
+      "time_offset_ms": 34500,
+      "type": "ATTACK",
+      "actor_id": "char_B2",
+      "target_id": "char_B2",
+      "hp_change": -3,
+      "is_critical": false
+    },
+    {
+      "time_offset_ms": 34500,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 34500,
+      "type": "VFX",
       "target_id": "char_B1",
-      "hp_change": -180,
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 34500,
+      "type": "VFX",
+      "target_id": "char_B2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_particles": {
+        "vfx_id": "burn_flames",
+        "emitter_type": "continuous",
+        "emit_rate": 20,
+        "emit_duration_ms": 800,
+        "particle_lifetime_ms": 500,
+        "spawn_width": 0.8,
+        "offset_y": 0.5,
+        "start_color": "#FF4500",
+        "end_color": "#FFA500",
+        "start_scale": 0.4,
+        "end_scale": 0.1,
+        "speed": 1.5,
+        "gravity_y": -3.0
+      }
+    },
+    {
+      "time_offset_ms": 34800,
+      "type": "DIALOGUE",
+      "actor_id": "char_B1",
+      "content": "Yên nghỉ đi.",
+      "emotion": "COLD"
+    },
+    {
+      "time_offset_ms": 34800,
+      "type": "ATTACK",
+      "actor_id": "char_B1",
+      "target_id": "char_A2",
+      "hp_change": -5,
       "is_critical": true
     },
     {
-      "time_offset_ms": 15500,
+      "time_offset_ms": 34800,
       "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_text": {
-        "content": "CRIT",
-        "color": "#FF4500",
-        "font_size": 0.9,
-        "font_weight": "bold",
-        "float_distance_y": -1.5,
-        "float_duration_ms": 500,
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "MULTIPLY" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash",
+        "path_points": [[-1, -1], [0.5, 0], [-1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.6,
+        "color": "#000000",
+        "alpha": 0.9,
+        "style": "dash_trail",
         "fade_in_ms": 50,
-        "lifetime_ms": 300,
+        "lifetime_ms": 200,
+        "fade_out_ms": 300
+      }
+    },
+    {
+      "time_offset_ms": 34850,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
+      "pixi_mesh": {
+        "vfx_id": "nyx_void_slash_edge",
+        "path_points": [[-1.1, -1], [0.6, 0], [-1.1, 1]],
+        "is_closed_path": false,
+        "thickness": 0.2,
+        "color": "#8A2BE2",
+        "alpha": 1.0,
+        "style": "dash_trail",
+        "fade_in_ms": 50,
+        "lifetime_ms": 150,
+        "fade_out_ms": 250
+      }
+    },
+    {
+      "time_offset_ms": 34800,
+      "type": "VFX",
+      "target_id": "char_A2",
+      "gsap_tween": {
+        "scale_x": 1.2,
+        "scale_y": 0.6,
+        "x": 0.2,
+        "duration_ms": 150,
+        "ease": "bounce.out",
+        "yoyo": true,
+        "repeat": 1
+      },
+      "pixi_text": {
+        "vfx_id": "crit_text",
+        "content": "-5 FATAL",
+        "font_family": "Arial",
+        "color": "#FF8C00",
+        "font_size": 0.8,
+        "font_weight": "bold",
+        "stroke_color": "#000000",
+        "stroke_thickness": 0.1,
+        "float_distance_y": -1.5,
+        "float_duration_ms": 600,
+        "fade_in_ms": 50,
+        "lifetime_ms": 400,
         "fade_out_ms": 150
       }
     },
     {
-      "time_offset_ms": 15500,
+      "time_offset_ms": 34850,
       "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "scale_x": 1.3,
-        "scale_y": 0.7,
-        "skew_x": -0.2,
-        "duration_ms": 150,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 15550,
-      "type": "VFX",
-      "target_id": "char_B1",
+      "target_id": "char_A2",
+      "blend_mode": { "mode": "ADD" },
       "pixi_particles": {
+        "vfx_id": "crit_sparks",
         "emitter_type": "burst",
         "burst_count": 30,
-        "spawn_radius": 0.5,
-        "start_color": "#FFD700",
+        "particle_lifetime_ms": 400,
+        "spawn_radius": 0.2,
+        "start_color": "#FF8C00",
         "end_color": "#FFFF00",
         "start_scale": 0.4,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 400,
-        "speed": 5.0,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 15500,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.0,
-        "duration_ms": 200,
-        "ease": "power1.out"
-      }
-    },
-    {
-      "time_offset_ms": 15500,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [1, 0]],
-        "is_closed_path": false,
-        "thickness": 0.8,
-        "color": "#ADD8E6",
-        "alpha": 0.5,
-        "fade_in_ms": 0,
-        "lifetime_ms": 200,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 15700,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.2,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 15700,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 15750,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.3,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 15900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.4,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 15900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 15950,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.4,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 16100,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.6,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 16100,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.3,
-        "end_scale": 2.0,
+        "end_scale": 0.1,
         "speed": 6.0,
-        "emit_angle": 0,
-        "spread_angle": 45,
-        "blend_mode": "ADD"
+        "friction": 0.85,
+        "spread_angle": 360
       }
     },
     {
-      "time_offset_ms": 16150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 0.6,
-        "duration_ms": 100,
-        "ease": "power1.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 16150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "color_tint": "#8B0000",
-        "tint_alpha": 0.9,
-        "duration_ms": 100,
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 16150,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_text": {
-        "content": "-",
-        "color": "#FF0000",
-        "font_size": 0.6,
-        "float_distance_x": 0.3,
-        "float_distance_y": -0.8,
-        "float_duration_ms": 400,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 16500,
-      "type": "MOVE",
-      "actor_id": "char_B1",
-      "target_x": 7,
-      "target_y": 15
-    },
-    {
-      "time_offset_ms": 16700,
-      "type": "DIALOGUE",
-      "actor_id": "char_B1",
-      "content": "Cái chết... không phân biệt một ai.",
-      "emotion": "COLD"
-    },
-    {
-      "time_offset_ms": 16800,
-      "type": "SKILL",
-      "actor_id": "char_B1",
-      "target_id": "char_A1",
-      "hp_change": -88,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 16800,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 1000,
-        "emit_rate": 15,
-        "spawn_radius": 1.5,
-        "start_color": "#1A1A1A",
-        "end_color": "#000000",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 0.5,
-        "particle_lifetime_ms": 800
-      }
-    },
-    {
-      "time_offset_ms": 17800,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "gsap_tween": {
-        "x": 4.0,
-        "duration_ms": 250,
-        "ease": "power2.inOut"
-      }
-    },
-    {
-      "time_offset_ms": 17800,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_mesh": {
-        "path_points": [[-4.0, 0], [0, 0]],
-        "is_closed_path": false,
-        "thickness": 0.8,
-        "color": "#333333",
-        "alpha": 0.8,
-        "fade_in_ms": 50,
-        "lifetime_ms": 300,
-        "fade_out_ms": 200
-      }
-    },
-    {
-      "time_offset_ms": 18050,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 40,
-        "spawn_radius": 0.8,
-        "start_color": "#8B0000",
-        "end_color": "#4A0000",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 700,
-        "speed": 3.0,
-        "spread_angle": 360,
-        "gravity_y": 3.0
-      }
-    },
-    {
-      "time_offset_ms": 18050,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "color_tint": "#FF0000",
-        "tint_alpha": 0.8,
-        "duration_ms": 150,
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 18050,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_text": {
-        "content": "-88",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 400,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 17000,
-      "type": "ATTACK",
-      "actor_id": "char_B2",
-      "target_id": "char_A2",
-      "hp_change": -58,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 17000,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
-        "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 17100,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
-      }
-    },
-    {
-      "time_offset_ms": 17000,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 17000,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-58",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 17600,
-      "type": "DIALOGUE",
-      "actor_id": "char_A2",
-      "content": "Kẻ thù chưa bị triệt tiêu. Áp dụng dư chấn.",
-      "emotion": "ROBOTIC"
-    },
-    {
-      "time_offset_ms": 17800,
-      "type": "SKILL",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -42,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 17800,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 0.8,
-        "scale_y": 1.2,
-        "y": -0.8,
-        "duration_ms": 150,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 17950,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.3,
-        "scale_y": 0.7,
-        "y": 0,
-        "duration_ms": 100,
-        "ease": "power2.in"
-      }
-    },
-    {
-      "time_offset_ms": 18050,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 2.0,
-        "line_width": 0.4,
-        "line_color": "#FFA500",
-        "fill_color": "#FFD700",
-        "fill_alpha": 0.3,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 250,
-        "scale_x": 0.1,
-        "scale_y": 0.1
-      }
-    },
-    {
-      "time_offset_ms": 18050,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.0,
-        "scale_y": 1.0,
-        "duration_ms": 300,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 18150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "y": -1.2,
-        "duration_ms": 250,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 18200,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 400,
-        "emit_rate": 20,
-        "spawn_width": 1.2,
-        "spawn_height": 1.2,
-        "start_color": "#FFD700",
-        "end_color": "#FFA500",
-        "start_scale": 0.4,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 300,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 18150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 18150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-42",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 18200,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 0.5,
-        "offset_y": -1.2,
-        "line_width": 0.1,
-        "line_color": "#FFD700",
-        "line_dash": [0.2, 0.4],
-        "fade_in_ms": 100,
-        "lifetime_ms": 1000,
-        "fade_out_ms": 200,
-        "rotation_deg": 360
-      }
-    },
-    {
-      "time_offset_ms": 18200,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.08,
-        "duration_ms": 1000,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 19500,
+      "time_offset_ms": 35000,
       "type": "NARRATIVE",
-      "content": "Nhiệt độ cực hạn rút cạn sinh lực. Sát thủ bóng đêm hoàn toàn gục ngã!"
-    },
-    {
-      "time_offset_ms": 19800,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 19800,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 19800,
-      "type": "VFX",
-      "target_id": "char_B1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 19800,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
+      "content": "Braum gục ngã! Kỷ Nguyên Công Nghệ đã hoàn toàn bị thiêu rụi tại Lò Luyện Ngục!"
     }
   ]
 }
-{
-  "chunk_summary": "Khi cái bóng của Nyx vừa tan biến thành tro bụi, Karn nổi điên điên cuồng lao đến một vị trí thuận lợi, tung sợi xích sắt tử thần móc thẳng vào ngực Braum và kéo giật cỗ máy khổng lồ về phía mình. Lớp giáp của Braum bị phá vỡ nghiêm trọng. Không bỏ lỡ cơ hội, Lyra ngay lập tức di chuyển vào tầm ngắm, khai hỏa tia plasma hỗ trợ, trong khi Braum cũng kiên cường đáp trả bằng một cú nện khiên chát chúa. Lò Luyện Ngục tiếp tục rực lửa, bòn rút sinh lực của tất cả những kẻ còn sống sót.",
-  "is_game_over": false,
-  "winning_team": null,
-  "updated_state": {
-    "char_A1": { "hp": 54, "x": 1, "y": 10 },
-    "char_A2": { "hp": 366, "x": 5, "y": 10 },
-    "char_B1": { "hp": 0, "x": 7, "y": 15 },
-    "char_B2": { "hp": 306, "x": 5, "y": 10 }
-  },
-  "timeline": [
-    {
-      "time_offset_ms": 20000,
-      "type": "NARRATIVE",
-      "content": "Bóng Đêm đã tàn lụi, nhưng Lò Luyện Ngục vẫn không ngừng gầm thét."
-    },
-    {
-      "time_offset_ms": 20200,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 1,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 20500,
-      "type": "MOVE",
-      "actor_id": "char_B2",
-      "target_x": 5,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 20800,
-      "type": "MOVE",
-      "actor_id": "char_A2",
-      "target_x": 9,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 22000,
-      "type": "DIALOGUE",
-      "actor_id": "char_B2",
-      "content": "Một mình tao sẽ xé xác tất cả bọn mày!",
-      "emotion": "RAGE"
-    },
-    {
-      "time_offset_ms": 22500,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [5.0, 0]],
-        "is_closed_path": false,
-        "thickness": 0.3,
-        "color": "#696969",
-        "alpha": 1.0,
-        "fade_in_ms": 100,
-        "lifetime_ms": 250,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 22750,
-      "type": "SKILL",
-      "actor_id": "char_B2",
-      "target_id": "char_A2",
-      "hp_change": -62,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 22750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "x": -4.0,
-        "duration_ms": 150,
-        "ease": "power3.in"
-      }
-    },
-    {
-      "time_offset_ms": 22750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 150,
-        "emit_rate": 30,
-        "spawn_radius": 0.4,
-        "start_color": "#A9A9A9",
-        "end_color": "#808080",
-        "start_scale": 0.5,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 200,
-        "speed": 2.0
-      }
-    },
-    {
-      "time_offset_ms": 22750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 22750,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-62",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 22900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "spawn_radius": 0.6,
-        "start_color": "#808080",
-        "end_color": "#696969",
-        "start_scale": 0.4,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 400,
-        "speed": 3.5,
-        "gravity_y": 5.0
-      }
-    },
-    {
-      "time_offset_ms": 23500,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.1,
-        "start_color": "#00FFFF",
-        "end_color": "#8A2BE2",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 1.5,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 23550,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [4, 0]],
-        "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 1.0,
-        "taper_end": 0.1,
-        "color": "#00FFFF",
-        "alpha": 1.0,
-        "blend_mode": "ADD",
-        "animation_speed": 5.0,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 50
-      }
-    },
-    {
-      "time_offset_ms": 23650,
-      "type": "ATTACK",
-      "actor_id": "char_A1",
-      "target_id": "char_B2",
-      "hp_change": -47,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 23650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 300,
-        "spawn_width": 0.5,
-        "spawn_height": 0.5,
-        "start_color": "#8A2BE2",
-        "end_color": "#00FFFF",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4.0,
-        "spread_angle": 180,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 23650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 23650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-47",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 24000,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "x": 0.5,
-        "duration_ms": 150,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 24100,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.0], [1.2, 0], [0.5, 1.0]],
-        "is_closed_path": false,
-        "thickness": 0.6,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#708090",
-        "alpha": 0.8,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 24150,
-      "type": "ATTACK",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -42,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 24150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.5,
-        "start_color": "#A9A9A9",
-        "end_color": "#D3D3D3",
-        "start_scale": 0.6,
-        "end_scale": 0.1,
-        "speed": 3.0,
-        "spread_angle": 180
-      }
-    },
-    {
-      "time_offset_ms": 24150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 24150,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-42",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 24800,
-      "type": "NARRATIVE",
-      "content": "Sàn kim loại tiếp tục nung chảy giáp trụ của những kẻ còn trụ lại."
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 24900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    }
-  ]
-}
-{
-  "chunk_summary": "Braum và Karn tiếp tục cuộc đụng độ thể lực đẫm máu giữa biển lửa. Dù giáp trụ đã vỡ nát, Braum vẫn kiên cường cản bước tiến của ác thú, tạo khoảng trống hoàn hảo. Từ phía sau, Lyra khôn khéo lùi lại một bước, xả toàn bộ hỏa lực của 'Bão Đạn' thẳng vào Karn, đẩy lùi và bòn rút sinh lực hắn. Cả ba kẻ sống sót đều đang thoi thóp dưới cái nóng thiêu đốt tột độ của Lò Luyện Ngục, trận chiến đã bước vào những giây phút sinh tử cuối cùng.",
-  "is_game_over": false,
-  "winning_team": null,
-  "updated_state": {
-    "char_A1": { "hp": 39, "x": 0, "y": 10 },
-    "char_A2": { "hp": 224, "x": 5, "y": 10 },
-    "char_B1": { "hp": 0, "x": 7, "y": 15 },
-    "char_B2": { "hp": 80, "x": 6, "y": 10 }
-  },
-  "timeline": [
-    {
-      "time_offset_ms": 25000,
-      "type": "NARRATIVE",
-      "content": "Máu và kim loại hòa quyện. Nhiệt lượng Lò Luyện Ngục đang nuốt chửng tất cả!"
-    },
-    {
-      "time_offset_ms": 25200,
-      "type": "DIALOGUE",
-      "actor_id": "char_A1",
-      "content": "Ngươi sắp thành đống thịt nướng rồi đấy, con quái vật!",
-      "emotion": "ARROGANT"
-    },
-    {
-      "time_offset_ms": 25500,
-      "type": "ATTACK",
-      "actor_id": "char_B2",
-      "target_id": "char_A2",
-      "hp_change": -62,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 25500,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
-        "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 25600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
-      }
-    },
-    {
-      "time_offset_ms": 25500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 25500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-62",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 25800,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 0,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 25800,
-      "type": "SKILL",
-      "actor_id": "char_A1",
-      "target_id": "char_B2",
-      "hp_change": -125,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 25800,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "x": -1.0,
-        "duration_ms": 200,
-        "ease": "power1.out"
-      }
-    },
-    {
-      "time_offset_ms": 25800,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [1, 0]],
-        "is_closed_path": false,
-        "thickness": 0.8,
-        "color": "#ADD8E6",
-        "alpha": 0.5,
-        "fade_in_ms": 0,
-        "lifetime_ms": 200,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 26000,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": { "x": -1.2, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26000,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 26050,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": { "x": 0.3, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26200,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": { "x": -1.4, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26200,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.2,
-        "end_scale": 1.5,
-        "speed": 5.0,
-        "emit_angle": 0,
-        "spread_angle": 30,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 26250,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": { "x": 0.4, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26400,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": { "x": -1.6, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26400,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.2,
-        "start_color": "#FF4500",
-        "end_color": "#FF8C00",
-        "start_scale": 0.3,
-        "end_scale": 2.0,
-        "speed": 6.0,
-        "emit_angle": 0,
-        "spread_angle": 45,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 26450,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": { "x": 0.6, "duration_ms": 100, "ease": "power1.out", "yoyo": true, "repeat": 1 }
-    },
-    {
-      "time_offset_ms": 26450,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 26450,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-125",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 26500,
-      "type": "MOVE",
-      "actor_id": "char_B2",
-      "target_x": 6,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 27200,
-      "type": "MOVE",
-      "actor_id": "char_A2",
-      "target_x": 5,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 27500,
-      "type": "ATTACK",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -38,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 27500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "x": 0.5,
-        "duration_ms": 150,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 27600,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.0], [1.2, 0], [0.5, 1.0]],
-        "is_closed_path": false,
-        "thickness": 0.6,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#708090",
-        "alpha": 0.8,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 27650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 250,
-        "spawn_radius": 0.5,
-        "start_color": "#A9A9A9",
-        "end_color": "#D3D3D3",
-        "start_scale": 0.6,
-        "end_scale": 0.1,
-        "speed": 3.0,
-        "spread_angle": 180
-      }
-    },
-    {
-      "time_offset_ms": 27650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 27650,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-38",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 28500,
-      "type": "DIALOGUE",
-      "actor_id": "char_B2",
-      "content": "RRAAAGH! Chết đi đồ sắt vụn!",
-      "emotion": "RAGE"
-    },
-    {
-      "time_offset_ms": 28700,
-      "type": "ATTACK",
-      "actor_id": "char_B2",
-      "target_id": "char_A2",
-      "hp_change": -65,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 28700,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
-        "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 28800,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
-      }
-    },
-    {
-      "time_offset_ms": 28700,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 28700,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-65",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 29200,
-      "type": "ATTACK",
-      "actor_id": "char_A1",
-      "target_id": "char_B2",
-      "hp_change": -48,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 29200,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.1,
-        "start_color": "#00FFFF",
-        "end_color": "#8A2BE2",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 1.5,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 29250,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [4, 0]],
-        "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 1.0,
-        "taper_end": 0.1,
-        "color": "#00FFFF",
-        "alpha": 1.0,
-        "blend_mode": "ADD",
-        "animation_speed": 5.0,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 50
-      }
-    },
-    {
-      "time_offset_ms": 29350,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 300,
-        "spawn_width": 0.5,
-        "spawn_height": 0.5,
-        "start_color": "#8A2BE2",
-        "end_color": "#00FFFF",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4.0,
-        "spread_angle": 180,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 29350,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 29350,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-48",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 29800,
-      "type": "NARRATIVE",
-      "content": "Tia lửa điện và khói độc bốc lên ngùn ngụt, trận chiến đã đi đến hồi kết."
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 29900,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    }
-  ]
-}
-{
-  "chunk_summary": "Với chút sinh lực thoi thóp cuối cùng, Karn điên cuồng vung rìu chém mạnh vào Braum hòng tìm kiếm một sự kết liễu đồng quy ư tận. Tuy nhiên, bức tường thép vẫn đứng vững và đáp trả bằng cú dậm Rung Chấn làm choáng ác thú. Tận dụng cơ hội, Lyra lướt lên ngang tầm, kết liễu cuộc đời của Đao Phủ bằng một luồng plasma lạnh lùng. Karn gục ngã giữa biển lửa, khép lại trận chiến sinh tử. Kỷ Nguyên Công Nghệ giành chiến thắng cuối cùng tại Lò Luyện Ngục.",
-  "is_game_over": true,
-  "winning_team": "team_A",
-  "updated_state": {
-    "char_A1": { "hp": 24, "x": 2, "y": 10 },
-    "char_A2": { "hp": 151, "x": 5, "y": 10 },
-    "char_B1": { "hp": 0, "x": 7, "y": 15 },
-    "char_B2": { "hp": 0, "x": 6, "y": 10 }
-  },
-  "timeline": [
-    {
-      "time_offset_ms": 30000,
-      "type": "NARRATIVE",
-      "content": "Sàn đấu bốc hơi đến mức cực hạn. Sinh tử đếm ngược từng giây."
-    },
-    {
-      "time_offset_ms": 30200,
-      "type": "DIALOGUE",
-      "actor_id": "char_B2",
-      "content": "Chết cùng tao đi, đồ rác rưởi!!",
-      "emotion": "RAGE"
-    },
-    {
-      "time_offset_ms": 30500,
-      "type": "ATTACK",
-      "actor_id": "char_B2",
-      "target_id": "char_A2",
-      "hp_change": -58,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 30500,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_mesh": {
-        "path_points": [[0.5, -1.5], [1.5, 0], [0.5, 1.5]],
-        "is_closed_path": false,
-        "thickness": 0.7,
-        "taper_start": 0.1,
-        "taper_end": 0.1,
-        "color": "#DC143C",
-        "alpha": 0.9,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 150
-      }
-    },
-    {
-      "time_offset_ms": 30600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 20,
-        "particle_lifetime_ms": 300,
-        "spawn_radius": 0.5,
-        "start_color": "#B22222",
-        "end_color": "#8B0000",
-        "start_scale": 1.0,
-        "end_scale": 0.2,
-        "speed": 3.0,
-        "emit_angle": 0,
-        "spread_angle": 120
-      }
-    },
-    {
-      "time_offset_ms": 30500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.2,
-        "scale_y": 0.8,
-        "duration_ms": 100,
-        "ease": "bounce.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 30500,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_text": {
-        "content": "-58",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_x": 0.5,
-        "float_distance_y": -0.5,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 100,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 31000,
-      "type": "DIALOGUE",
-      "actor_id": "char_A2",
-      "content": "Đe dọa mức độ nghiêm trọng. Khởi động loại bỏ mục tiêu.",
-      "emotion": "ROBOTIC"
-    },
-    {
-      "time_offset_ms": 31200,
-      "type": "SKILL",
-      "actor_id": "char_A2",
-      "target_id": "char_B2",
-      "hp_change": -39,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 31200,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 0.8,
-        "scale_y": 1.2,
-        "y": -0.8,
-        "duration_ms": 150,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 31350,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.3,
-        "scale_y": 0.7,
-        "y": 0,
-        "duration_ms": 100,
-        "ease": "power2.in"
-      }
-    },
-    {
-      "time_offset_ms": 31450,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 2.0,
-        "line_width": 0.4,
-        "line_color": "#FFA500",
-        "fill_color": "#FFD700",
-        "fill_alpha": 0.3,
-        "fade_in_ms": 50,
-        "lifetime_ms": 200,
-        "fade_out_ms": 250,
-        "scale_x": 0.1,
-        "scale_y": 0.1
-      }
-    },
-    {
-      "time_offset_ms": 31450,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "scale_x": 1.0,
-        "scale_y": 1.0,
-        "duration_ms": 300,
-        "ease": "power2.out"
-      }
-    },
-    {
-      "time_offset_ms": 31550,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "y": -1.2,
-        "duration_ms": 250,
-        "ease": "power2.out",
-        "yoyo": true,
-        "repeat": 1
-      }
-    },
-    {
-      "time_offset_ms": 31600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "emit_duration_ms": 400,
-        "emit_rate": 20,
-        "spawn_width": 1.2,
-        "spawn_height": 1.2,
-        "start_color": "#FFD700",
-        "end_color": "#FFA500",
-        "start_scale": 0.4,
-        "end_scale": 0.1,
-        "particle_lifetime_ms": 300,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 31550,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 31550,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-39",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 31600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_graphics": {
-        "shape_type": "circle",
-        "radius": 0.5,
-        "offset_y": -1.2,
-        "line_width": 0.1,
-        "line_color": "#FFD700",
-        "line_dash": [0.2, 0.4],
-        "fade_in_ms": 100,
-        "lifetime_ms": 1000,
-        "fade_out_ms": 200,
-        "rotation_deg": 360
-      }
-    },
-    {
-      "time_offset_ms": 31600,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.08,
-        "duration_ms": 1000,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 31800,
-      "type": "MOVE",
-      "actor_id": "char_A1",
-      "target_x": 2,
-      "target_y": 10
-    },
-    {
-      "time_offset_ms": 32500,
-      "type": "DIALOGUE",
-      "actor_id": "char_A1",
-      "content": "Ngủ ngoan nhé, cục thịt thối.",
-      "emotion": "COLD"
-    },
-    {
-      "time_offset_ms": 32700,
-      "type": "ATTACK",
-      "actor_id": "char_A1",
-      "target_id": "char_B2",
-      "hp_change": -250,
-      "is_critical": false
-    },
-    {
-      "time_offset_ms": 32700,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 15,
-        "particle_lifetime_ms": 200,
-        "spawn_radius": 0.1,
-        "start_color": "#00FFFF",
-        "end_color": "#8A2BE2",
-        "start_scale": 0.8,
-        "end_scale": 0.1,
-        "speed": 1.5,
-        "spread_angle": 360,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 32750,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_mesh": {
-        "path_points": [[0, 0], [4, 0]],
-        "is_closed_path": false,
-        "thickness": 0.4,
-        "taper_start": 1.0,
-        "taper_end": 0.1,
-        "color": "#00FFFF",
-        "alpha": 1.0,
-        "blend_mode": "ADD",
-        "animation_speed": 5.0,
-        "fade_in_ms": 50,
-        "lifetime_ms": 150,
-        "fade_out_ms": 50
-      }
-    },
-    {
-      "time_offset_ms": 32850,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_particles": {
-        "emitter_type": "burst",
-        "burst_count": 25,
-        "particle_lifetime_ms": 300,
-        "spawn_width": 0.5,
-        "spawn_height": 0.5,
-        "start_color": "#8A2BE2",
-        "end_color": "#00FFFF",
-        "start_scale": 0.3,
-        "end_scale": 0.05,
-        "speed": 4.0,
-        "spread_angle": 180,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 32850,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "gsap_tween": {
-        "local_shake_x": 0.1,
-        "duration_ms": 150,
-        "ease": "rough.ease"
-      }
-    },
-    {
-      "time_offset_ms": 32850,
-      "type": "VFX",
-      "target_id": "char_B2",
-      "pixi_text": {
-        "content": "-250",
-        "color": "#FFFFFF",
-        "font_size": 0.6,
-        "float_distance_y": -1.0,
-        "float_duration_ms": 300,
-        "fade_in_ms": 0,
-        "lifetime_ms": 150,
-        "fade_out_ms": 100
-      }
-    },
-    {
-      "time_offset_ms": 33500,
-      "type": "NARRATIVE",
-      "content": "Karn ngã gục. Lò Luyện Ngục đã thiêu rụi toàn bộ phe Quái Vật."
-    },
-    {
-      "time_offset_ms": 34900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 34900,
-      "type": "VFX",
-      "target_id": "char_A1",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    },
-    {
-      "time_offset_ms": 34900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "pixi_particles": {
-        "emitter_type": "continuous",
-        "offset_y": 0.8,
-        "emit_duration_ms": 2000,
-        "emit_rate": 8,
-        "spawn_width": 1.2,
-        "start_color": "#FF4500",
-        "end_color": "#8B0000",
-        "start_alpha": 0.8,
-        "end_alpha": 0.0,
-        "start_scale": 0.25,
-        "end_scale": 0.05,
-        "particle_lifetime_ms": 600,
-        "speed": 1.5,
-        "gravity_y": -1.5,
-        "blend_mode": "ADD"
-      }
-    },
-    {
-      "time_offset_ms": 34900,
-      "type": "VFX",
-      "target_id": "char_A2",
-      "gsap_tween": {
-        "color_tint": "#FF2200",
-        "tint_alpha": 0.6,
-        "duration_ms": 800,
-        "yoyo": true,
-        "repeat": -1
-      }
-    }
-  ]
-}
+
 
 `;
 // =========================================================================
