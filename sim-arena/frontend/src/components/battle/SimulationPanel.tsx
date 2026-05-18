@@ -109,8 +109,8 @@ export default function SimulationPanel() {
                   target_id: event.actor_id,
                   from_x: oldX,
                   from_y: oldY,
-                  x: event.target_x,
-                  y: event.target_y,
+                  target_x: event.target_x, // 🚀 FIX: Đổi từ x -> target_x (Báo hiệu đây là Toạ độ Tuyệt đối)
+                  target_y: event.target_y, // 🚀 FIX: Đổi từ y -> target_y (Báo hiệu đây là Toạ độ Tuyệt đối)
                   duration_ms: duration,
                   ease: "power1.inOut"
                 }

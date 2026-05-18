@@ -1,0 +1,78 @@
+### PHẦN 1: TÓM TẮT QUY TRÌNH CỐT LÕI CỦA DỰ ÁN
+- **Dự án là gì?** SimArena là hệ thống web mô phỏng trận chiến, gồm backend FastAPI và frontend React/Vite, sử dụng AI để tạo timeline hành động và VFX trên bàn cờ 20x20.
+- **Dự án dùng để làm gì?** Cho phép người dùng tải map và hình nhân vật, tạo đội hình và chỉ số, gọi AI sinh kịch bản trận đấu, chạy mô phỏng với hiệu ứng hình ảnh (PixiJS/GSAP) và xuất bản demo video.
+- **Hoạt động như thế nào?** Người dùng vào Studio, tải map và shapes, tạo nhân vật và kéo thả lên bàn cờ. Frontend gửi map/shapes lên backend, backend lưu file và metadata vào SQLite và phát static từ /uploads. Khi cần, frontend gọi /api/ai/generate-timeline, backend dùng prompt trong ai_prompts và Gemini để sinh JSON timeline. Timeline được lưu trong Zustand store; SimulationPanel chạy timeline, cập nhật HP/vị trí và gọi VFX engine để vẽ effect trên canvas; cuối cùng có thể chuyển sang màn hình Export mô phỏng xuất video.
+
+### PHẦN 2: CẤU TRÚC THƯ MỤC VÀ CHI TIẾT FILE
+- sim-arena/
+  - .gitignore - Quy định bỏ qua cache Python, virtual env, file DB local và thư mục uploads, cùng các thư mục build Node và IDE.
+  - backend/
+    - package.json - Danh sách dependencies NPM (tailwindcss, zustand); file này phục vụ tooling nếu cần, không ảnh hưởng trực tiếp đến runtime FastAPI.
+    - package-lock.json - Lockfile NPM đảm bảo phiên bản dependency trong backend folder.
+    - app/
+      - main.py - Khởi tạo FastAPI, CORS, mount static /uploads, khởi động init_db, và khai báo router cho assets và AI.
+      - api/
+        - routes_ai.py - Endpoint /api/ai/generate-timeline; đóng gói request, chèn data vào prompt, gọi Gemini và trả về JSON timeline.
+        - routes_assets.py - Endpoint upload map và shape; lưu file vào uploads và ghi metadata vào SQLite.
+      - core/
+        - ai_prompts.py - System prompt chi tiết cho AI về quy tắc trận đấu, VFX và format JSON đầu ra.
+        - config.py - Nơi lưu GEMINI_API_KEY (hiện đang hard-code) cho routes_ai.
+      - db/
+        - database.py - Kết nối aiosqlite, khởi tạo schema từ schemas.sql và cung cấp get_db_connection.
+        - schemas.sql - DDL tạo bảng uploaded_assets và map_configs.
+        - simarena.db - File SQLite lưu metadata upload (asset và map config).
+      - uploads/
+        - maps/
+          - 48ca4a25-f1e8-4eb1-b4ce-fef1b710a436.svg - Ảnh map đã upload, được serve qua /uploads/maps.
+          - 6d65bab5-e75d-40db-94ad-435f237a4a6e.svg - Ảnh map đã upload, được serve qua /uploads/maps.
+        - shapes/
+          - 23afbdd7-844f-4711-86a4-be891a682cf6.svg - Ảnh shape nhân vật đã upload, được serve qua /uploads/shapes.
+          - ffcabf87-f89a-4f1c-8350-14779913d13e.png - Ảnh shape nhân vật đã upload, được serve qua /uploads/shapes.
+  - frontend/
+    - .gitignore - Bỏ qua node_modules, dist, cache và file của IDE trên frontend.
+    - eslint.config.js - Cấu hình ESLint flat config cho TypeScript và React Hooks/Refresh.
+    - index.html - HTML entry point cho Vite, mount root và nạp main.tsx.
+    - package.json - Scripts dev/build/lint và dependencies React, PixiJS, GSAP, DnD, Tailwind, Zustand.
+    - package-lock.json - Lockfile NPM cho frontend.
+    - README.md - Hướng dẫn mặc định của template React + Vite.
+    - tsconfig.app.json - Cấu hình TypeScript cho code app (src), noEmit, JSX react-jsx.
+    - tsconfig.json - File references tới tsconfig app/node.
+    - tsconfig.node.json - Cấu hình TypeScript cho vite.config.ts (môi trường Node).
+    - vite.config.ts - Cấu hình Vite, sử dụng plugin React và Tailwind.
+    - public/
+      - favicon.svg - Favicon cho trình duyệt.
+      - icons.svg - Bộ icon SVG dùng làm tài nguyên tĩnh.
+    - src/
+      - App.css - CSS từ template Vite (counter/hero/next-steps); hiện không được import trực tiếp trong main.tsx.
+      - App.tsx - Điều hướng giao diện theo appStage, render MainDashboard hoặc BattleLayout, kèm nút QuickTester.
+      - index.css - Global CSS (Tailwind import) và override z-index cho canvas và arena board.
+      - main.tsx - Entry React, render App vào #root và load index.css.
+      - assets/
+        - hero.png - Ảnh tĩnh từ template Vite, dùng làm tài nguyên UI nếu cần.
+        - react.svg - Logo React của template.
+        - vite.svg - Logo Vite của template.
+      - components/
+        - QuickTester.tsx - Nút test nhanh; parse RAW_DATA_STRING JSON, bơm dữ liệu vào store và nhảy thẳng sang simulate.
+        - battle/
+          - AIPanel.tsx - Gọi backend AI, hiển thị chunk_summary và timeline, cho phép approve và chuyển stage.
+          - ArenaBoard.tsx - Vẽ bàn cờ 20x20, layer VFX canvas, nhân vật và panel log; khởi tạo VFX engine.
+          - BattleLayout.tsx - Layout chính cho màn battle, xử lý DnD đặt nhân vật và chọn panel bên phải.
+          - DraggableCharacter.tsx - Thẻ nhân vật kéo thả với DnD, hiển thị avatar và thông số cơ bản.
+          - DroppableCell.tsx - Ô lưới có thể drop, hiển thị highlight khi kéo.
+          - ExportPanel.tsx - Mô phỏng tiến trình xuất video và reset về Studio.
+          - ManagementPanel.tsx - Quản lý đội hình, copy payload cho AI, nối timeline JSON, chạy giả lập.
+          - SimulationPanel.tsx - Chạy timeline, cập nhật HP/vị trí, gọi VFX engine và quản lý tốc độ.
+        - center/
+          - AssetUploader.tsx - Upload shape vào store, xem preview danh sách shapes.
+          - MapUploader.tsx - Upload map và nhập mô tả hiệu ứng map để gửi AI.
+          - StartButton.tsx - Gửi map và shapes lên backend và chuyển sang phase setup board.
+        - layout/
+          - MainDashboard.tsx - Màn Studio gồm TeamA/TeamB và khu vực upload map/shape.
+        - teams/
+          - CharacterModal.tsx - Form tạo/sửa nhân vật, chọn shape, sử dụng portal cho modal.
+          - TeamAColumn.tsx - Danh sách nhân vật Team A, mở modal và xóa/sửa.
+          - TeamBColumn.tsx - Danh sách nhân vật Team B, mở modal và xóa/sửa.
+      - store/
+        - useMainStore.ts - Zustand store trung tâm (map, shapes, team, timeline, logs, VFX, appStage).
+      - utils/
+        - vfxEngine.ts - Động cơ VFX PixiJS + GSAP: init canvas, render pixi_graphics/text/particles/mesh, filters, tweens, và dọn dẹp.

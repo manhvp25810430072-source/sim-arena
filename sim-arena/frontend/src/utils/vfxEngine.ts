@@ -5,6 +5,24 @@ import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useMainStore } from '../store/useMainStore';
 import { ShockwaveFilter } from 'pixi-filters';
 
+// ==========================================
+// 🕵️ TRẠM THU THẬP LOG DEBUG (VFX SPY)
+// ==========================================
+(window as any).VFX_SPY_LOGS = [];
+(window as any).DUMP_SPY = () => {
+  const logs = (window as any).VFX_SPY_LOGS;
+  console.log("%c📋 DỮ LIỆU RUNTIME GIẢ LẬP (COPY BÊN DƯỚI):", "color: #00ff00; font-size: 16px; font-weight: bold;");
+  console.log(JSON.stringify(logs, null, 2));
+  console.log(`%cĐã xuất ${logs.length} sự kiện!`, "color: yellow");
+};
+
+const clearSpyLogs = () => {
+  if (Array.isArray((window as any).VFX_SPY_LOGS)) {
+    (window as any).VFX_SPY_LOGS.length = 0;
+  }
+};
+// ==========================================
+
 // Đăng ký RoughEase và MotionPathPlugin để xử lý rung lắc & quỹ đạo cong
 gsap.registerPlugin(RoughEase, MotionPathPlugin);
 
@@ -167,9 +185,10 @@ const resolveTargetPosition = (targetId?: string) => {
   const state = useMainStore.getState();
   const targetChar = [...state.teamA, ...state.teamB].find((c) => c.id === targetId);
   if (targetChar?.position) {
-    return { x: targetChar.position.x, y: targetChar.position.y };
+    // 🚀 FIX LỆCH TÂM: Cộng thêm 0.5 để gốc toạ độ PixiJS chỉ thẳng vào giữa ô lưới của nhân vật
+    return { x: targetChar.position.x + 0.5, y: targetChar.position.y + 0.5 };
   }
-  return { x: 10, y: 10 }; // Fallback
+  return { x: 10.5, y: 10.5 }; // Fallback
 };
 
 const parseColor = (value?: string, fallback = '#ffffff') => {
@@ -268,6 +287,7 @@ const handleLifecycle = (
         onComplete: () => {
           if (!obj.destroyed) {
             gsap.killTweensOf(obj);
+            if (obj.scale) gsap.killTweensOf(obj.scale);
             stage.removeChild(obj);
             obj.destroy();
           }
@@ -277,6 +297,7 @@ const handleLifecycle = (
     } else {
       if (!obj.destroyed) {
         gsap.killTweensOf(obj);
+        if (obj.scale) gsap.killTweensOf(obj.scale);
         stage.removeChild(obj);
         obj.destroy();
       }
@@ -286,6 +307,7 @@ const handleLifecycle = (
 };
 
 export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
+  clearSpyLogs(); // 🕵️ Dọn rác log
   const token = ++initToken;
   isReady = false;
 
@@ -336,6 +358,7 @@ export const initVFXEngine = async (bgCanvasId: string, fgCanvasId: string) => {
 };
 
 export const clearAllVFX = () => {
+  clearSpyLogs(); // 🕵️ Dọn rác log
   clearTracked();
   pendingQueue.length = 0;
   if (appBg) {
@@ -380,10 +403,32 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     return;
   }
 
+  // 🕵️ BẮT ĐẦU GHI LOG RUNTIME
+  const spyEntry = {
+    real_time_ms: typeof performance !== 'undefined' ? performance.now() : Date.now(),
+    target_id: vfxEvent.target_id || 'GLOBAL',
+    speed: simulationSpeed,
+    resolved_position: resolveTargetPosition(vfxEvent.target_id),
+    blend_mode_raw: vfxEvent.blend_mode,
+    blend_mode_resolved: resolveBlendMode(vfxEvent.blend_mode?.mode || vfxEvent.blend_mode),
+    active_effects: [] as string[],
+    raw_payload: JSON.parse(JSON.stringify(vfxEvent))
+  };
+
+  if (vfxEvent.gsap_tween) spyEntry.active_effects.push('gsap_tween');
+  if (vfxEvent.pixi_text) spyEntry.active_effects.push('pixi_text');
+  if (vfxEvent.pixi_particles) spyEntry.active_effects.push('pixi_particles');
+  if (vfxEvent.pixi_mesh) spyEntry.active_effects.push('pixi_mesh');
+  if (vfxEvent.pixi_graphics) spyEntry.active_effects.push('pixi_graphics');
+  if (vfxEvent.pixi_filters) spyEntry.active_effects.push('pixi_filters');
+
+  (window as any).VFX_SPY_LOGS.push(spyEntry);
+  // 🕵️ KẾT THÚC GHI LOG
+
   const targetApp = vfxEvent.canvas_layer?.layer === 'bg' ? appBg : appFg;
   const stage = targetApp.stage;
   const sequence = normalizeSequence(vfxEvent.timeline_sequence);
-  const blendMode = resolveBlendMode(vfxEvent.blend_mode?.mode || vfxEvent.blend_mode);
+  const blendMode = spyEntry.blend_mode_resolved; // Lấy luôn từ biến spy cho nhất quán
 
   // ------------------------------------------
   // 1. GSAP TWEEN
@@ -391,29 +436,35 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
   if (vfxEvent.gsap_tween) {
     try {
       const {
-      target_id, x, y, from_x, from_y, offset_x, offset_y, motion_path_points,
+      target_id, x, y, target_x, target_y, from_x, from_y, offset_x, offset_y, motion_path_points,
       scale_x, scale_y, skew_x, skew_y, transform_origin, opacity, rotation_deg, color_tint, tint_alpha,
       duration_ms, delay_ms, ease, local_shake_x, local_shake_y,
       repeat, yoyo
     } = vfxEvent.gsap_tween;
 
-    const domTarget = target_id === 'GLOBAL' ? '#arena-board' : `#char-${target_id || vfxEvent.target_id}`;
+    const isGlobal = target_id === 'GLOBAL';
+    const domTarget = isGlobal ? '#arena-board' : `#char-${target_id || vfxEvent.target_id}`;
     const duration = ((duration_ms ?? 500) / 1000) / simulationSpeed;
+    
+    // 🚀 FIX CỐT LÕI: Đơn vị % để dịch chuyển mượt mà trên Responsive
+    // 1 ô lưới = 100% kích thước nhân vật HOẶC 5% kích thước của toàn bản đồ
+    const unitPercent = isGlobal ? 5 : 100;
 
-    // 🚀 VÁ LỖI 1: Setup tọa độ xuất phát (từ from_x, from_y) để tránh lỗi giật cục / Teleport
+    // 1. Setup tọa độ xuất phát Tuyệt đối
     if (from_x !== undefined && from_y !== undefined) {
       let fX = from_x; if (offset_x) fX += offset_x;
       let fY = from_y; if (offset_y) fY += offset_y;
       gsap.set(domTarget, { left: `${fX * 5}%`, top: `${fY * 5}%` });
     }
 
+    // 2. Rung lắc bằng Percent để chuẩn xác trên mọi kích thước màn hình
     if (local_shake_x || local_shake_y) {
-      const sx = (local_shake_x || 0) * CELL_SIZE;
-      const sy = (local_shake_y || 0) * CELL_SIZE;
+      const sx = (local_shake_x || 0) * unitPercent;
+      const sy = (local_shake_y || 0) * unitPercent;
       const shakeCount = repeat !== undefined ? repeat : Math.max(1, Math.floor((duration * 1000) / 50));
       gsap.fromTo(domTarget,
-        { x: -sx, y: -sy },
-        { x: sx, y: sy, duration: 0.05 / simulationSpeed, repeat: shakeCount, yoyo: true, ease: 'none', clearProps: 'x,y' }
+        { xPercent: -sx, yPercent: -sy },
+        { xPercent: sx, yPercent: sy, duration: 0.05 / simulationSpeed, repeat: shakeCount, yoyo: true, ease: 'none', clearProps: 'transform' }
       );
     }
 
@@ -421,7 +472,7 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
 
     const toConfig: gsap.TweenVars = {
       duration,
-      ease: ease || 'power1.out', // Sẽ tự nhận diện 'rough.ease' vì đã register
+      ease: ease || 'power1.out',
       delay: (specificDelay / 1000) / simulationSpeed,
       repeat: sequence.repeat ?? repeat ?? 0,
       yoyo: sequence.yoyo || yoyo || false,
@@ -437,23 +488,29 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
     if (rotation_deg !== undefined) toConfig.rotation = rotation_deg;
     if (transform_origin !== undefined) toConfig.transformOrigin = transform_origin;
     
-    // Hỗ trợ motion_path_points (Lưu ý: Để chạy thực tế sau này cần đăng ký MotionPathPlugin của GSAP)
     if (motion_path_points !== undefined && Array.isArray(motion_path_points)) {
       toConfig.motionPath = { 
-        path: motion_path_points.map((p: number[]) => ({ x: `${p[0] * 5}%`, y: `${p[1] * 5}%` })),
+        path: motion_path_points.map((p: number[]) => ({ left: `${p[0] * 5}%`, top: `${p[1] * 5}%` })),
         curviness: 1.2
       };
     }
 
+    // 🚀 FIX: Dịch chuyển TƯƠNG ĐỐI (VD: AI xuất x: -1.0 để lùi 1 ô)
     if (x !== undefined) {
-       let finalX = x;
-       if(offset_x) finalX += offset_x;
-       toConfig.left = `${finalX * 5}%`;
+       toConfig.xPercent = (x + (offset_x || 0)) * unitPercent;
     }
     if (y !== undefined) {
-       let finalY = y;
-       if(offset_y) finalY += offset_y;
-       toConfig.top = `${finalY * 5}%`;
+       toConfig.yPercent = (y + (offset_y || 0)) * unitPercent;
+    }
+
+    // 🚀 FIX: Dịch chuyển TUYỆT ĐỐI (Được gọi từ hệ thống Move chính)
+    if (target_x !== undefined) {
+       toConfig.left = `${(target_x + (offset_x || 0)) * 5}%`;
+       toConfig.xPercent = 0; // Dọn sạch rác dịch chuyển tương đối trước đó
+    }
+    if (target_y !== undefined) {
+       toConfig.top = `${(target_y + (offset_y || 0)) * 5}%`;
+       toConfig.yPercent = 0; // Dọn sạch rác dịch chuyển tương đối trước đó
     }
 
     // NÂNG CẤP: Xử lý màu sắc có Alpha trong CSS Filter
@@ -675,6 +732,12 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
         
         trackTimeout(setTimeout(() => {
           if (!container.destroyed) {
+            container.children.forEach(child => {
+              gsap.killTweensOf(child);
+              if (child.scale) gsap.killTweensOf(child.scale);
+            });
+            gsap.killTweensOf(container);
+            if (container.scale) gsap.killTweensOf(container.scale);
             stage.removeChild(container);
             container.destroy({ children: true });
           }
@@ -973,7 +1036,12 @@ export const executeVFX = (vfxEvent: any, simulationSpeed: number) => {
             gsap.to(waveRing, { alpha: 0, duration: (durationMs / 1000) / simulationSpeed, ease: 'power2.in' });
             
             trackTimeout(setTimeout(() => {
-                if (!waveRing.destroyed) { stage.removeChild(waveRing); waveRing.destroy(); }
+                if (!waveRing.destroyed) { 
+                    gsap.killTweensOf(waveRing);
+                    if (waveRing.scale) gsap.killTweensOf(waveRing.scale);
+                    stage.removeChild(waveRing); 
+                    waveRing.destroy(); 
+                }
             }, durationMs / simulationSpeed));
         }
 
